@@ -1,0 +1,210 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* ── HUD ───────────────────────────────────────────────────────────────── */
+
+.hudFrame {
+  --pf-hud: var(--pf-accent-line);
+
+  position: absolute;
+  inset: calc(var(--pf-topbar-h) + var(--pf-space-3)) calc(var(--pf-map-right-inset) + var(--pf-space-3))
+    calc(var(--pf-dock-h) + var(--pf-space-5)) calc(var(--pf-rail-width) + var(--pf-space-4));
+  background:
+    linear-gradient(var(--pf-hud), var(--pf-hud)) top left / 28px 1px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) top left / 1px 28px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) top right / 28px 1px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) top right / 1px 28px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) bottom left / 28px 1px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) bottom left / 1px 28px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) bottom right / 28px 1px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) bottom right / 1px 28px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) top center / 1px 8px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) bottom center / 1px 8px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) left center / 8px 1px,
+    linear-gradient(var(--pf-hud), var(--pf-hud)) right center / 8px 1px;
+  background-repeat: no-repeat;
+  opacity: 0.7;
+  transition: right var(--pf-dur) var(--pf-ease);
+}
+
+.hudReadout {
+  position: absolute;
+  left: calc(var(--pf-rail-width) + var(--pf-space-8));
+  bottom: calc(var(--pf-dock-h) + var(--pf-space-8));
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  text-shadow:
+    0 0 4px var(--pf-surface-0),
+    0 0 2px var(--pf-surface-0);
+}
+
+.hudDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pf-accent-base);
+  box-shadow: 0 0 8px var(--pf-accent-base);
+  animation: pf-pulse 2.4s ease-in-out infinite;
+}
+
+.hudZoom {
+  color: var(--pf-accent-base);
+}
+
+/* ── Atlas furniture ───────────────────────────────────────────────────── */
+
+.compass {
+  position: absolute;
+  right: calc(var(--pf-map-right-inset) + 76px);
+  bottom: calc(var(--pf-dock-h) + var(--pf-space-6));
+  width: 112px;
+  height: 112px;
+  overflow: visible;
+  opacity: 0.85;
+  transition: right var(--pf-dur) var(--pf-ease);
+}
+
+.compassRing {
+  fill: none;
+  stroke: var(--pf-text-secondary);
+  stroke-width: 1.2;
+}
+
+.compassRingFine {
+  fill: none;
+  stroke: var(--pf-text-secondary);
+  stroke-width: 0.5;
+}
+
+.compassTick {
+  stroke: var(--pf-text-secondary);
+  stroke-width: 0.6;
+}
+
+.bladeLight {
+  fill: var(--pf-surface-1);
+  stroke: var(--pf-text-secondary);
+  stroke-width: 0.7;
+}
+
+.bladeDark {
+  fill: var(--pf-text-secondary);
+  stroke: var(--pf-text-secondary);
+  stroke-width: 0.7;
+}
+
+.bladeNorth {
+  fill: var(--pf-surface-1);
+  stroke: var(--pf-accent-base);
+  stroke-width: 0.8;
+}
+
+.bladeNorthDark {
+  fill: var(--pf-accent-base);
+  stroke: var(--pf-accent-base);
+  stroke-width: 0.8;
+}
+
+.compassHub {
+  fill: var(--pf-surface-1);
+  stroke: var(--pf-text-secondary);
+  stroke-width: 0.8;
+}
+
+.compassN {
+  fill: var(--pf-accent-base);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: 13px;
+  text-anchor: middle;
+}
+
+.cartouche {
+  position: absolute;
+  left: calc(var(--pf-rail-width) + var(--pf-space-6));
+  bottom: calc(var(--pf-dock-h) + var(--pf-space-6));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 200px;
+  padding: var(--pf-space-3) var(--pf-space-6);
+  border: 1.5px solid var(--pf-text-secondary);
+  outline: 0.5px solid var(--pf-text-secondary);
+  outline-offset: 3px;
+  background: var(--pf-panel-bg);
+  color: var(--pf-text-primary);
+  box-shadow: var(--pf-shadow-raise);
+  text-align: center;
+}
+
+.cartoucheKicker {
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-xs);
+  letter-spacing: 0.3em;
+}
+
+.cartoucheTitle {
+  font-size: var(--pf-font-lg);
+  line-height: 1.1;
+}
+
+.cartoucheYear {
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  letter-spacing: 0.12em;
+}
+
+/* ── Camera controls ───────────────────────────────────────────────────── */
+
+.controls {
+  position: absolute;
+  right: calc(var(--pf-map-right-inset) + var(--pf-space-4));
+  bottom: calc(var(--pf-dock-h) + var(--pf-space-6));
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-bg);
+  backdrop-filter: var(--pf-panel-filter);
+  box-shadow: var(--pf-shadow-raise);
+  pointer-events: auto;
+  transition: right var(--pf-dur) var(--pf-ease);
+}
+
+.control {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease;
+}
+
+.control:hover {
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+}
+
+.controlRule {
+  height: 1px;
+  margin: 3px 4px;
+  background: var(--pf-border-subtle);
+}

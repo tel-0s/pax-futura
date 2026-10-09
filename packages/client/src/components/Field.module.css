@@ -5,21 +5,30 @@
 }
 
 .label {
-  font-size: var(--pf-font-xs);
   color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
 .input {
   padding: var(--pf-space-2) var(--pf-space-3);
   border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-md);
-  background: var(--pf-surface-0);
+  background: var(--pf-panel-inset);
   color: var(--pf-text-primary);
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur-fast) ease;
+}
+
+.input:hover {
+  border-color: var(--pf-border-strong);
 }
 
 .input:focus {
   border-color: var(--pf-border-focus);
   outline: none;
+  box-shadow: 0 0 0 3px var(--pf-accent-wash);
 }

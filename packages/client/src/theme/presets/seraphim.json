@@ -1,34 +1,69 @@
 {
-  "meta": { "id": "seraphim", "name": "Seraphim", "scheme": "dark" },
+  "meta": {
+    "id": "seraphim",
+    "name": "Seraphim",
+    "scheme": "dark",
+    "tagline": "Machined charcoal, hazard orange, field-terminal type"
+  },
   "color": {
-    "surface": ["#161618", "#1d1d20", "#252528", "#2e2e32"],
-    "text": { "primary": "#f2efe9", "secondary": "#c9c5bc", "muted": "#8a867d", "inverse": "#161618" },
-    "accent": { "base": "#FF812A", "hover": "#ff9a52", "subtle": "#3d2a1a" },
-    "semantic": { "success": "#8fc65e", "warning": "#FF812A", "danger": "#e05545", "info": "#5aa8c9" },
-    "border": { "subtle": "#38383c", "strong": "#4c4c52", "focus": "#FF812A" },
-    "loom": { "canonicalEdge": "#FF812A", "siblingEdge": "#4c4c52", "nodeCurrent": "#ff9a52", "nodePending": "#c9a24a" }
+    "surface": ["#101012", "#17171a", "#1f1f23", "#29292e"],
+    "text": { "primary": "#f3efe8", "secondary": "#bfb9af", "muted": "#7f7a72", "inverse": "#101012" },
+    "accent": { "base": "#ff812a", "hover": "#ff9d55", "subtle": "#3a2416" },
+    "semantic": { "success": "#9ccc5a", "warning": "#f5c542", "danger": "#ff5644", "info": "#5bb3d6" },
+    "border": { "subtle": "#2d2d32", "strong": "#47474e", "focus": "#ff812a" },
+    "loom": { "canonicalEdge": "#ff812a", "siblingEdge": "#47474e", "nodeCurrent": "#ff9d55", "nodePending": "#f5c542" }
   },
   "font": {
     "ui": "'Chakra Petch', system-ui, sans-serif",
     "display": "'Chakra Petch', system-ui, sans-serif",
-    "mono": "'JetBrains Mono', 'SF Mono', monospace",
-    "scale": { "xs": "11.5px", "sm": "13px", "md": "14.5px", "lg": "17.5px", "xl": "23px" }
+    "mono": "'JetBrains Mono Variable', 'SF Mono', ui-monospace, monospace",
+    "scale": { "xs": "11.5px", "sm": "13px", "md": "14.5px", "lg": "17.5px", "xl": "27px" }
   },
   "space": { "unit": 4 },
-  "radius": { "sm": "2px", "md": "5px", "lg": "9px" },
+  "radius": { "sm": "2px", "md": "3px", "lg": "4px" },
   "shadow": {
-    "raise": "0 2px 8px rgba(0,0,0,0.5)",
-    "overlay": "0 8px 40px rgba(0,0,0,0.7)"
+    "raise": "0 2px 8px rgba(0,0,0,0.55)",
+    "overlay": "0 14px 48px rgba(0,0,0,0.7)"
+  },
+  "style": {
+    "panelOpacity": 0.92,
+    "panelBlur": 10,
+    "corners": "chamfer",
+    "ornament": "hazard",
+    "texture": "grain",
+    "textureOpacity": 0.07,
+    "glow": 0.3,
+    "heading": { "case": "uppercase", "tracking": "0.12em", "weight": 600 },
+    "fleuron": "//"
   },
   "map": {
-    "water": "#131315",
-    "land": "#232326",
+    "water": "#0c0c0e",
+    "land": "#1c1c20",
     "terrainTintOpacity": 0.2,
-    "boundary": { "line": "#4c4c52", "disputed": "#FF812A" },
-    "label": { "color": "#f2efe9", "halo": "#161618", "glyphStack": "sans" },
-    "graticule": "#1d1d20",
-    "selectionOutline": "#FF812A",
-    "hoverFill": "#3d2a1a",
-    "polityPalette": { "hueOffset": 12, "sat": [30, 55], "lum": [42, 58], "contested": "stripe" }
+    "boundary": { "line": "#3a3a41", "disputed": "#f5c542" },
+    "label": {
+      "color": "#f3efe8",
+      "halo": "#0c0c0e",
+      "glyphStack": "sans",
+      "font": "'Chakra Petch', sans-serif",
+      "case": "uppercase",
+      "tracking": "0.26em",
+      "italic": false
+    },
+    "graticule": "#1d1d21",
+    "selectionOutline": "#ff812a",
+    "hoverFill": "#ff812a",
+    "polityPalette": { "hueOffset": 12, "sat": [24, 44], "lum": [34, 48], "contested": "stripe", "hueSpread": 1 },
+    "projection": "mercator",
+    "atmosphere": { "space": "#080809", "horizon": "#ff812a", "glow": 0.35 },
+    "coast": { "style": "glow", "color": "#ff812a", "width": 4, "opacity": 0.22 },
+    "waterPattern": "dots",
+    "landTexture": "grain",
+    "textureStrength": 0.22,
+    "fillOpacity": 0.74,
+    "borderBand": 2,
+    "boundaryDash": [],
+    "vignette": 0.35,
+    "ornament": "hud"
   }
 }

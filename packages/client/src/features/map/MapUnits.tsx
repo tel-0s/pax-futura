@@ -1,41 +1,38 @@
 import { useMemo } from "react";
 import { Marker } from "react-map-gl/maplibre";
 import type { WorldState } from "@pax/domain";
-import { UNIT_STATUS_TONE, unitGlyph } from "../../lib/unitDisplay.ts";
+import { UnitSymbol } from "../../components/UnitSymbol.tsx";
+import { structureIcon } from "../../components/StructureIcon.tsx";
 import { useUiStore } from "../../stores/ui.ts";
+import type { ZoomTier } from "./MapStage.tsx";
 import styles from "./MapUnits.module.css";
-
-/** Structure glyphs for the kinds scenarios use most; anything else falls back. */
-const STRUCTURE_GLYPHS: Record<string, string> = {
-  base: "⛫",
-  port: "⚓",
-  embassy: "🏛",
-  silo: "🚀",
-};
-
-const structureGlyph = (kind: string): string => STRUCTURE_GLYPHS[kind] ?? "▲";
 
 interface Props {
   world: WorldState | null;
   palette: Record<string, string>;
+  /** Detail level: far = compact counters + structure dots. */
+  tier: ZoomTier;
 }
 
 /**
  * Units and structures as DOM markers: the base style ships no glyphs or
  * sprites, so symbol layers are unavailable — counts are small enough that
- * one element per entity is cheap.
+ * one element per entity is cheap. Units are NATO-style counters in their
+ * owner's color; structures are small seals with a kind icon.
  */
-export function MapUnits({ world, palette }: Props) {
+export function MapUnits({ world, palette, tier }: Props) {
   const setSelection = useUiStore((state) => state.setSelection);
   const openLeftDrawer = useUiStore((state) => state.openLeftDrawer);
 
   const units = useMemo(() => {
     if (!world) return null;
     return world.units.map((unit) => {
-      const tone = UNIT_STATUS_TONE[unit.status];
       const classes = [
         styles.unit,
-        tone === "danger" ? styles.danger : tone === "warning" ? styles.warning : "",
+        tier === "far" ? styles.compact : "",
+        unit.status === "engaged" ? styles.engaged : "",
+        unit.status === "moving" ? styles.moving : "",
+        unit.status === "pending" ? styles.pending : "",
         unit.status === "defeated" ? styles.defeated : "",
       ]
         .filter(Boolean)
@@ -59,30 +56,35 @@ export function MapUnits({ world, palette }: Props) {
           <button
             type="button"
             className={classes}
-            style={{ borderColor: palette[unit.ownerCode] }}
             title={`${unit.name} (${unit.type}, ${unit.ownerCode}) — strength ${unit.strength}, ${unit.status}`}
           >
-            <span className={styles.glyph}>{unitGlyph(unit.type)}</span>
-            <span className={styles.strength}>{unit.strength}</span>
+            <UnitSymbol type={unit.type} color={palette[unit.ownerCode]} size={22} />
+            <span className={styles.strength}>{formatStrength(unit.strength)}</span>
           </button>
         </Marker>
       );
     });
-  }, [world, palette, setSelection, openLeftDrawer]);
+  }, [world, palette, tier, setSelection, openLeftDrawer]);
 
   const structures = useMemo(() => {
     if (!world) return null;
-    return world.markers.map((marker) => (
-      <Marker key={marker.id} longitude={marker.lng} latitude={marker.lat} anchor="center">
-        <span
-          className={styles.structure}
-          title={`${marker.name} (${marker.kind}${marker.ownerCode ? `, ${marker.ownerCode}` : ""})`}
-        >
-          {structureGlyph(marker.kind)}
-        </span>
-      </Marker>
-    ));
-  }, [world]);
+    return world.markers.map((marker) => {
+      const Icon = structureIcon(marker.kind);
+      return (
+        <Marker key={marker.id} longitude={marker.lng} latitude={marker.lat} anchor="center">
+          <span
+            className={`${styles.structure} ${styles[tier]}`}
+            style={marker.ownerCode && palette[marker.ownerCode] ? { color: palette[marker.ownerCode] } : undefined}
+            title={`${marker.name} (${marker.kind}${marker.ownerCode ? `, ${marker.ownerCode}` : ""})`}
+          >
+            <span className={styles.structureInner}>
+              <Icon size={11} strokeWidth={2.2} />
+            </span>
+          </span>
+        </Marker>
+      );
+    });
+  }, [world, palette, tier]);
 
   return (
     <>
@@ -91,3 +93,5 @@ export function MapUnits({ world, palette }: Props) {
     </>
   );
 }
+
+const formatStrength = (value: number): string => (value >= 1000 ? `${Math.round(value / 100) / 10}k` : String(value));

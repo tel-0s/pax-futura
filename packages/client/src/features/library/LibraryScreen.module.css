@@ -1,20 +1,96 @@
 .screen {
-  min-height: 100%;
-  padding: var(--pf-space-8);
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
   background: var(--pf-surface-0);
+}
+
+/* ── Living backdrop ───────────────────────────────────────────────────── */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Readability veil: dense where the text sits (left, bottom), clear where the
+   world turns (right, top). */
+.flatStage {
+  position: absolute;
+  inset: 0;
+}
+
+/* The globe hangs in the open right side of the screen, half-risen like a
+   planet seen from orbit, clear of the campaign column. */
+.globeStage {
+  position: absolute;
+  inset: -6% -14% -30% 34%;
+}
+
+.backdropShade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      var(--pf-surface-0) 0%,
+      color-mix(in srgb, var(--pf-surface-0) 72%, transparent) 38%,
+      color-mix(in srgb, var(--pf-surface-0) 10%, transparent) 75%
+    ),
+    linear-gradient(
+      0deg,
+      var(--pf-surface-0) 0%,
+      color-mix(in srgb, var(--pf-surface-0) 55%, transparent) 45%,
+      transparent 75%
+    );
+}
+
+/* ── Content column ────────────────────────────────────────────────────── */
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-6);
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--pf-space-8) var(--pf-space-8) calc(var(--pf-space-8) * 2);
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--pf-space-6);
+  gap: var(--pf-space-4);
+  animation: pf-fade-in var(--pf-dur-slow) ease;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-4);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .title {
-  font-family: var(--pf-font-display);
-  font-size: var(--pf-font-xl);
   margin: 0;
+  font-size: calc(var(--pf-font-xl) * 1.25);
+  line-height: 1;
+}
+
+.tagline {
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-sm);
+  font-style: italic;
 }
 
 .headerActions {
@@ -41,90 +117,291 @@
   justify-content: space-between;
   gap: var(--pf-space-3);
   padding: var(--pf-space-3) var(--pf-space-4);
-  margin-bottom: var(--pf-space-4);
   border: 1px solid var(--pf-semantic-danger);
   border-radius: var(--pf-radius-md);
+  background: var(--pf-semantic-danger-wash);
   color: var(--pf-semantic-danger);
   font-size: var(--pf-font-sm);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--pf-space-4);
+/* ── Continue hero ─────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  max-width: 760px;
+  padding: var(--pf-space-6) var(--pf-space-8) var(--pf-space-6) var(--pf-space-6);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-lg);
+  animation: pf-rise-in var(--pf-dur-slow) var(--pf-ease-out);
 }
 
-.card {
+.heroEmpty {
   display: flex;
   flex-direction: column;
+  gap: var(--pf-space-3);
+}
+
+.heroBody {
+  display: flex;
+  gap: var(--pf-space-6);
+}
+
+.heroMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: var(--pf-font-xl);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pf-space-2) var(--pf-space-4);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+}
+
+.heroEra {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--pf-accent-base);
+  font-weight: 600;
+}
+
+.heroText {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-md);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.heroActions {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+  margin-top: var(--pf-space-2);
+}
+
+/* The era seal: a big year numeral stamped beside the title. */
+.heroSeal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: var(--pf-space-2);
-  padding: var(--pf-space-5);
-  background: var(--pf-surface-1);
-  border: 1px solid var(--pf-border-subtle);
-  border-radius: var(--pf-radius-lg);
-  cursor: pointer;
-  transition: border-color 120ms ease;
+  width: 132px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--pf-border-subtle);
+  color: var(--pf-accent-base);
 }
 
-.card:hover {
-  border-color: var(--pf-border-focus);
-}
-
-.cardTitle {
-  font-size: var(--pf-font-lg);
+.heroYear {
+  color: var(--pf-text-primary);
   font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: calc(var(--pf-font-xl) * 1.4);
+  font-variant-numeric: lining-nums;
+  letter-spacing: var(--pf-heading-tracking);
+  line-height: 1;
 }
 
-.cardMeta {
+.code {
+  padding: 1px 6px;
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-sm);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+}
+
+.played {
   color: var(--pf-text-muted);
   font-size: var(--pf-font-xs);
 }
 
-.cardActions {
+/* ── Shelf ─────────────────────────────────────────────────────────────── */
+
+.shelf {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--pf-space-2);
-  margin-top: var(--pf-space-2);
+  flex-direction: column;
+  gap: var(--pf-space-3);
 }
 
-/* Matches the shared Button's resting look so the row reads as one control
-   group; an <a download> is used because a link downloads without a popup. */
-.linkButton {
-  display: inline-flex;
+.shelfHeader {
+  display: flex;
   align-items: center;
   gap: var(--pf-space-2);
-  padding: var(--pf-space-2) var(--pf-space-4);
-  border: 1px solid transparent;
-  border-radius: var(--pf-radius-md);
-  background: var(--pf-surface-2);
-  color: var(--pf-text-primary);
-  font-size: var(--pf-font-sm);
-  font-weight: 500;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 120ms ease;
 }
 
-.linkButton:hover {
+.count {
+  padding: 0 6px;
+  border-radius: 8px;
   background: var(--pf-surface-3);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  line-height: 16px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: var(--pf-space-3);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  min-height: 168px;
+  padding: var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-lg);
+  background: var(--pf-panel-bg-solid);
+  box-shadow: var(--pf-shadow-raise);
+  color: var(--pf-text-primary);
+  text-align: left;
+  cursor: pointer;
+  animation: pf-rise-in var(--pf-dur-slow) var(--pf-ease-out) backwards;
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    transform var(--pf-dur) var(--pf-ease),
+    box-shadow var(--pf-dur) ease;
+}
+
+.card:hover {
+  border-color: var(--pf-accent-line);
+  box-shadow: var(--pf-shadow-overlay);
+  transform: translateY(-2px);
+}
+
+.cardEra {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.cardYear {
+  margin-left: auto;
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-lg);
+  font-variant-numeric: lining-nums;
+  line-height: 1;
+}
+
+.cardTitle {
+  margin: var(--pf-space-1) 0 0;
+  font-size: var(--pf-font-md);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pf-space-2);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.cardFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--pf-space-2);
+  border-top: 1px solid var(--pf-border-subtle);
+}
+
+.cardActions {
+  display: flex;
+  gap: 2px;
+  opacity: 0.35;
+  transition: opacity var(--pf-dur-fast) ease;
+}
+
+.cardActions:focus-within {
+  opacity: 1;
+}
+
+.card:hover .cardActions {
+  opacity: 1;
+}
+
+/* Matches the ghost icon Button so the row reads as one control group; an
+   <a download> is used because a link downloads without a popup. */
+.iconLink {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--pf-radius-md);
+  color: var(--pf-text-secondary);
+  transition: background var(--pf-dur-fast) ease;
+}
+
+.iconLink:hover {
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
 }
 
 .imported {
   border-color: var(--pf-accent-base);
-  background: var(--pf-accent-subtle);
+  box-shadow: var(--pf-glow-accent);
 }
 
 .newCard {
   align-items: center;
   justify-content: center;
-  min-height: 130px;
+  gap: var(--pf-space-2);
   border-style: dashed;
-  color: var(--pf-text-secondary);
+  border-color: var(--pf-border-strong);
+  background: var(--pf-panel-bg);
+  backdrop-filter: var(--pf-panel-filter);
+  text-align: center;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pf-space-4);
+.newIcon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--pf-accent-line);
+  border-radius: 50%;
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+}
+
+.newLabel {
+  font-size: var(--pf-font-md);
+}
+
+.newHint {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
 }

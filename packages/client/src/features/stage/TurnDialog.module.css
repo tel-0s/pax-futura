@@ -1,27 +1,594 @@
-.orders {
-  margin: 0 0 var(--pf-space-4);
-  color: var(--pf-text-secondary);
-  font-size: var(--pf-font-sm);
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-5);
 }
+
+/* ── Chronometer: now ──── span ────▶ latest arrival ───────────────────── */
+
+.chronometer {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr) auto;
+  align-items: end;
+  gap: var(--pf-space-5);
+}
+
+.endpoint {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  min-width: 0;
+}
+
+.arrival {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.date {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: calc(var(--pf-font-xl) * 0.92);
+  font-weight: var(--pf-heading-weight);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: var(--pf-heading-tracking);
+  line-height: 1.05;
+  color: var(--pf-text-primary);
+  white-space: nowrap;
+}
+
+.arrivalDate {
+  color: var(--pf-accent-base);
+  text-shadow: var(--pf-text-glow);
+  animation: pf-fade-in var(--pf-dur-fast) ease;
+}
+
+.scouting .arrivalDate {
+  color: var(--pf-text-secondary);
+  text-shadow: none;
+}
+
+.track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  margin-bottom: 2px;
+}
+
+/* A ruler: a rule with ticks beneath, ending in an arrowhead. */
+.trackLine {
+  position: absolute;
+  left: 0;
+  right: 6px;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--pf-border-strong), var(--pf-accent-line));
+}
+
+.trackLine::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 3px;
+  height: 5px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--pf-border-strong) 0 1px,
+    transparent 1px 10px
+  );
+  opacity: 0.7;
+}
+
+.trackLine::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  top: -4px;
+  border-top: 4.5px solid transparent;
+  border-bottom: 4.5px solid transparent;
+  border-left: 8px solid var(--pf-accent-base);
+}
+
+.scouting .trackLine {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--pf-accent-line) 0 6px,
+    transparent 6px 10px
+  );
+}
+
+.trackLabel {
+  position: relative;
+  padding: 2px var(--pf-space-3);
+  border: 1px solid var(--pf-accent-line);
+  border-radius: calc(var(--pf-radius-sm) * 3);
+  background: var(--pf-panel-bg-solid);
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── Interval tiles ───────────────────────────────────────────────────── */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--pf-space-2);
 }
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--pf-space-3);
+  min-height: 104px;
+  padding: var(--pf-space-3) var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-primary);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur) ease,
+    transform var(--pf-dur-fast) ease;
+}
+
+/* Bottom accent filament, drawn in on hover/selection. */
+.tile::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--pf-accent-base);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--pf-dur) var(--pf-ease-out);
+}
+
+.tile:hover {
+  border-color: var(--pf-border-strong);
+  background: var(--pf-accent-wash);
+  transform: translateY(-1px);
+}
+
+.tile:hover::after,
+.tileSelected::after {
+  transform: scaleX(1);
+}
+
+.tile:active {
+  transform: translateY(0);
+}
+
+/* Focus IS selection here (arrows / number keys move it), so the selected
+   treatment doubles as the focus ring — clip-path would cut an outline. */
+.tile:focus-visible {
+  outline: none;
+}
+
+.tileSelected {
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  box-shadow:
+    var(--pf-glow-accent),
+    inset 0 0 0 1px var(--pf-accent-line);
+}
+
+.tileKey {
+  position: absolute;
+  top: var(--pf-space-2);
+  right: var(--pf-space-2);
+  opacity: 0.6;
+}
+
+.tileSelected .tileKey {
+  opacity: 1;
+}
+
+.tileFigure {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pf-space-2);
+}
+
+.tileAmount {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: calc(var(--pf-font-xl) * 1.3);
+  font-weight: var(--pf-heading-weight);
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 0.95;
+}
+
+.tileSelected .tileAmount,
+.tile:hover .tileAmount {
+  color: var(--pf-accent-base);
+  text-shadow: var(--pf-text-glow);
+}
+
+.tileUnit {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+  font-weight: var(--pf-heading-weight);
+  font-variant-caps: var(--pf-heading-variant);
+  letter-spacing: var(--pf-heading-tracking);
+  text-transform: var(--pf-heading-transform);
+  color: var(--pf-text-secondary);
+}
+
+.tileDate {
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--pf-text-muted);
+  white-space: nowrap;
+}
+
+.tileSelected .tileDate,
+.tile:hover .tileDate {
+  color: var(--pf-text-secondary);
+}
+
+.tileCustom {
+  grid-column: span 2;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--pf-space-4);
+  border-style: dashed;
+  border-color: var(--pf-border-strong);
+  background: transparent;
+}
+
+.tileOpen {
+  border-style: solid;
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+}
+
+.customIcon {
+  flex-shrink: 0;
+  color: var(--pf-accent-base);
+}
+
+.customText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+}
+
+/* ── Custom span row ──────────────────────────────────────────────────── */
 
 .custom {
   display: flex;
-  gap: var(--pf-space-2);
   align-items: center;
-  margin-top: var(--pf-space-4);
+  gap: var(--pf-space-3);
+  margin-top: calc(var(--pf-space-2) * -1);
+  padding: var(--pf-space-3);
+  border: 1px solid var(--pf-accent-line);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-accent-wash);
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
 }
 
 .amount {
-  width: 80px;
-  padding: var(--pf-space-1) var(--pf-space-2);
+  width: 84px;
+  height: 34px;
+  padding: 0 var(--pf-space-2);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-md);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  appearance: textfield;
+}
+
+.amount::-webkit-inner-spin-button,
+.amount::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.amount:focus {
+  border-color: var(--pf-border-focus);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--pf-accent-wash);
+}
+
+.units {
+  display: inline-flex;
+  padding: 2px;
   border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-md);
-  background: var(--pf-surface-0);
+  background: var(--pf-panel-inset);
+}
+
+.unit {
+  padding: 5px 10px;
+  border: none;
+  border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  cursor: pointer;
+}
+
+.unit:hover {
   color: var(--pf-text-primary);
+}
+
+.unitActive {
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  box-shadow: inset 0 0 0 1px var(--pf-accent-line);
+}
+
+.customPreview {
+  flex: 1;
+  min-width: 0;
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Orders + scout ───────────────────────────────────────────────────── */
+
+.lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: var(--pf-space-3);
+}
+
+.card {
+  min-width: 0;
+  padding: var(--pf-space-3) var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  margin-bottom: var(--pf-space-2);
+}
+
+.cardIcon {
+  color: var(--pf-text-muted);
+}
+
+.count {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: calc(var(--pf-radius-sm) * 3);
+  background: var(--pf-surface-2);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.link {
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-xs);
+  cursor: pointer;
+}
+
+.link:hover {
+  color: var(--pf-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: order;
+}
+
+.order {
+  position: relative;
+  overflow: hidden;
+  padding-left: 24px;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  counter-increment: order;
+}
+
+.order::before {
+  content: counter(order, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+}
+
+.more {
+  padding-left: 24px;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.empty {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.45;
+}
+
+.emptyHint {
+  margin: var(--pf-space-1) 0 0;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.scout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pf-space-3);
+  color: var(--pf-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur) ease;
+}
+
+.scout:hover {
+  border-color: var(--pf-border-strong);
+}
+
+.scoutOn {
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  margin-top: 1px;
+  border: 1px solid var(--pf-border-strong);
+  border-radius: calc(var(--pf-radius-sm) * 2.5);
+  background: var(--pf-surface-2);
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease;
+}
+
+.knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: calc(var(--pf-radius-sm) * 2);
+  background: var(--pf-text-muted);
+  transition:
+    transform var(--pf-dur) var(--pf-ease-out),
+    background var(--pf-dur-fast) ease;
+}
+
+.scoutOn .switch {
+  border-color: var(--pf-accent-base);
+  background: var(--pf-accent-base);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.scoutOn .knob {
+  background: var(--pf-text-inverse);
+  transform: translateX(16px);
+}
+
+.scoutText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.scoutTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--pf-font-sm);
+  font-weight: 600;
+}
+
+.scoutOn .scoutTitle {
+  color: var(--pf-accent-base);
+}
+
+.scoutHelp {
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* ── Footer hints ─────────────────────────────────────────────────────── */
+
+.hints {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: auto;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  white-space: nowrap;
+}
+
+.hintSep {
+  width: 1px;
+  height: 12px;
+  margin: 0 6px;
+  background: var(--pf-border-subtle);
+}
+
+@media (width <= 760px) {
+  .chronometer {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .arrival {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lower {
+    grid-template-columns: 1fr;
+  }
+
+  .custom {
+    flex-wrap: wrap;
+  }
+
+  .hints {
+    display: none;
+  }
 }

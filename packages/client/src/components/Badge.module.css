@@ -3,25 +3,43 @@
   align-items: center;
   gap: var(--pf-space-1);
   padding: 0 var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-sm);
   background: var(--pf-surface-2);
   color: var(--pf-text-secondary);
   font-size: var(--pf-font-xs);
-  line-height: 1.8;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.7;
   white-space: nowrap;
 }
 
 .accent {
-  background: var(--pf-accent-subtle);
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
   color: var(--pf-accent-base);
 }
 
 .warning {
-  background: var(--pf-surface-2);
+  border-color: var(--pf-semantic-warning);
+  background: var(--pf-semantic-warning-wash);
   color: var(--pf-semantic-warning);
 }
 
 .danger {
-  background: var(--pf-surface-2);
+  border-color: var(--pf-semantic-danger);
+  background: var(--pf-semantic-danger-wash);
   color: var(--pf-semantic-danger);
+}
+
+.success {
+  border-color: var(--pf-semantic-success);
+  background: var(--pf-semantic-success-wash);
+  color: var(--pf-semantic-success);
+}
+
+.info {
+  border-color: var(--pf-semantic-info);
+  background: var(--pf-semantic-info-wash);
+  color: var(--pf-semantic-info);
 }

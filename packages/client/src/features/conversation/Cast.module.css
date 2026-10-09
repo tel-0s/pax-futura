@@ -1,0 +1,496 @@
+/* The cast (channel switcher), its empty seats, and the two pickers that
+   open new channels from them. */
+
+/* ── Cast ──────────────────────────────────────────────────────────────── */
+
+.castRow {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--pf-space-2);
+  margin: 0 calc(var(--pf-space-5) * -1);
+  padding: 0 var(--pf-space-4) var(--pf-space-3) var(--pf-space-4);
+  border-bottom: 1px solid var(--pf-border-subtle);
+}
+
+/* Inside the book frame the rule stops short of the double border. */
+[data-pf-ornament="double-rule"] .castRow {
+  margin: 0;
+  padding: 0 0 var(--pf-space-3);
+}
+
+.castViewport {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.cast {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-1);
+  padding: 3px 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cast::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fade whichever edge has correspondents scrolled past it. */
+.fadeStart {
+  mask-image: linear-gradient(90deg, transparent 8px, var(--pf-surface-0) 40px);
+}
+
+.fadeEnd {
+  mask-image: linear-gradient(90deg, var(--pf-surface-0) calc(100% - 40px), transparent calc(100% - 8px));
+}
+
+.fadeStart.fadeEnd {
+  mask-image: linear-gradient(
+    90deg,
+    transparent 8px,
+    var(--pf-surface-0) 40px,
+    var(--pf-surface-0) calc(100% - 40px),
+    transparent calc(100% - 8px)
+  );
+}
+
+/* "+N" chips over a faded edge: who else is in the cast, out of view. */
+.castMore {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  height: 20px;
+  padding: 0 5px;
+  border: 1px solid var(--pf-border-strong);
+  border-radius: 10px;
+  background: var(--pf-panel-bg-solid);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    color var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease;
+}
+
+.castMoreLeft {
+  left: 0;
+}
+
+.castMoreRight {
+  right: 0;
+}
+
+.castMore:hover {
+  border-color: var(--pf-accent-line);
+  color: var(--pf-accent-base);
+}
+
+.castMoreUnread {
+  border-color: var(--pf-accent-base);
+  color: var(--pf-accent-base);
+  box-shadow: var(--pf-glow-accent);
+}
+
+[data-pf-corners="chamfer"] .castMore,
+[data-pf-glow="high"] .castMore,
+[data-pf-ornament="double-rule"] .castMore {
+  border-radius: var(--pf-radius-sm);
+}
+
+.castItem {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: 3px;
+  border: 1px solid transparent;
+  border-radius: calc(var(--pf-radius-lg) * 3);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease,
+    padding var(--pf-dur) var(--pf-ease-out);
+}
+
+.castItem:hover {
+  background: var(--pf-accent-wash);
+}
+
+[data-pf-corners="chamfer"] .castItem {
+  border-radius: var(--pf-radius-sm);
+}
+
+.castActive {
+  padding-right: var(--pf-space-3);
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.castMark {
+  position: relative;
+  display: grid;
+  transition: transform var(--pf-dur-fast) ease;
+}
+
+.castItem:not(.castActive):hover .castMark {
+  transform: translateY(-1px);
+}
+
+/* Name and office unfold only for the channel being written to; the rest of
+   the cast stays a row of seals. */
+.castLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  transition:
+    max-width var(--pf-dur) var(--pf-ease-out),
+    opacity var(--pf-dur) ease;
+}
+
+.castActive .castLabel {
+  max-width: 150px;
+  opacity: 1;
+}
+
+.castName {
+  overflow: hidden;
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-sm);
+  font-weight: var(--pf-heading-weight);
+  letter-spacing: var(--pf-heading-tracking);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  text-transform: var(--pf-heading-transform);
+  font-variant-caps: var(--pf-heading-variant);
+}
+
+.castOffice {
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+[data-pf-ornament="double-rule"] .castOffice {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-xs);
+  font-style: italic;
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* A reply you haven't looked at. */
+.unreadDot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--pf-surface-1);
+  border-radius: 50%;
+  background: var(--pf-accent-base);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.unreadDot::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: var(--pf-accent-base);
+  animation: pf-ping 1.8s var(--pf-ease-out) infinite;
+}
+
+/* A reply being written in that channel. */
+.busyRing {
+  position: absolute;
+  inset: -3px;
+  border: 1.5px dashed var(--pf-accent-base);
+  border-radius: 50%;
+  animation: pf-spin 4s linear infinite;
+  pointer-events: none;
+}
+
+[data-pf-corners="chamfer"] .busyRing,
+[data-pf-glow="high"] .busyRing {
+  border-radius: 0;
+}
+
+/* ── Empty seats: open a new channel ───────────────────────────────────── */
+
+.seats {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--pf-space-1);
+  padding-left: var(--pf-space-2);
+  border-left: 1px solid var(--pf-border-subtle);
+}
+
+.seat {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px dashed var(--pf-border-strong);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--pf-text-muted);
+  cursor: pointer;
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease,
+    background var(--pf-dur-fast) ease;
+}
+
+/* The small "+" that makes an empty chair read as "add someone". */
+.seat::after {
+  content: "+";
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  display: grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--pf-surface-3);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.seat:hover,
+.seatOpen {
+  border-style: solid;
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+}
+
+.seat:hover::after,
+.seatOpen::after {
+  background: var(--pf-accent-base);
+  color: var(--pf-text-inverse);
+}
+
+[data-pf-corners="chamfer"] .seat,
+[data-pf-corners="chamfer"] .seat::after {
+  border-radius: var(--pf-radius-sm);
+}
+
+[data-pf-glow="high"] .seat,
+[data-pf-glow="high"] .seat::after {
+  border-radius: 0;
+}
+
+/* ── Pickers (council roster, foreign courts) ──────────────────────────── */
+
+.picker {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+/* Stand clear of the popover's double-rule book frame. */
+[data-pf-ornament="double-rule"] .picker {
+  padding: var(--pf-space-2);
+}
+
+.pickerHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-1) var(--pf-space-2) 0;
+}
+
+.pickerNote {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  font-style: italic;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: 0 var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur-fast) ease;
+}
+
+.search:focus-within {
+  border-color: var(--pf-border-focus);
+  box-shadow: 0 0 0 3px var(--pf-accent-wash);
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  color: var(--pf-text-muted);
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+}
+
+.pickList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 288px;
+  margin: 0 calc(var(--pf-space-1) * -1);
+  padding: 0 var(--pf-space-1);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.pickRow {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--pf-radius-md);
+  background: transparent;
+  color: var(--pf-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease;
+}
+
+.pickRow:hover,
+.pickCursor {
+  border-color: var(--pf-border-subtle);
+  background: var(--pf-accent-wash);
+}
+
+.pickCompact {
+  gap: var(--pf-space-2);
+  padding: 5px var(--pf-space-2);
+}
+
+.pickText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pickName {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pf-space-2);
+  overflow: hidden;
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-sm);
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pickHint {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.35;
+}
+
+[data-pf-ornament="double-rule"] .pickHint {
+  font-style: italic;
+}
+
+.pickOpen {
+  flex-shrink: 0;
+  padding: 0 5px;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 15px;
+  text-transform: uppercase;
+}
+
+.pickCode {
+  flex-shrink: 0;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+}
+
+.pickPlus {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px dashed var(--pf-accent-line);
+  border-radius: 50%;
+  color: var(--pf-accent-base);
+}
+
+.pickEmpty {
+  margin: 0;
+  padding: var(--pf-space-4) var(--pf-space-3);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.5;
+  text-align: center;
+}

@@ -1,0 +1,7 @@
+.specimen {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 240 / 110;
+  border-radius: var(--pf-radius-sm);
+}

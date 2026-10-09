@@ -236,6 +236,40 @@ describe("game lifecycle over HTTP", () => {
     expect(chronicle.recent[0]?.lines.join(" ")).toContain("territory");
   });
 
+  it("serves a polity's leader psyche from the node's rollup", async () => {
+    const game = await createGame();
+    const t1 = await executeTurn(game.gameId, game.activeNodeId);
+    await manager.drainExtractions(game.gameId);
+    const port = manager.get(game.gameId).port;
+    const rollup = port.getRollup(t1.id);
+    expect(rollup).not.toBeNull();
+    port.setRollup(t1.id, {
+      ...rollup!,
+      psyches: {
+        GER: {
+          temperament: "prickly about honor",
+          ambitions: ["the Rhineland"],
+          grudges: [],
+          opinionOfPlayer: -2,
+          opinionReason: "lost r2",
+        },
+      },
+    });
+
+    const sheet = await json<{ temperament: string; opinionOfPlayer: number } | null>(
+      await app.request(`/api/games/${game.gameId}/nodes/${t1.id}/psyche/GER`),
+    );
+    expect(sheet).toMatchObject({ temperament: "prickly about honor", opinionOfPlayer: -2 });
+
+    // Never profiled → null, not an error.
+    const none = await app.request(`/api/games/${game.gameId}/nodes/${t1.id}/psyche/ITA`);
+    expect(none.status).toBe(200);
+    expect(await none.json()).toBeNull();
+
+    const unknown = await app.request(`/api/games/${game.gameId}/nodes/nope/psyche/GER`);
+    expect(unknown.status).toBe(404);
+  });
+
   it("404s the chronicle for an unknown node", async () => {
     const game = await createGame();
     const res = await app.request(`/api/games/${game.gameId}/nodes/does-not-exist/chronicle`);

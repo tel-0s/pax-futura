@@ -1,37 +1,120 @@
 .rail {
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
+  top: var(--pf-space-2);
+  left: var(--pf-space-2);
+  z-index: 35;
   display: flex;
   flex-direction: column;
   gap: var(--pf-space-1);
-  padding: var(--pf-space-2);
-  background: var(--pf-surface-1);
-  border-right: 1px solid var(--pf-border-subtle);
-  z-index: 20;
+  width: calc(var(--pf-rail-width) - var(--pf-space-2));
+  padding: var(--pf-space-2) 0;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-lg);
+  background: var(--pf-panel-bg);
+  backdrop-filter: var(--pf-panel-filter);
+  box-shadow: var(--pf-shadow-raise);
+}
+
+.slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rule {
+  width: 22px;
+  height: 1px;
+  margin: var(--pf-space-1) 0 var(--pf-space-2);
+  background: var(--pf-border-subtle);
 }
 
 .item {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid transparent;
   border-radius: var(--pf-radius-md);
   background: transparent;
   color: var(--pf-text-secondary);
-  font-size: var(--pf-font-lg);
   cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease;
 }
 
 .item:hover {
-  background: var(--pf-surface-2);
+  background: var(--pf-accent-wash);
   color: var(--pf-text-primary);
 }
 
 .active {
-  background: var(--pf-accent-subtle);
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
   color: var(--pf-accent-base);
+  box-shadow: var(--pf-glow-accent);
+}
+
+/* Active indicator: a lit notch on the rail's outer edge. */
+.active::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 9px;
+  bottom: 9px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--pf-accent-base);
+  box-shadow: 0 0 10px var(--pf-accent-base);
+}
+
+.count {
+  position: absolute;
+  top: -3px;
+  right: -4px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border: 2px solid var(--pf-surface-1);
+  border-radius: 9px;
+  background: var(--pf-accent-base);
+  color: var(--pf-text-inverse);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 13px;
+  text-shadow: none;
+}
+
+.tip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 12px);
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: 5px var(--pf-space-2) 5px var(--pf-space-3);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-panel-bg-solid);
+  box-shadow: var(--pf-shadow-raise);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-xs);
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-4px, -50%);
+  transition:
+    opacity var(--pf-dur-fast) ease,
+    transform var(--pf-dur-fast) ease;
+}
+
+.slot:hover .tip {
+  opacity: 1;
+  transform: translate(0, -50%);
+  transition-delay: 250ms;
 }

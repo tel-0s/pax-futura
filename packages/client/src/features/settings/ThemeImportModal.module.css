@@ -1,23 +1,260 @@
-.hint {
-  margin: 0 0 var(--pf-space-3);
-  color: var(--pf-text-secondary);
+.starts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pf-space-2);
+  margin-bottom: var(--pf-space-4);
+}
+
+.starts > :global(.pfKicker) {
+  margin-right: var(--pf-space-1);
+}
+
+.preset {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: 5px 10px;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-primary);
   font-size: var(--pf-font-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    background var(--pf-dur-fast) ease;
+}
+
+.preset:hover {
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+}
+
+.presetDots {
+  display: inline-flex;
+}
+
+.presetDot {
+  width: 10px;
+  height: 10px;
+  margin-left: -3px;
+  border: 1px solid var(--pf-border-strong);
+  border-radius: 50%;
+}
+
+.presetDot:first-child {
+  margin-left: 0;
+}
+
+/* ── Workbench: editor + live preview ─────────────────────────────────── */
+
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--pf-space-4);
 }
 
 .editor {
-  width: 100%;
-  resize: vertical;
-  font-family: var(--pf-font-mono);
-  font-size: var(--pf-font-xs);
-  padding: var(--pf-space-2) var(--pf-space-3);
+  display: flex;
+  height: min(440px, 52vh);
+  overflow: hidden;
   border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-md);
   background: var(--pf-surface-0);
-  color: var(--pf-text-primary);
+  transition: border-color var(--pf-dur-fast) ease;
 }
 
-.error {
-  margin: var(--pf-space-2) 0 0;
-  color: var(--pf-semantic-danger);
+.editor:focus-within {
+  border-color: var(--pf-border-focus);
+  box-shadow: 0 0 0 3px var(--pf-accent-wash);
+}
+
+.editorBad,
+.editorBad:focus-within {
+  border-color: color-mix(in srgb, var(--pf-semantic-danger) 70%, transparent);
+}
+
+/* Line numbers scroll with the textarea (synced in onScroll). */
+.gutter {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-width: 44px;
+  padding: var(--pf-space-3) var(--pf-space-2) var(--pf-space-3) 0;
+  overflow: hidden;
+  border-right: 1px solid var(--pf-border-subtle);
+  background: var(--pf-surface-1);
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+  text-align: right;
+  user-select: none;
+}
+
+.code {
+  flex: 1;
+  min-width: 0;
+  padding: var(--pf-space-3);
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  line-height: 1.6;
+  white-space: pre;
+  resize: none;
+  tab-size: 2;
+}
+
+.code:focus-visible {
+  outline: none;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  min-width: 0;
+  padding: var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.specimen {
+  overflow: hidden;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  animation: pf-fade-in var(--pf-dur) ease;
+}
+
+.themeName {
+  margin-top: var(--pf-space-1);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-lg);
+  line-height: 1.2;
+}
+
+.tagline {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.4;
+}
+
+.chips {
+  display: flex;
+  gap: 4px;
+  margin-top: var(--pf-space-1);
+}
+
+.chip {
+  flex: 1;
+  height: 16px;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pf-space-1);
+}
+
+.valid,
+.problem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pf-space-2);
+  margin: var(--pf-space-1) 0 0;
   font-size: var(--pf-font-sm);
+  line-height: 1.4;
+}
+
+.valid svg,
+.problem svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.valid {
+  color: var(--pf-semantic-success);
+}
+
+.problem {
+  color: var(--pf-semantic-danger);
+}
+
+.issues {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+.issueList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.issue {
+  margin: 0;
+  padding: var(--pf-space-1) var(--pf-space-2);
+  border-left: 2px solid var(--pf-semantic-danger);
+  background: var(--pf-semantic-danger-wash);
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.more {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-4) var(--pf-space-2);
+  color: var(--pf-text-muted);
+  text-align: center;
+}
+
+.empty p {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.footHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-right: auto;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+@media (width <= 760px) {
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .footHint {
+    display: none;
+  }
 }

@@ -1,56 +1,114 @@
 .unit {
   display: flex;
   align-items: center;
-  gap: var(--pf-space-1);
-  padding: 0 var(--pf-space-1);
-  border: 2px solid var(--pf-border-strong);
+  gap: 3px;
+  padding: 2px 4px 2px 2px;
+  border: 1px solid var(--pf-border-strong);
   border-radius: var(--pf-radius-sm);
-  background: var(--pf-surface-1);
+  background: var(--pf-panel-bg-solid);
+  box-shadow: var(--pf-shadow-raise);
   color: var(--pf-text-primary);
-  font-size: var(--pf-font-xs);
-  line-height: 1.6;
-  white-space: nowrap;
   cursor: pointer;
+  transition:
+    transform var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease;
 }
 
 .unit:hover {
-  background: var(--pf-surface-2);
-}
-
-/* Status ring rides outside the owner-colored border so both stay readable. */
-.danger {
-  outline: 1px solid var(--pf-semantic-danger);
-  outline-offset: 1px;
-}
-
-.warning {
-  outline: 1px solid var(--pf-semantic-warning);
-  outline-offset: 1px;
-}
-
-.defeated {
-  opacity: 0.55;
-}
-
-.glyph {
-  line-height: 1;
+  border-color: var(--pf-accent-base);
+  transform: translateY(-1px) scale(1.06);
 }
 
 .strength {
   font-family: var(--pf-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
   color: var(--pf-text-secondary);
 }
 
+/* In contact: a red ring that breathes. */
+.engaged {
+  border-color: var(--pf-semantic-danger);
+  box-shadow:
+    0 0 0 1px var(--pf-semantic-danger),
+    0 0 12px var(--pf-semantic-danger-wash);
+  animation: pf-pulse 1.6s ease-in-out infinite;
+}
+
+.moving {
+  border-style: dashed;
+  border-color: var(--pf-semantic-warning);
+}
+
+.pending {
+  border-style: dotted;
+  border-color: var(--pf-semantic-info);
+}
+
+.defeated {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+/* Structure seal: a small rotated square in the owner's color with the icon. */
 .structure {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 16px;
-  padding: 0 2px;
-  border: 1px solid var(--pf-border-subtle);
-  border-radius: var(--pf-radius-sm);
-  background: var(--pf-surface-1);
-  color: var(--pf-text-muted);
-  font-size: var(--pf-font-xs);
-  line-height: 1.4;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: var(--pf-text-secondary);
+  filter: drop-shadow(var(--pf-shadow-raise));
+}
+
+.structureInner {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid currentcolor;
+  border-radius: 50%;
+  background: var(--pf-panel-bg-solid);
+}
+
+.structureInner svg {
+  color: var(--pf-text-primary);
+}
+
+/* ── Zoom tiers ────────────────────────────────────────────────────────── */
+
+/* Continental scale: counters drop their strength, structures become pips. */
+.compact {
+  padding: 2px;
+}
+
+.compact .strength {
+  display: none;
+}
+
+.far {
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+
+.far .structureInner {
+  width: 7px;
+  height: 7px;
+  border-width: 1.5px;
+  background: currentcolor;
+}
+
+.far svg {
+  display: none;
+}
+
+.mid .structureInner {
+  width: 14px;
+  height: 14px;
+}
+
+.near .structureInner {
+  width: 20px;
+  height: 20px;
 }

@@ -1,8 +1,11 @@
 import { memo } from "react";
 import Markdown from "react-markdown";
+import { PencilLine, RefreshCw } from "lucide-react";
 import type { Message } from "@pax/domain";
 import { Button } from "../../components/Button.tsx";
-import styles from "./ConversationsDrawer.module.css";
+import type { Correspondent } from "./correspondents.ts";
+import { LetterHead, letterTint, SiblingNav, ToolButton } from "./LetterParts.tsx";
+import styles from "./Letters.module.css";
 
 export interface BubbleEditState {
   text: string;
@@ -10,6 +13,8 @@ export interface BubbleEditState {
 
 interface MessageBubbleProps {
   message: Message;
+  /** Who signs incoming letters. Referentially stable per channel (see the drawer). */
+  who: Correspondent;
   siblingIndex: number;
   siblingCount: number;
   /** ✎ edit-and-fork affordance (user messages, when nothing is in flight). */
@@ -30,8 +35,14 @@ interface MessageBubbleProps {
   onRegenerate: (message: Message) => void;
 }
 
+/**
+ * One exchange in the thread. Incoming replies are letters — signed with the
+ * correspondent's seal or flag, set as prose; the player's own messages are
+ * compact notes on the right in the accent ink.
+ */
 function MessageBubbleImpl({
   message,
+  who,
   siblingIndex,
   siblingCount,
   showEdit,
@@ -44,93 +55,74 @@ function MessageBubbleImpl({
   onFlip,
   onRegenerate,
 }: MessageBubbleProps) {
-  const roleClass = message.role === "user" ? styles.user : styles.assistant;
-  return (
-    <div
-      className={`${styles.message} ${roleClass} ${edit ? styles.editing : ""}`}
-    >
-      {message.speaker ? <div className={styles.speaker}>{message.speaker}</div> : null}
-      {edit ? (
-        <>
-          <textarea
-            className={styles.editInput}
-            rows={3}
-            autoFocus
-            value={edit.text}
-            onChange={(event) => onEditChange(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                onEditSave(message, edit.text);
-              } else if (event.key === "Escape") {
-                onEditCancel();
-              }
-            }}
-          />
-          <div className={styles.editActions}>
-            <Button variant="ghost" onClick={onEditCancel}>
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              disabled={!edit.text.trim()}
-              onClick={() => onEditSave(message, edit.text)}
-            >
-              Send
-            </Button>
-          </div>
-        </>
-      ) : (
-        <div className={styles.content}>
-          {message.role === "assistant" ? (
-            <Markdown>{message.content}</Markdown>
-          ) : (
-            message.content
-          )}
+  const siblings =
+    siblingCount > 1 ? (
+      <SiblingNav index={siblingIndex} count={siblingCount} onFlip={(direction) => onFlip(message, direction)} />
+    ) : null;
+
+  if (message.role !== "user") {
+    const tint = letterTint(who);
+    return (
+      <article className={`${styles.letter} ${tint.className} pfChamfer`} style={tint.style}>
+        <LetterHead who={who}>
+          {showRegenerate ? (
+            <ToolButton label="Regenerate reply" onClick={() => onRegenerate(message)}>
+              <RefreshCw size={13} />
+            </ToolButton>
+          ) : null}
+          {siblings}
+        </LetterHead>
+        <div className={styles.body}>
+          <Markdown>{message.content}</Markdown>
         </div>
-      )}
-      <div className={styles.messageMeta}>
-        {siblingCount > 1 ? (
-          <span
-            className={styles.siblingNav}
-            title={`${siblingCount} versions of this message — flip to see the other branches`}
-          >
-            <button
-              aria-label="Previous version"
-              onClick={() => onFlip(message, -1)}
-              disabled={siblingIndex === 0}
-            >
-              ‹
-            </button>
-            {siblingIndex + 1}/{siblingCount}
-            <button
-              aria-label="Next version"
-              onClick={() => onFlip(message, 1)}
-              disabled={siblingIndex === siblingCount - 1}
-            >
-              ›
-            </button>
-          </span>
-        ) : null}
-        {showEdit && !edit ? (
-          <button
-            className={styles.regen}
-            title="Edit message (forks the conversation)"
-            onClick={() => onStartEdit(message)}
-          >
-            ✎
-          </button>
-        ) : null}
-        {showRegenerate ? (
-          <button
-            className={styles.regen}
-            title="Regenerate reply"
-            onClick={() => onRegenerate(message)}
-          >
-            ↻
-          </button>
-        ) : null}
+      </article>
+    );
+  }
+
+  if (edit) {
+    // Edit-and-fork: the note widens into an editor; sending forks a sibling.
+    return (
+      <div className={styles.editor}>
+        <span className={`${styles.editorLabel} pfKicker`}>Revise &amp; fork</span>
+        <textarea
+          className={styles.editInput}
+          rows={3}
+          autoFocus
+          value={edit.text}
+          onChange={(event) => onEditChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              onEditSave(message, edit.text);
+            } else if (event.key === "Escape") {
+              onEditCancel();
+            }
+          }}
+        />
+        <div className={styles.editActions}>
+          <span className={styles.editHint}>The original stays a branch you can flip back to.</span>
+          <Button variant="ghost" size="sm" onClick={onEditCancel}>
+            Cancel
+          </Button>
+          <Button variant="primary" size="sm" disabled={!edit.text.trim()} onClick={() => onEditSave(message, edit.text)}>
+            Send
+          </Button>
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className={styles.noteWrap}>
+      {showEdit ? (
+        <span className={styles.noteTools}>
+          <ToolButton label="Edit message (forks the conversation)" onClick={() => onStartEdit(message)}>
+            <PencilLine size={13} />
+          </ToolButton>
+        </span>
+      ) : null}
+      <div className={`${styles.note} pfChamfer`}>{message.content}</div>
+      {siblings ? <div className={styles.noteMeta}>{siblings}</div> : null}
     </div>
   );
 }

@@ -1,0 +1,32 @@
+.flag {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  line-height: 1;
+  text-shadow: none;
+}
+
+.emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--pf-border-strong);
+}
+
+.shield {
+  width: 82%;
+  height: 90%;
+  overflow: visible;
+}
+
+.shieldEdge {
+  fill: none;
+  stroke: var(--pf-text-primary);
+  stroke-opacity: 0.45;
+  stroke-width: 1.2;
+}

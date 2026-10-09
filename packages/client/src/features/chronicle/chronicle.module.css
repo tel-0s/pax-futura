@@ -1,184 +1,911 @@
-.empty,
-.error {
-  color: var(--pf-text-muted);
-  font-size: var(--pf-font-sm);
-  line-height: 1.5;
-}
+/* The Chronicle as a codex: a contents page, the unfinished chapter (the
+   unsummarized tail on a time rail), then the bound era chapters. The base
+   rules are the console voice (index numerals, accent rails); the book and
+   field-terminal themes re-typeset it from their structural attributes at the
+   bottom of this file, so a custom theme inherits the matching voice. */
 
-.error {
-  color: var(--pf-semantic-danger);
-}
+/* ── States ────────────────────────────────────────────────────────────── */
 
-.section {
+.empty {
   display: flex;
   flex-direction: column;
-  gap: var(--pf-space-2);
-  margin-bottom: var(--pf-space-5);
-}
-
-.sectionTitle {
-  margin: 0;
-  font-family: var(--pf-font-display);
-  font-size: var(--pf-font-xs);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--pf-text-secondary);
-}
-
-.turns {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--pf-space-2);
-}
-
-.turn {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pf-space-1);
-  padding: var(--pf-space-2) var(--pf-space-3);
-  border-left: 2px solid var(--pf-border-subtle);
-  background: var(--pf-surface-0);
-  border-radius: var(--pf-radius-sm);
-}
-
-.turnHead {
-  font-family: var(--pf-font-mono);
-  font-size: var(--pf-font-xs);
-  color: var(--pf-accent-base);
-}
-
-.turnSummary {
-  margin: 0;
-  font-size: var(--pf-font-sm);
-  line-height: 1.45;
-  color: var(--pf-text-primary);
-}
-
-/* Extracted facts fold away so the narrative line stays skimmable; the
-   disclosure triangle is the native <details> marker restyled via ::marker. */
-.digestDetails {
-  font-size: var(--pf-font-xs);
-}
-
-.digestToggle {
-  cursor: pointer;
-  color: var(--pf-text-muted);
-  user-select: none;
-}
-
-.digestToggle::marker {
-  color: var(--pf-accent-base);
-}
-
-.digestToggle:hover {
-  color: var(--pf-text-secondary);
-}
-
-.digest {
-  margin: var(--pf-space-1) 0 0;
-  padding-left: var(--pf-space-4);
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: var(--pf-font-xs);
-  line-height: 1.4;
-  color: var(--pf-text-muted);
-}
-
-/* Intel marks: how well the court actually knows the line it is reading.
-   Confirmed facts carry no badge at all — certainty is the quiet default. */
-.reported,
-.rumor {
-  font-family: var(--pf-font-mono);
-  border: 1px solid var(--pf-border-subtle);
-  border-radius: var(--pf-radius-sm);
-  padding: 0 3px;
-  white-space: nowrap;
-}
-
-.reported {
-  color: var(--pf-text-muted);
-}
-
-.rumor {
-  color: var(--pf-semantic-warning);
-  border-color: var(--pf-semantic-warning);
-}
-
-/* An author display on the list overrides the UA's closed-<details> hiding —
-   restore the collapse explicitly. */
-.digestDetails:not([open]) .digest {
-  display: none;
-}
-
-.eras {
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: var(--pf-space-3);
-}
-
-.era {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pf-space-2);
-  padding: var(--pf-space-3);
-  border: 1px solid var(--pf-border-subtle);
-  border-radius: var(--pf-radius-md);
-  background: var(--pf-surface-1);
-}
-
-.eraTitle {
-  margin: 0;
-  font-family: var(--pf-font-display);
-  font-size: var(--pf-font-md);
-  color: var(--pf-accent-base);
-}
-
-.eraRange {
-  font-family: var(--pf-font-mono);
-  font-size: var(--pf-font-xs);
+  padding: var(--pf-space-8) var(--pf-space-4);
   color: var(--pf-text-muted);
+  text-align: center;
 }
 
-.eraSummary {
+.empty p {
+  max-width: 36ch;
   margin: 0;
   font-size: var(--pf-font-sm);
   line-height: 1.55;
-  color: var(--pf-text-primary);
-  white-space: pre-wrap;
+  text-wrap: pretty;
 }
 
-.threadsTitle {
-  margin: var(--pf-space-1) 0 0;
-  font-family: var(--pf-font-display);
-  font-size: var(--pf-font-xs);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--pf-accent-hover);
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pf-space-2);
+  margin: 0 0 var(--pf-space-4);
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-semantic-danger);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-semantic-danger-wash);
+  color: var(--pf-semantic-danger);
+  font-size: var(--pf-font-sm);
+  line-height: 1.45;
 }
 
-/* The open-threads ledger is the panel's action list — dashes plus an accent
-   rule keep it scannable against the narrative paragraph above it. */
-.threads {
-  margin: 0;
-  padding: 0 0 0 var(--pf-space-3);
-  list-style: none;
-  border-left: 2px solid var(--pf-accent-subtle);
+.error svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+  padding-top: var(--pf-space-2);
+}
+
+.skeletonTitle,
+.skeletonLine,
+.skeletonLineShort {
+  display: block;
+  height: 11px;
+  border-radius: var(--pf-radius-sm);
+  background: linear-gradient(90deg, var(--pf-surface-2), var(--pf-surface-3), var(--pf-surface-2));
+  background-size: 200% 100%;
+  animation: pf-shimmer 1.8s linear infinite;
+}
+
+.skeletonTitle {
+  width: 62%;
+  height: 22px;
+  margin-bottom: var(--pf-space-2);
+}
+
+.skeletonLineShort {
+  width: 44%;
+}
+
+/* ── Codex ─────────────────────────────────────────────────────────────── */
+
+.codex {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-8);
+  padding-bottom: var(--pf-space-4);
+}
+
+/* Contents page: newest chapter first, dot leaders to the turn span. */
+.contents {
   display: flex;
   flex-direction: column;
   gap: var(--pf-space-1);
-  font-size: var(--pf-font-sm);
-  line-height: 1.4;
-  color: var(--pf-text-secondary);
+  padding: var(--pf-space-3) var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
 }
 
-.threads li::before {
-  content: "— ";
+.contentsLabel {
+  margin-bottom: var(--pf-space-1);
+}
+
+.contentsList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contentsItem {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pf-space-2);
+  width: 100%;
+  padding: 3px 0;
+  border: 0;
+  background: none;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--pf-dur-fast) ease;
+}
+
+.contentsNumeral {
+  flex: 0 0 26px;
   color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.contentsTitle {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leader {
+  flex: 1 1 18px;
+  min-width: 18px;
+  border-bottom: 1px dotted var(--pf-border-strong);
+  transform: translateY(-4px);
+}
+
+.contentsRange {
+  flex: none;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.contentsItem:hover {
+  color: var(--pf-text-primary);
+}
+
+.contentsItem:hover .leader {
+  border-bottom-color: var(--pf-accent-line);
+}
+
+.contentsItem:focus-visible {
+  outline: 2px solid var(--pf-border-focus);
+  outline-offset: 1px;
+}
+
+/* ── Chapter ───────────────────────────────────────────────────────────── */
+
+.chapter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+  scroll-margin-top: var(--pf-space-4);
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.chapterHead {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  column-gap: var(--pf-space-4);
+}
+
+/* The chapter mark: an index numeral on the consoles, Roman in the books. */
+.numeral {
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: 54px;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 0.8;
+  letter-spacing: -0.01em;
+  text-shadow: var(--pf-text-glow);
+}
+
+/* The chapter still being written: an outline of the mark it will carry. */
+.numeralPending {
+  color: transparent;
+  text-shadow: none;
+  -webkit-text-stroke: 1px var(--pf-accent-line);
+}
+
+.numeralRoman {
+  display: none;
+}
+
+.chapterHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+/* Era titles run long: cap the theme's heading tracking so wide-tracked
+   uppercase voices still set them in two or three lines, not five. */
+.chapterTitle {
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-lg);
+  line-height: 1.2;
+  letter-spacing: min(var(--pf-heading-tracking), 0.06em);
+  text-wrap: balance;
+}
+
+.chapterDates {
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.draftNote {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pf-space-2);
+  margin: 0;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.5;
+}
+
+.rule {
+  margin: var(--pf-space-1) 0;
+}
+
+/* Prose: book-measure narrative on an accent rail. */
+.prose {
+  padding-left: var(--pf-space-4);
+  border-left: 2px solid var(--pf-accent-line);
+}
+
+.prose p {
+  max-width: 68ch;
+  margin: 0 0 0.85em;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-md);
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+.prose p:first-child::first-line {
+  color: var(--pf-text-primary);
+}
+
+/* ── Open-threads ledger ───────────────────────────────────────────────── */
+
+.ledger {
+  margin-top: var(--pf-space-2);
+  padding: var(--pf-space-3) var(--pf-space-4) var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.ledgerHead {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  margin-bottom: var(--pf-space-1);
+}
+
+.count {
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--pf-surface-3);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 16px;
+}
+
+.ledgerList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: thread;
+}
+
+.thread {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: var(--pf-space-2);
+  padding: 7px 0;
+  border-top: 1px solid var(--pf-border-subtle);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.45;
+  counter-increment: thread;
+}
+
+.thread:first-child {
+  border-top: 0;
+}
+
+.thread::before {
+  content: counter(thread, decimal-leading-zero);
+  padding-top: 2px;
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.threadText {
+  min-width: 0;
+  text-wrap: pretty;
+}
+
+.threadParties {
+  padding: 0 4px;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-2);
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  white-space: nowrap;
+}
+
+.threadArc {
+  color: var(--pf-text-primary);
+  font-weight: 600;
+}
+
+/* ── The Present Age ───────────────────────────────────────────────────── */
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+}
+
+.progressTrack {
+  display: flex;
+  flex: none;
+  gap: 3px;
+}
+
+.progressTick {
+  width: 13px;
+  height: 4px;
+  border-radius: 1px;
+  background: var(--pf-border-subtle);
+}
+
+.progressDone {
+  background: var(--pf-accent-base);
+  box-shadow: 0 0 6px var(--pf-accent-line);
+}
+
+.progressLabel {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+/* Time rail: one node per turn, the newest lit. */
+.timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry {
+  position: relative;
+  padding: 0 0 var(--pf-space-5) 28px;
+}
+
+.entry:last-child {
+  padding-bottom: 0;
+}
+
+.entry::before {
+  content: "";
+  position: absolute;
+  top: 17px;
+  bottom: 3px;
+  left: 6px;
+  width: 1px;
+  background: linear-gradient(var(--pf-accent-line), var(--pf-border-subtle));
+}
+
+.entry:last-child::before {
+  display: none;
+}
+
+.entry::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 2px;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--pf-accent-base);
+  border-radius: 50%;
+  background: var(--pf-panel-bg-solid);
+}
+
+.entryLatest::after {
+  background: var(--pf-accent-base);
+  box-shadow:
+    0 0 0 3px var(--pf-accent-wash),
+    var(--pf-glow-accent);
+}
+
+.entryHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--pf-space-1) var(--pf-space-2);
+}
+
+.entryDate {
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: var(--pf-heading-transform);
+}
+
+.entryTurn {
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.entrySummary {
+  max-width: 68ch;
+  margin: var(--pf-space-1) 0 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* ── Extracted facts ───────────────────────────────────────────────────── */
+
+/* Extracted facts fold away so the narrative line stays skimmable; the
+   native <details> marker is replaced by a rotating chevron. */
+.facts {
+  margin-top: var(--pf-space-2);
+}
+
+.factsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px var(--pf-space-2) 2px var(--pf-space-1);
+  border-radius: var(--pf-radius-sm);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    color var(--pf-dur-fast) ease,
+    background var(--pf-dur-fast) ease;
+}
+
+.factsToggle::-webkit-details-marker {
+  display: none;
+}
+
+.factsToggle:hover {
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+}
+
+.chevron {
+  color: var(--pf-accent-base);
+  transition: transform var(--pf-dur-fast) var(--pf-ease);
+}
+
+.facts[open] .chevron {
+  transform: rotate(90deg);
+}
+
+.tallyReported,
+.tallyRumor {
+  padding-left: 6px;
+  border-left: 1px solid var(--pf-border-subtle);
+}
+
+.tallyReported {
+  color: var(--pf-semantic-info);
+}
+
+.tallyRumor {
+  color: var(--pf-semantic-warning);
+}
+
+.factList {
+  display: flex;
+  flex-direction: column;
+  margin: var(--pf-space-2) 0 0;
+  padding: var(--pf-space-1) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  list-style: none;
+  animation: pf-fade-in var(--pf-dur) ease;
+}
+
+.fact {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: var(--pf-space-2);
+  padding: 5px 0;
+  border-top: 1px solid var(--pf-border-subtle);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.5;
+}
+
+.fact:first-child {
+  border-top: 0;
+}
+
+.factIcon {
+  margin-top: 2px;
+  color: var(--pf-text-muted);
+}
+
+.factDanger .factIcon {
+  color: var(--pf-semantic-danger);
+}
+
+.factSuccess .factIcon {
+  color: var(--pf-semantic-success);
+}
+
+.factText {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.factCategory {
+  margin-right: 6px;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Per-theme typesetting ─────────────────────────────────────────────── */
+
+/* Glyph fleuron themes carry their own mark; the rest get a drawn lozenge. */
+[data-pf-ornament="hairline"] .fleuron,
+[data-pf-ornament="brackets"]:not([data-pf-glow="high"]) .fleuron {
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--pf-accent-line);
+  transform: rotate(45deg);
+}
+
+/* Book themes: Roman chapter marks. */
+[data-pf-ornament="double-rule"] .numeralRoman,
+[data-pf-ornament="hairline"] .numeralRoman {
+  display: inline;
+}
+
+[data-pf-ornament="double-rule"] .numeralIndex,
+[data-pf-ornament="hairline"] .numeralIndex {
+  display: none;
+}
+
+/* Parchment — an illuminated codex: centred chapter openings, a rubric
+   drop cap, justified text, pilcrow ledger between double rules. */
+[data-pf-ornament="double-rule"] .contents {
+  padding: 0 var(--pf-space-2);
+  border: 0;
+  background: none;
+}
+
+[data-pf-ornament="double-rule"] .contentsLabel {
+  align-self: center;
+  margin-bottom: var(--pf-space-2);
+}
+
+[data-pf-ornament="double-rule"] .contentsNumeral {
+  flex-basis: 34px;
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-sm);
+  text-align: right;
+  padding-right: var(--pf-space-1);
+}
+
+[data-pf-ornament="double-rule"] .contentsTitle {
+  font-style: italic;
+}
+
+[data-pf-ornament="double-rule"] .contentsRange,
+[data-pf-ornament="double-rule"] .chapterDates,
+[data-pf-ornament="double-rule"] .entryTurn {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-numeric: oldstyle-nums;
+}
+
+[data-pf-ornament="double-rule"] .chapterHead {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  row-gap: var(--pf-space-1);
+  text-align: center;
+}
+
+[data-pf-ornament="double-rule"] .chapterHeading {
+  align-items: center;
+}
+
+[data-pf-ornament="double-rule"] .numeral {
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.08em;
+}
+
+[data-pf-ornament="double-rule"] .numeralPending {
+  color: var(--pf-text-muted);
+  -webkit-text-stroke: 0;
+}
+
+[data-pf-ornament="double-rule"] .chapterTitle {
+  font-size: 22px;
+}
+
+[data-pf-ornament="double-rule"] .chapterDates {
+  font-style: italic;
+}
+
+[data-pf-ornament="double-rule"] .progress {
+  justify-content: center;
+}
+
+[data-pf-ornament="double-rule"] .progressTick {
+  border-radius: 0;
+}
+
+[data-pf-ornament="double-rule"] .progressDone {
+  box-shadow: none;
+}
+
+[data-pf-ornament="double-rule"] .prose {
+  padding-left: 0;
+  border-left: 0;
+}
+
+[data-pf-ornament="double-rule"] .prose p {
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-md);
+  line-height: 1.6;
+  text-align: justify;
+  text-indent: 1.4em;
+  hyphens: auto;
+}
+
+[data-pf-ornament="double-rule"] .prose p:first-child {
+  text-indent: 0;
+}
+
+[data-pf-ornament="double-rule"] .prose p:first-child::first-line {
+  font-variant-caps: small-caps;
+  letter-spacing: 0.03em;
+}
+
+[data-pf-ornament="double-rule"] .prose p:first-child::first-letter {
+  float: left;
+  margin: 0.05em 0.08em 0 0;
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-display);
+  font-size: 3.55em;
+  line-height: 0.8;
+}
+
+[data-pf-ornament="double-rule"] .ledger {
+  padding: var(--pf-space-3) var(--pf-space-1);
+  border: 0;
+  border-top: 3px double var(--pf-border-strong);
+  border-bottom: 3px double var(--pf-border-strong);
+  border-radius: 0;
+  background: none;
+}
+
+[data-pf-ornament="double-rule"] .ledgerHead {
+  justify-content: center;
+}
+
+[data-pf-ornament="double-rule"] .count {
+  border-radius: 0;
+  background: none;
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-numeric: oldstyle-nums;
+}
+
+[data-pf-ornament="double-rule"] .thread {
+  grid-template-columns: 16px minmax(0, 1fr);
+  padding: 4px 0;
+  border-top: 0;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+}
+
+[data-pf-ornament="double-rule"] .thread::before {
+  content: "¶";
+  padding-top: 0;
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-md);
+  line-height: 1.2;
+}
+
+[data-pf-ornament="double-rule"] .threadParties {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+}
+
+[data-pf-ornament="double-rule"] .entry::after {
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  transform: rotate(45deg);
+}
+
+[data-pf-ornament="double-rule"] .entryLatest::after {
+  box-shadow: 0 0 0 3px var(--pf-accent-wash);
+}
+
+[data-pf-ornament="double-rule"] .entryDate {
+  font-size: var(--pf-font-md);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+[data-pf-ornament="double-rule"] .entrySummary {
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-md);
+  line-height: 1.55;
+}
+
+[data-pf-ornament="double-rule"] .factList {
+  background: none;
+}
+
+[data-pf-ornament="double-rule"] .factCategory {
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
+[data-pf-ornament="double-rule"] .fact {
+  font-size: var(--pf-font-sm);
+}
+
+/* Daylight — an editorial atlas: light Roman numerals, a serif drop cap. */
+[data-pf-ornament="hairline"] .numeral {
+  font-size: 46px;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+[data-pf-ornament="hairline"] .contentsNumeral {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-sm);
+  font-style: italic;
+}
+
+[data-pf-ornament="hairline"] .prose {
+  padding-left: 0;
+  border-left: 0;
+}
+
+[data-pf-ornament="hairline"] .prose p:first-child::first-letter {
+  float: left;
+  margin: 0.06em 0.1em 0 0;
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-display);
+  font-size: 3.35em;
+  font-weight: 600;
+  line-height: 0.82;
+}
+
+[data-pf-ornament="hairline"] .thread::before {
+  font-family: var(--pf-font-display);
+  font-size: var(--pf-font-sm);
+  font-style: italic;
+}
+
+/* Seraphim — a field terminal: the chapter index stamped on a cut plate. */
+[data-pf-ornament="hazard"] .numeral {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  min-width: 52px;
+  padding: 6px 10px 4px;
+  background: var(--pf-accent-base);
+  color: var(--pf-text-inverse);
+  font-size: 30px;
+  line-height: 1;
+  text-shadow: none;
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+}
+
+[data-pf-ornament="hazard"] .numeralPending {
+  background: repeating-linear-gradient(-45deg, var(--pf-accent-wash) 0 5px, transparent 5px 10px);
+  color: var(--pf-accent-base);
+  -webkit-text-stroke: 0;
+}
+
+[data-pf-ornament="hazard"] .prose {
+  border-left-color: var(--pf-accent-base);
+}
+
+[data-pf-ornament="hazard"] .thread::before {
+  content: "//";
+  font-weight: 600;
+}
+
+[data-pf-ornament="hazard"] .entry::after,
+[data-pf-glow="high"] .entry::after {
+  border-radius: 0;
+}
+
+[data-pf-ornament="hazard"] .progressTick {
+  width: 12px;
+  height: 6px;
+  transform: skewX(-24deg);
+}
+
+/* Phosphor — a teletype printout: oversized index, dashed rails, bracketed
+   ledger numbers. */
+[data-pf-glow="high"] .numeral {
+  font-size: 66px;
+  font-weight: 400;
+  line-height: 0.68;
+}
+
+[data-pf-glow="high"] .numeralPending {
+  color: var(--pf-accent-line);
+  -webkit-text-stroke: 0;
+}
+
+[data-pf-glow="high"] .prose {
+  border-left: 1px dashed var(--pf-accent-line);
+}
+
+[data-pf-glow="high"] .thread::before {
+  content: "[" counter(thread, decimal-leading-zero) "]";
+}
+
+[data-pf-glow="high"] .thread {
+  grid-template-columns: 32px minmax(0, 1fr);
+  border-top-style: dashed;
+}
+
+[data-pf-glow="high"] .contents,
+[data-pf-glow="high"] .ledger,
+[data-pf-glow="high"] .factList {
+  border-style: dashed;
+}
+
+[data-pf-glow="high"] .entryDate {
+  font-size: var(--pf-font-lg);
+  font-weight: 400;
+}
+
+/* An author display on the list overrides the UA's closed-<details> hiding —
+   restore the collapse explicitly. (Last in the file: it must outrank every
+   themed .factList rule above.) */
+.facts:not([open]) .factList {
+  display: none;
 }

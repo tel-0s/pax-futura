@@ -1,6 +1,8 @@
 import { useMemo } from "react";
+import { GitBranch } from "lucide-react";
 import type { TimelineNodeMeta } from "@pax/domain";
 import { api } from "../../lib/api.ts";
+import { formatGameMonth } from "../../lib/dates.ts";
 import { selectCurrentPath, selectSiblings, useLoomStore } from "../../stores/loom.ts";
 import { useSessionStore } from "../../stores/session.ts";
 import { useUiStore } from "../../stores/ui.ts";
@@ -35,9 +37,17 @@ export function LoomStrip() {
   );
 
   if (path.length === 0) return null;
+  const first = path[0]!;
+  const last = path[path.length - 1]!;
 
   return (
     <div className={styles.strip}>
+      <span className={styles.span} title="The checked-out path">
+        <span className="pfKicker">Timeline</span>
+        <span className={styles.range}>
+          {formatGameMonth(first.gameDate)} — {formatGameMonth(last.gameDate)}
+        </span>
+      </span>
       <div className={styles.dots}>
         {path.map((node, index) => {
           const siblingCount = selectSiblings(nodes, node.id).length;
@@ -63,8 +73,8 @@ export function LoomStrip() {
           );
         })}
       </div>
-      <button className={styles.open} onClick={() => setLoomOpen(true)} title="Open loom (L)">
-        ⤢ loom
+      <button className={styles.open} onClick={() => setLoomOpen(true)} title="Open the loom (L)">
+        <GitBranch size={13} /> Loom <kbd>L</kbd>
       </button>
     </div>
   );
@@ -94,12 +104,12 @@ function Dot({
 
   return (
     <button
-      className={`${styles.dot} ${isCurrent ? styles.current : ""} ${node.status === "failed" ? styles.failed : ""} ${node.anchor ? styles.anchored : ""}`}
+      className={`${styles.dot} ${node.depth === 0 ? styles.root : ""} ${isCurrent ? styles.current : ""} ${node.status === "failed" ? styles.failed : ""} ${node.anchor ? styles.anchored : ""}`}
       style={dominant ? { color: dominant } : undefined}
       title={`${node.depth === 0 ? "Start" : node.gameDate} — ${node.summary || "…"}${siblingCount > 1 ? ` (${siblingCount} branches)` : ""}${node.anchor ? ` · 🔖 ${node.anchor}` : ""}`}
       onClick={onClick}
     >
-      {node.depth === 0 ? "◉" : "○"}
+      <span className={styles.pip} />
     </button>
   );
 }

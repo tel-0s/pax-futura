@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
+import { Bookmark, Film, Pause, Play, RotateCcw, StepBack, StepForward, X } from "lucide-react";
 import type { TimelineNodeMeta, WorldState } from "@pax/domain";
 import { api } from "../../lib/api.ts";
+import { formatGameDate, formatGameMonth } from "../../lib/dates.ts";
 import { useLoomStore } from "../../stores/loom.ts";
 import { useSessionStore } from "../../stores/session.ts";
 import { useWorldStore } from "../../stores/world.ts";
@@ -26,15 +29,20 @@ function pathToCurrent(
   return path.reverse();
 }
 
-const truncate = (text: string, max: number): string =>
-  text.length > max ? `${text.slice(0, max - 1)}…` : text;
+/** Position of step `index` along the scrubber, as a percentage. */
+const at = (index: number, count: number): string => `${count > 1 ? (index / (count - 1)) * 100 : 0}%`;
 
 /**
  * Plays the current path's world snapshots on the live map, oldest to
- * newest, by writing each snapshot straight
- * into the world store (the same painting path the overlay's selection uses). Fetched snapshots are cached locally so
- * scrubbing back and forth doesn't refetch, and the next step prefetches
- * while the current one is showing.
+ * newest, by writing each snapshot straight into the world store (the same
+ * painting path the overlay's selection uses). Fetched snapshots are cached
+ * locally so scrubbing back and forth doesn't refetch, and the next step
+ * prefetches while the current one is showing.
+ *
+ * Presented as a film: the frame's date as a title card over the map, and a
+ * transport deck below — play/pause, step, speed, and a scrubber with one
+ * tick per turn and a bookmark over every anchored one. Space plays/pauses,
+ * ←/→ step (the loom's tree keys are dormant while this is open).
  */
 export function TimeLapse({ onClose }: { onClose: () => void }) {
   const gameId = useSessionStore((state) => state.gameId);
@@ -50,6 +58,8 @@ export function TimeLapse({ onClose }: { onClose: () => void }) {
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState<Speed>(1);
   const cache = useRef(new Map<string, WorldState>());
+  const track = useRef<HTMLDivElement>(null);
+  const scrubbing = useRef(false);
 
   const restoreLive = useCallback(() => {
     if (gameId && currentNodeId) void useWorldStore.getState().load(gameId, currentNodeId);
@@ -130,64 +140,178 @@ export function TimeLapse({ onClose }: { onClose: () => void }) {
     setIndex((current) => Math.min(Math.max(current + delta, 0), steps.length - 1));
   };
 
+  // Play from the last frame starts the reel over rather than doing nothing.
+  const togglePlay = useCallback(() => {
+    if (!playing && index >= steps.length - 1) setIndex(0);
+    setPlaying((was) => !was);
+  }, [playing, index, steps.length]);
+
+  // Transport keys. Escape stays with the overlay (it closes us); Space and
+  // the arrows are ours — the tree's own handler is dormant while we're open.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      // A focused control already answers Space/Enter itself (the play
+      // button would toggle twice); fields keep their keys entirely.
+      if (target && ["BUTTON", "INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
+      if (event.key === " ") {
+        event.preventDefault();
+        togglePlay();
+      } else if (event.key === "ArrowLeft") {
+        step(-1);
+      } else if (event.key === "ArrowRight") {
+        step(1);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  // Scrubbing: press/drag anywhere on the track to jump frames (pauses).
+  const scrubTo = (clientX: number) => {
+    const rect = track.current?.getBoundingClientRect();
+    if (!rect || steps.length === 0) return;
+    const ratio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+    setIndex(Math.round(ratio * (steps.length - 1)));
+  };
+  const onScrubStart = (event: ReactPointerEvent<HTMLDivElement>) => {
+    scrubbing.current = true;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setPlaying(false);
+    scrubTo(event.clientX);
+  };
+  const onScrubMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (scrubbing.current) scrubTo(event.clientX);
+  };
+  const onScrubEnd = () => {
+    scrubbing.current = false;
+  };
+
   if (!node) {
     return (
-      <div className={styles.card}>
-        <span>Nothing to play back yet.</span>
-        <Button variant="ghost" onClick={onClose} title="Close time-lapse">
-          ✕
+      <div className={`${styles.empty} pfPanel`}>
+        <Film size={24} className={styles.emptyIcon} />
+        <p className={styles.emptyText}>Nothing to play back yet — complete a turn first.</p>
+        <Button variant="ghost" size="sm" onClick={onClose} title="Back to the tree (Esc)">
+          <X size={14} /> Back to the loom
         </Button>
       </div>
     );
   }
 
+  const first = steps[0]!;
+  const last = steps[steps.length - 1]!;
+
   return (
-    <div className={styles.card}>
-      <div className={styles.info}>
-        <span className={styles.date}>{node.depth === 0 ? "Start" : node.gameDate}</span>
-        <span className={styles.turn}>Turn {node.depth}</span>
+    <div className={styles.player} data-passthrough>
+      <div className={styles.letterbox} aria-hidden />
+
+      <div className={styles.titleCard} aria-live="polite">
+        <span className={`${styles.reel} pfKicker`}>
+          <span className={`${styles.recDot} ${playing ? styles.recLive : ""}`} />
+          Time-lapse · Turn {node.depth}
+        </span>
+        <span key={node.id} className={`${styles.frameDate} pfTitle pfGlowText`}>
+          {node.depth === 0 ? "Scenario start" : formatGameDate(node.gameDate)}
+        </span>
         {node.anchor ? (
-          <span className={styles.anchor} title={node.anchor}>
-            🔖 {truncate(node.anchor, 24)}
+          <span className={styles.frameAnchor}>
+            <Bookmark size={13} /> {node.anchor}
           </span>
         ) : null}
+        {node.summary && node.depth > 0 ? (
+          <p key={`${node.id}-summary`} className={styles.frameSummary}>
+            {node.summary}
+          </p>
+        ) : null}
       </div>
-      <div className={styles.progress}>
-        <div
-          className={styles.progressFill}
-          style={{ width: `${((index + 1) / steps.length) * 100}%` }}
-        />
-      </div>
-      <div className={styles.controls}>
-        <button className={styles.iconButton} disabled={atStart} onClick={() => step(-1)} title="Step back">
-          ⏮
-        </button>
-        <button
-          className={styles.iconButton}
-          onClick={() => setPlaying((was) => !was)}
-          title={playing ? "Pause" : "Play"}
-        >
-          {playing ? "⏸" : "⏵"}
-        </button>
-        <button className={styles.iconButton} disabled={atEnd} onClick={() => step(1)} title="Step forward">
-          ⏭
-        </button>
-        <span className={styles.speeds}>
+
+      <div className={`${styles.deck} pfPanel`}>
+        <div className={styles.transport}>
+          <Button variant="ghost" size="sm" icon disabled={atStart} onClick={() => step(-1)} title="Step back (←)" aria-label="Step back">
+            <StepBack size={15} />
+          </Button>
+          <button
+            className={`${styles.play} pfChamfer`}
+            onClick={togglePlay}
+            title={playing ? "Pause (Space)" : atEnd ? "Replay from the start (Space)" : "Play (Space)"}
+            aria-label={playing ? "Pause" : "Play"}
+          >
+            {playing ? <Pause size={18} /> : atEnd ? <RotateCcw size={17} /> : <Play size={18} />}
+          </button>
+          <Button variant="ghost" size="sm" icon disabled={atEnd} onClick={() => step(1)} title="Step forward (→)" aria-label="Step forward">
+            <StepForward size={15} />
+          </Button>
+        </div>
+
+        <div className={styles.scrubber}>
+          <div
+            ref={track}
+            className={styles.track}
+            role="slider"
+            aria-label="Turn"
+            aria-valuemin={1}
+            aria-valuemax={steps.length}
+            aria-valuenow={index + 1}
+            aria-valuetext={formatGameDate(node.gameDate)}
+            onPointerDown={onScrubStart}
+            onPointerMove={onScrubMove}
+            onPointerUp={onScrubEnd}
+            onPointerCancel={onScrubEnd}
+          >
+            <span className={styles.rail} />
+            <span className={styles.fill} style={{ width: at(index, steps.length) }} />
+            {steps.map((candidate, position) => (
+              <span
+                key={candidate.id}
+                className={`${styles.tick} ${position <= index ? styles.tickPast : ""}`}
+                style={{ left: at(position, steps.length) }}
+              />
+            ))}
+            {steps.map((candidate, position) =>
+              candidate.anchor ? (
+                <span
+                  key={`${candidate.id}-anchor`}
+                  className={`${styles.anchorMark} ${position <= index ? styles.anchorPast : ""}`}
+                  style={{ left: at(position, steps.length) }}
+                  title={`${candidate.anchor} — ${formatGameDate(candidate.gameDate)}`}
+                >
+                  <Bookmark size={11} />
+                </span>
+              ) : null,
+            )}
+            <span className={styles.playhead} style={{ left: at(index, steps.length) }} />
+          </div>
+          <div className={styles.scale}>
+            <span>{formatGameMonth(first.gameDate)}</span>
+            <span>{formatGameMonth(last.gameDate)}</span>
+          </div>
+        </div>
+
+        <div className={styles.speeds} role="radiogroup" aria-label="Playback speed">
           {SPEEDS.map((candidate) => (
             <button
               key={candidate}
-              className={`${styles.speedButton} ${speed === candidate ? styles.speedActive : ""}`}
+              role="radio"
+              aria-checked={speed === candidate}
+              className={`${styles.speed} ${speed === candidate ? styles.speedActive : ""}`}
               onClick={() => setSpeed(candidate)}
+              title={`${candidate}× speed`}
             >
-              x{candidate}
+              {candidate}×
             </button>
           ))}
+        </div>
+
+        <span className={styles.counter}>
+          <span className={styles.counterNow}>{index + 1}</span>
+          <span className={styles.counterOf}>/ {steps.length}</span>
         </span>
-        <span className={styles.step}>
-          {index + 1} / {steps.length}
-        </span>
-        <Button variant="ghost" onClick={onClose} title="Close time-lapse">
-          ✕
+
+        <span className={styles.deckRule} />
+        <Button variant="ghost" icon onClick={onClose} title="Back to the tree (Esc)" aria-label="Close time-lapse">
+          <X size={18} />
         </Button>
       </div>
     </div>

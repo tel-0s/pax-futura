@@ -1,63 +1,659 @@
+/* The body never scrolls (the stage owns the viewport), so the lab is its
+   own scroll container. */
 .lab {
-  min-height: 100%;
-  padding: var(--pf-space-8);
-  background: var(--pf-surface-0);
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--pf-space-8) clamp(var(--pf-space-4), 5vw, calc(var(--pf-space-8) * 2));
+  background:
+    radial-gradient(ellipse at 20% -10%, var(--pf-accent-wash), transparent 55%),
+    var(--pf-surface-0);
 }
 
-.row {
+.lab > * {
+  max-width: 1240px;
+  margin-inline: auto;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+
+.hero {
   display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-4);
+  padding-bottom: var(--pf-space-7);
+  border-bottom: 1px solid var(--pf-border-subtle);
+}
+
+.heroTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-4);
+}
+
+.title {
+  margin: 2px 0 0;
+  color: var(--pf-text-primary);
+  font-size: calc(var(--pf-font-xl) * 1.4);
+  line-height: 1;
+}
+
+.lede {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-md);
+  line-height: 1.6;
+}
+
+.switcher {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--pf-space-2);
+}
+
+.themeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-primary);
+  cursor: pointer;
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    background var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur) ease;
+}
+
+.themeChip:hover {
+  border-color: var(--pf-border-strong);
+  background: var(--pf-accent-wash);
+}
+
+.themeChipActive {
+  border-color: var(--pf-accent-base);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.themeDots {
+  display: inline-flex;
+}
+
+.themeDots > span {
+  width: 12px;
+  height: 12px;
+  margin-left: -4px;
+  border: 1px solid var(--pf-border-strong);
+  border-radius: 50%;
+}
+
+.themeDots > span:first-child {
+  margin-left: 0;
+}
+
+.themeChipName {
+  font-size: var(--pf-font-md);
+}
+
+.meta {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
+  gap: var(--pf-space-2);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+.tagline {
+  margin-left: var(--pf-space-2);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+  font-style: italic;
+}
+
+/* ── Plates ───────────────────────────────────────────────────────────── */
+
+.plate {
+  display: flex;
+  flex-direction: column;
   gap: var(--pf-space-5);
-  margin-top: var(--pf-space-6);
+  padding: var(--pf-space-8) 0;
+  border-bottom: 1px solid var(--pf-border-subtle);
+  animation: pf-rise-in var(--pf-dur-slow) var(--pf-ease-out) both;
+}
+
+.plateHead {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: var(--pf-space-1) var(--pf-space-4);
+}
+
+.plateNumber {
+  grid-row: span 2;
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-lg);
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--pf-text-glow);
+}
+
+.plateTitle {
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-xl);
+  line-height: 1.1;
+}
+
+.plateNote {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
 }
 
 .cell {
   display: flex;
   flex-direction: column;
   gap: var(--pf-space-3);
-  padding: var(--pf-space-5);
-  background: var(--pf-surface-1);
+  min-width: 0;
+  padding: var(--pf-space-4) var(--pf-space-5) var(--pf-space-5);
   border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-lg);
+  background: var(--pf-surface-1);
 }
 
-.surfaces {
+.cellHead {
   display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--pf-space-1);
+}
+
+.cellTitle {
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-sm);
+}
+
+.cellNote {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.token {
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+}
+
+/* ── Typography ───────────────────────────────────────────────────────── */
+
+.typeGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: var(--pf-space-6);
+}
+
+.typeSpecimen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-5) var(--pf-space-6);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-lg);
+  background: var(--pf-surface-1);
+}
+
+.display {
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-size: calc(var(--pf-font-xl) * 1.5);
+  line-height: 1.05;
+}
+
+.prose {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--pf-text-secondary);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.prose em {
+  color: var(--pf-text-primary);
+}
+
+.mono {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.mono :global(.pfGlowText) {
+  color: var(--pf-accent-base);
+}
+
+.scale {
+  display: flex;
+  flex-direction: column;
+}
+
+.scaleRow {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: baseline;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-2) 0;
+  border-bottom: 1px dashed var(--pf-border-subtle);
+}
+
+.scaleSample {
+  overflow: hidden;
+  color: var(--pf-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.faceDisplay,
+.faceUi,
+.faceMono {
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-lg);
+}
+
+.faceDisplay {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+}
+
+.faceUi {
+  font-family: var(--pf-font-ui);
+}
+
+.faceMono {
+  font-family: var(--pf-font-mono);
+}
+
+/* ── Colour tokens ────────────────────────────────────────────────────── */
+
+.tokenGroups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--pf-space-5) var(--pf-space-6);
+}
+
+.tokenGroup {
+  display: flex;
+  flex-direction: column;
   gap: var(--pf-space-2);
 }
 
-.surface0,
-.surface1,
-.surface2,
-.surface3 {
-  width: 48px;
-  height: 48px;
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--pf-space-2);
+}
+
+.swatch {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: var(--pf-space-2);
+  padding: var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.chip {
+  grid-row: span 2;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-sm);
+}
+
+.value {
+  overflow: hidden;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Material ─────────────────────────────────────────────────────────── */
+
+.materialStage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: var(--pf-space-6);
+  padding: var(--pf-space-6);
+  overflow: hidden;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-lg);
+  isolation: isolate;
+}
+
+/* A sliver of map so the glass has something to be glass over. */
+.mapBackdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(var(--pf-map-graticule) 1px, transparent 1px) 0 0 / 100% 48px,
+    linear-gradient(90deg, var(--pf-map-graticule) 1px, transparent 1px) 0 0 / 48px 100%,
+    var(--pf-map-water);
+}
+
+.realm {
+  position: absolute;
+  border: 1px solid color-mix(in srgb, var(--pf-text-primary) 25%, transparent);
+  border-radius: 46% 54% 38% 62% / 52% 40% 60% 48%;
+  opacity: 0.9;
+}
+
+.realm:nth-child(1) {
+  top: 8%;
+  left: 4%;
+  width: 34%;
+  height: 54%;
+}
+
+.realm:nth-child(2) {
+  top: 30%;
+  left: 30%;
+  width: 26%;
+  height: 58%;
+}
+
+.realm:nth-child(3) {
+  top: -10%;
+  left: 52%;
+  width: 30%;
+  height: 50%;
+}
+
+.realm:nth-child(4) {
+  top: 46%;
+  left: 62%;
+  width: 40%;
+  height: 64%;
+}
+
+.demoPanel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-4);
+  padding: var(--pf-space-5);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-lg);
+}
+
+.demoHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.demoTitle {
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-lg);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+}
+
+.row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: var(--pf-radius-md);
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-2) var(--pf-space-3);
   border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease;
 }
 
-.surface0 {
-  background: var(--pf-surface-0);
+.row:hover {
+  border-color: var(--pf-border-strong);
+  background: var(--pf-accent-wash);
 }
 
-.surface1 {
-  background: var(--pf-surface-1);
+.rowSelected {
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  box-shadow: var(--pf-glow-accent);
 }
 
-.surface2 {
+.rowIndex {
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+}
+
+.rails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+.rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--pf-space-2) var(--pf-space-3) var(--pf-space-2) var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.rail::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--pf-border-strong);
+}
+
+.major::before {
+  background: var(--pf-semantic-warning);
+}
+
+.pivotal::before {
+  background: var(--pf-semantic-danger);
+  box-shadow: 0 0 8px var(--pf-semantic-danger);
+}
+
+.railTitle {
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+}
+
+.materialNotes {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--pf-space-2);
+}
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--pf-space-3) var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-bg-solid);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+}
+
+.note .token {
+  color: var(--pf-accent-base);
+}
+
+/* ── Controls & marks ─────────────────────────────────────────────────── */
+
+.controls,
+.marks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: var(--pf-space-4);
+}
+
+.row2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pf-space-2);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--pf-space-3);
+}
+
+.selectField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+}
+
+.selectField select {
+  min-height: 36px;
+}
+
+/* Mirrors the shared Field label. */
+.selectLabel {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.popoverBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  padding: var(--pf-space-2);
+}
+
+.popoverBody p {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+}
+
+.icons {
+  gap: var(--pf-space-1);
+}
+
+.iconTile {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-secondary);
+}
+
+.realms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+.realmRow {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+}
+
+.realmName {
+  flex: 1;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+}
+
+.units {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: var(--pf-space-2);
+}
+
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pf-space-1);
+  padding: var(--pf-space-2) var(--pf-space-1);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.unitLabel {
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+}
+
+.structure {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-sm);
   background: var(--pf-surface-2);
+  color: var(--pf-text-secondary);
 }
 
-.surface3 {
-  background: var(--pf-surface-3);
+.modalText {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  line-height: 1.6;
+}
+
+@media (width <= 900px) {
+  .typeGrid,
+  .materialStage {
+    grid-template-columns: 1fr;
+  }
+
+  .controls,
+  .marks,
+  .tokenGroups {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,0 +1,163 @@
+.stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 75% 70% at 50% 48%, transparent 55%, currentcolor 100%);
+  z-index: 1;
+}
+
+/* ── Polity labels ─────────────────────────────────────────────────────── */
+
+.label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--pf-font-label);
+  font-weight: var(--pf-heading-weight);
+  font-variant-caps: var(--pf-map-label-variant);
+  font-style: var(--pf-map-label-style);
+  letter-spacing: var(--pf-map-label-tracking);
+  line-height: 1.12;
+  color: var(--pf-map-label);
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0.88;
+  text-shadow:
+    0 0 1px var(--pf-map-label-halo),
+    0 0 2px var(--pf-map-label-halo),
+    0 0 4px var(--pf-map-label-halo),
+    0 0 9px var(--pf-map-label-halo);
+  transition:
+    font-size var(--pf-dur-slow) var(--pf-ease),
+    opacity var(--pf-dur) ease;
+  animation: pf-fade-in var(--pf-dur-slow) ease;
+  user-select: none;
+}
+
+/* Tracking adds trailing space after the last letter; pull it back so the
+   visual center stays on the anchor. */
+.label span {
+  margin-right: calc(-1 * var(--pf-map-label-tracking));
+}
+
+.labelPlayer {
+  color: var(--pf-accent-base);
+  opacity: 1;
+}
+
+[data-pf-glow="low"] .labelPlayer,
+[data-pf-glow="high"] .label {
+  text-shadow:
+    0 0 1px var(--pf-map-label-halo),
+    0 0 3px var(--pf-map-label-halo),
+    0 0 10px var(--pf-accent-line);
+}
+
+.labelSelected {
+  opacity: 1;
+  color: var(--pf-map-selection);
+}
+
+/* ── Hover dossier ─────────────────────────────────────────────────────── */
+
+.hoverCard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 15;
+  max-width: 300px;
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-bg-solid);
+  backdrop-filter: var(--pf-panel-filter);
+  box-shadow: var(--pf-shadow-raise);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hoverCard[hidden] {
+  display: none;
+}
+
+.hoverHead {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+}
+
+.hoverName {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+  font-weight: var(--pf-heading-weight);
+  letter-spacing: var(--pf-heading-tracking);
+  line-height: 1.2;
+  text-transform: var(--pf-heading-transform);
+}
+
+.hoverYou {
+  padding: 0 5px;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hoverPlace {
+  margin-top: 2px;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+}
+
+/* ── Event ping ────────────────────────────────────────────────────────── */
+
+.ping {
+  --pf-ping: var(--pf-accent-base);
+
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.pingMajor {
+  --pf-ping: var(--pf-semantic-warning);
+}
+
+.pingPivotal {
+  --pf-ping: var(--pf-semantic-danger);
+}
+
+.pingRing {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--pf-ping);
+  border-radius: 50%;
+  animation: pf-ping 2.2s var(--pf-ease-out) infinite;
+}
+
+.pingRing + .pingRing {
+  animation-delay: 1.1s;
+}
+
+.pingCore {
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--pf-ping);
+  box-shadow: 0 0 12px var(--pf-ping);
+}

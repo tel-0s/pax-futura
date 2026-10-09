@@ -3,17 +3,36 @@
   gap: var(--pf-space-1);
   border-bottom: 1px solid var(--pf-border-subtle);
   overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-1);
   padding: var(--pf-space-2) var(--pf-space-3);
   border: none;
-  border-bottom: 2px solid transparent;
   background: none;
-  color: var(--pf-text-secondary);
+  color: var(--pf-text-muted);
   font-size: var(--pf-font-sm);
-  cursor: pointer;
+  font-weight: 500;
   white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--pf-dur-fast) ease;
+}
+
+.tab::after {
+  content: "";
+  position: absolute;
+  left: var(--pf-space-2);
+  right: var(--pf-space-2);
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--pf-accent-base);
+  transform: scaleX(0);
+  transition: transform var(--pf-dur) var(--pf-ease-out);
 }
 
 .tab:hover {
@@ -21,6 +40,10 @@
 }
 
 .active {
-  color: var(--pf-accent-base);
-  border-bottom-color: var(--pf-accent-base);
+  color: var(--pf-text-primary);
+}
+
+.active::after {
+  transform: scaleX(1);
+  box-shadow: var(--pf-glow-accent);
 }

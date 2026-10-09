@@ -1,34 +1,137 @@
 {
-  "meta": { "id": "daylight", "name": "Daylight", "scheme": "light" },
+  "meta": {
+    "id": "daylight",
+    "name": "Daylight",
+    "scheme": "light",
+    "tagline": "Modern atlas — frosted glass over a bright sea"
+  },
   "color": {
-    "surface": ["#f7f9fb", "#eef2f6", "#e3e9f0", "#d6dee8"],
-    "text": { "primary": "#17202b", "secondary": "#45536a", "muted": "#7c8aa0", "inverse": "#f7f9fb" },
-    "accent": { "base": "#2f6fd0", "hover": "#4a86e0", "subtle": "#dbe7f8" },
-    "semantic": { "success": "#2e9e68", "warning": "#c98a1f", "danger": "#d0503f", "info": "#2f9cc0" },
-    "border": { "subtle": "#d5dde7", "strong": "#b4c0d0", "focus": "#2f6fd0" },
-    "loom": { "canonicalEdge": "#2f6fd0", "siblingEdge": "#b4c0d0", "nodeCurrent": "#4a86e0", "nodePending": "#c98a1f" }
+    "surface": [
+      "#edf1f6",
+      "#ffffff",
+      "#f3f6fa",
+      "#e6ecf3"
+    ],
+    "text": {
+      "primary": "#131f2d",
+      "secondary": "#45566b",
+      "muted": "#7d8ca1",
+      "inverse": "#ffffff"
+    },
+    "accent": {
+      "base": "#1f6fe0",
+      "hover": "#3a84ec",
+      "subtle": "#e1ecfc"
+    },
+    "semantic": {
+      "success": "#1b9a66",
+      "warning": "#c98512",
+      "danger": "#d9473a",
+      "info": "#1a9bc4"
+    },
+    "border": {
+      "subtle": "#e0e6ee",
+      "strong": "#c3cedb",
+      "focus": "#1f6fe0"
+    },
+    "loom": {
+      "canonicalEdge": "#1f6fe0",
+      "siblingEdge": "#c3cedb",
+      "nodeCurrent": "#3a84ec",
+      "nodePending": "#c98512"
+    }
   },
   "font": {
-    "ui": "'Inter', system-ui, sans-serif",
-    "display": "'Inter', system-ui, sans-serif",
-    "mono": "'JetBrains Mono', 'SF Mono', monospace",
-    "scale": { "xs": "11px", "sm": "12.5px", "md": "14px", "lg": "17px", "xl": "22px" }
+    "ui": "'Inter Variable', 'Inter', system-ui, sans-serif",
+    "display": "'Fraunces Variable', 'Iowan Old Style', Georgia, serif",
+    "mono": "'JetBrains Mono Variable', 'SF Mono', ui-monospace, monospace",
+    "scale": {
+      "xs": "11px",
+      "sm": "12.5px",
+      "md": "14px",
+      "lg": "17.5px",
+      "xl": "28px"
+    }
   },
-  "space": { "unit": 4 },
-  "radius": { "sm": "4px", "md": "8px", "lg": "14px" },
+  "space": {
+    "unit": 4
+  },
+  "radius": {
+    "sm": "6px",
+    "md": "10px",
+    "lg": "16px"
+  },
   "shadow": {
-    "raise": "0 1px 5px rgba(23,32,43,0.12)",
-    "overlay": "0 8px 36px rgba(23,32,43,0.22)"
+    "raise": "0 1px 2px rgba(19,31,45,0.06), 0 3px 10px rgba(19,31,45,0.08)",
+    "overlay": "0 24px 64px rgba(19,31,45,0.18), 0 2px 8px rgba(19,31,45,0.08)"
+  },
+  "style": {
+    "panelOpacity": 0.82,
+    "panelBlur": 24,
+    "corners": "round",
+    "ornament": "hairline",
+    "texture": "none",
+    "textureOpacity": 0,
+    "glow": 0,
+    "heading": {
+      "case": "none",
+      "tracking": "-0.01em",
+      "weight": 600
+    },
+    "fleuron": ""
   },
   "map": {
-    "water": "#cfe2ef",
-    "land": "#eef0e9",
+    "water": "#b4d3e9",
+    "land": "#f4f2eb",
     "terrainTintOpacity": 0.35,
-    "boundary": { "line": "#9daebe", "disputed": "#c98a1f" },
-    "label": { "color": "#17202b", "halo": "#f7f9fb", "glyphStack": "sans" },
-    "graticule": "#e3e9f0",
-    "selectionOutline": "#2f6fd0",
-    "hoverFill": "#dbe7f8",
-    "polityPalette": { "hueOffset": 0, "sat": [42, 65], "lum": [52, 68], "contested": "blend" }
+    "boundary": {
+      "line": "#ffffff",
+      "disputed": "#c98512"
+    },
+    "label": {
+      "color": "#1b2838",
+      "halo": "#ffffff",
+      "glyphStack": "sans",
+      "font": "'Inter Variable', sans-serif",
+      "case": "uppercase",
+      "tracking": "0.16em",
+      "italic": false
+    },
+    "graticule": "#c9deee",
+    "selectionOutline": "#1f6fe0",
+    "hoverFill": "#ffffff",
+    "polityPalette": {
+      "hueOffset": 0,
+      "sat": [
+        46,
+        66
+      ],
+      "lum": [
+        60,
+        72
+      ],
+      "contested": "blend",
+      "hueSpread": 1
+    },
+    "projection": "mercator",
+    "atmosphere": {
+      "space": "#dfe9f3",
+      "horizon": "#ffffff",
+      "glow": 0.6
+    },
+    "coast": {
+      "style": "shadow",
+      "color": "#1d3c5a",
+      "width": 9,
+      "opacity": 0.13
+    },
+    "waterPattern": "none",
+    "landTexture": "none",
+    "textureStrength": 0,
+    "fillOpacity": 0.9,
+    "borderBand": 0,
+    "boundaryDash": [],
+    "vignette": 0,
+    "ornament": "minimal"
   }
 }

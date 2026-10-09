@@ -1,34 +1,137 @@
 {
-  "meta": { "id": "parchment", "name": "Parchment", "scheme": "light" },
+  "meta": {
+    "id": "parchment",
+    "name": "Parchment",
+    "scheme": "light",
+    "tagline": "Antique atlas — iron-gall ink on laid paper"
+  },
   "color": {
-    "surface": ["#efe6d4", "#e7dcc6", "#ddd0b6", "#d2c3a5"],
-    "text": { "primary": "#2e2618", "secondary": "#54492f", "muted": "#7d7156", "inverse": "#f4ecdd" },
-    "accent": { "base": "#8a5a2b", "hover": "#a06b35", "subtle": "#e0cba8" },
-    "semantic": { "success": "#5e7d3f", "warning": "#a8762c", "danger": "#9c3f2f", "info": "#4a6b85" },
-    "border": { "subtle": "#cbbc9c", "strong": "#a89773", "focus": "#8a5a2b" },
-    "loom": { "canonicalEdge": "#8a5a2b", "siblingEdge": "#b3a586", "nodeCurrent": "#a06b35", "nodePending": "#a8762c" }
+    "surface": [
+      "#e4d5b3",
+      "#f2e7cd",
+      "#e8dabb",
+      "#dccaa3"
+    ],
+    "text": {
+      "primary": "#2a2013",
+      "secondary": "#574731",
+      "muted": "#857257",
+      "inverse": "#f7efdc"
+    },
+    "accent": {
+      "base": "#8f3b1f",
+      "hover": "#a94a29",
+      "subtle": "#ead3bd"
+    },
+    "semantic": {
+      "success": "#53723a",
+      "warning": "#a8741f",
+      "danger": "#a12d2d",
+      "info": "#3f6680"
+    },
+    "border": {
+      "subtle": "#cdb994",
+      "strong": "#a38b62",
+      "focus": "#8f3b1f"
+    },
+    "loom": {
+      "canonicalEdge": "#8f3b1f",
+      "siblingEdge": "#b8a37d",
+      "nodeCurrent": "#b04a28",
+      "nodePending": "#a8741f"
+    }
   },
   "font": {
-    "ui": "'Iowan Old Style', 'Palatino', Georgia, serif",
-    "display": "'Iowan Old Style', 'Palatino', Georgia, serif",
-    "mono": "'Courier New', monospace",
-    "scale": { "xs": "11.5px", "sm": "13px", "md": "15px", "lg": "18px", "xl": "24px" }
+    "ui": "'EB Garamond Variable', 'Iowan Old Style', Palatino, Georgia, serif",
+    "display": "'IM Fell English SC', 'EB Garamond Variable', Georgia, serif",
+    "mono": "'Courier Prime', 'Courier New', monospace",
+    "scale": {
+      "xs": "12.5px",
+      "sm": "14px",
+      "md": "16px",
+      "lg": "20px",
+      "xl": "30px"
+    }
   },
-  "space": { "unit": 4 },
-  "radius": { "sm": "2px", "md": "4px", "lg": "8px" },
+  "space": {
+    "unit": 4
+  },
+  "radius": {
+    "sm": "1px",
+    "md": "2px",
+    "lg": "3px"
+  },
   "shadow": {
-    "raise": "0 1px 4px rgba(72,58,32,0.25)",
-    "overlay": "0 6px 30px rgba(72,58,32,0.35)"
+    "raise": "0 1px 3px rgba(60,42,18,0.22)",
+    "overlay": "0 12px 40px rgba(60,42,18,0.32), 0 1px 0 rgba(60,42,18,0.18)"
+  },
+  "style": {
+    "panelOpacity": 1,
+    "panelBlur": 0,
+    "corners": "square",
+    "ornament": "double-rule",
+    "texture": "paper",
+    "textureOpacity": 0.55,
+    "glow": 0,
+    "heading": {
+      "case": "none",
+      "tracking": "0.03em",
+      "weight": 400
+    },
+    "fleuron": "❦"
   },
   "map": {
-    "water": "#cfd9d2",
-    "land": "#e9dfc8",
+    "water": "#c5cfba",
+    "land": "#eadcbc",
     "terrainTintOpacity": 0.4,
-    "boundary": { "line": "#8d7d5a", "disputed": "#a8762c" },
-    "label": { "color": "#2e2618", "halo": "#efe6d4", "glyphStack": "serif" },
-    "graticule": "#d8ccb0",
-    "selectionOutline": "#8a5a2b",
-    "hoverFill": "#e0cba8",
-    "polityPalette": { "hueOffset": 18, "sat": [28, 45], "lum": [55, 72], "contested": "stripe" }
+    "boundary": {
+      "line": "#6e5a3c",
+      "disputed": "#a12d2d"
+    },
+    "label": {
+      "color": "#3a2b17",
+      "halo": "#efe3c6",
+      "glyphStack": "serif",
+      "font": "'IM Fell English SC', 'EB Garamond Variable', serif",
+      "case": "none",
+      "tracking": "0.26em",
+      "italic": false,
+      "scale": 1.1
+    },
+    "graticule": "#8f8063",
+    "selectionOutline": "#8f3b1f",
+    "hoverFill": "#8f3b1f",
+    "polityPalette": {
+      "hueOffset": 18,
+      "sat": [
+        30,
+        50
+      ],
+      "lum": [
+        55,
+        69
+      ],
+      "contested": "stripe",
+      "hueSpread": 1
+    },
+    "projection": "mercator",
+    "atmosphere": null,
+    "coast": {
+      "style": "ripples",
+      "color": "#4f6457",
+      "width": 5,
+      "opacity": 0.42
+    },
+    "waterPattern": "hatch",
+    "landTexture": "paper",
+    "textureStrength": 0.5,
+    "fillOpacity": 0.6,
+    "borderBand": 3.5,
+    "boundaryDash": [
+      3,
+      1.5
+    ],
+    "vignette": 0.55,
+    "ornament": "compass"
   }
 }

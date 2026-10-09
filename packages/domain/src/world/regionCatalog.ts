@@ -14,8 +14,20 @@ export const KNOWN_REGION_IDS: ReadonlySet<string> = new Set([
 
 const NAMES = new Map<string, string>([...COUNTRY_ENTRIES, ...REGION_ENTRIES]);
 
-/** Human name for a catalog id, or the id itself if unknown. */
-export const regionDisplayName = (id: string): string => NAMES.get(id) ?? id;
+/**
+ * Human name for a catalog id, or the id itself if unknown. GADM marks a few
+ * provinces "NA" (its missing-value token); those read as an unnamed
+ * province of their country instead.
+ */
+export const regionDisplayName = (id: string): string => {
+  const name = NAMES.get(id);
+  if (name && name !== "NA") return name;
+  if (name === "NA") {
+    const country = NAMES.get(id.split(".")[0] ?? "");
+    return country ? `${country} (unnamed province)` : id;
+  }
+  return id;
+};
 
 /** The country-code vocabulary line used in prompts (compact, cacheable). */
 export const countryCodeVocabulary = (): string =>

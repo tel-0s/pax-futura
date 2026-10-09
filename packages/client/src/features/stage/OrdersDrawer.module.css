@@ -1,81 +1,257 @@
+/* The order queue as numbered dispatch slips: a perforated number stub on
+   the left, the order's text, and edit / withdraw on the right. */
+
 .empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-8) var(--pf-space-4);
   color: var(--pf-text-muted);
+  text-align: center;
+}
+
+.empty p {
+  max-width: 32ch;
+  margin: 0;
   font-size: var(--pf-font-sm);
+  line-height: 1.55;
+  text-wrap: pretty;
 }
 
 .list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
   display: flex;
   flex-direction: column;
   gap: var(--pf-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.item {
+/* ── Slip ──────────────────────────────────────────────────────────────── */
+
+.slip {
+  position: relative;
   display: flex;
-  gap: var(--pf-space-2);
-  align-items: flex-start;
-  padding: var(--pf-space-2) var(--pf-space-3);
+  align-items: stretch;
   border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-md);
-  background: var(--pf-surface-0);
-  font-size: var(--pf-font-sm);
+  background: var(--pf-panel-inset);
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out) backwards;
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    background var(--pf-dur-fast) ease;
 }
 
-.index {
+.slip:hover {
+  border-color: var(--pf-border-strong);
+}
+
+.slipEditing {
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  box-shadow: var(--pf-glow-accent);
+}
+
+/* Number stub, torn from the slip along a perforation. */
+.number {
+  display: flex;
+  flex: 0 0 48px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1px;
+  padding: var(--pf-space-3) 0 var(--pf-space-2);
+  border-right: 1px dashed var(--pf-border-strong);
+}
+
+.numberLabel {
+  color: var(--pf-text-muted);
   font-family: var(--pf-font-mono);
-  font-size: var(--pf-font-xs);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.numberIndex,
+.numberRoman {
   color: var(--pf-accent-base);
-  padding-top: 2px;
-  flex-shrink: 0;
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+  text-shadow: var(--pf-text-glow);
+}
+
+.numberRoman {
+  display: none;
 }
 
 .text {
   flex: 1;
-  line-height: 1.4;
+  min-width: 0;
+  margin: 0;
+  padding: var(--pf-space-3) var(--pf-space-2) var(--pf-space-3) var(--pf-space-3);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .actions {
   display: flex;
-  gap: var(--pf-space-1);
-  flex-shrink: 0;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--pf-space-2) var(--pf-space-2) var(--pf-space-2) 0;
+  opacity: 0.55;
+  transition: opacity var(--pf-dur-fast) ease;
 }
 
-.iconButton {
-  border: none;
-  background: transparent;
-  color: var(--pf-text-secondary);
-  cursor: pointer;
-  padding: 0 var(--pf-space-1);
-  border-radius: var(--pf-radius-sm);
+.actions:focus-within,
+.slip:hover .actions {
+  opacity: 1;
 }
 
-.iconButton:hover {
-  background: var(--pf-surface-2);
-  color: var(--pf-text-primary);
+.remove:hover:not(:disabled) {
+  background: var(--pf-semantic-danger-wash);
+  color: var(--pf-semantic-danger);
 }
+
+/* ── Editing ───────────────────────────────────────────────────────────── */
 
 .editBox {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: var(--pf-space-2);
+  min-width: 0;
+  padding: var(--pf-space-2);
 }
 
 .editArea {
   width: 100%;
-  resize: vertical;
   padding: var(--pf-space-2);
-  border: 1px solid var(--pf-border-subtle);
+  border: 1px solid var(--pf-border-strong);
   border-radius: var(--pf-radius-sm);
-  background: var(--pf-surface-1);
+  outline: none;
+  background: var(--pf-panel-bg-solid);
   color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.editArea:focus {
+  border-color: var(--pf-border-focus);
 }
 
 .editActions {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
   gap: var(--pf-space-2);
+}
+
+/* Shortcut hint: its own line, so the buttons always stay together. */
+.editHint {
+  flex: 1 1 100%;
+  color: var(--pf-text-muted);
+  font-size: 10.5px;
+}
+
+/* ── Advance-time pointer ──────────────────────────────────────────────── */
+
+.dispatchHint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pf-space-3);
+  margin-top: var(--pf-space-5);
+  padding: var(--pf-space-3);
+  border: 1px solid var(--pf-accent-line);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-accent-wash);
+}
+
+.hintIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-accent-base);
+  color: var(--pf-text-inverse);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.dispatchHint p {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.55;
+}
+
+.dispatchHint strong {
+  color: var(--pf-text-primary);
+  font-weight: 600;
+}
+
+/* ── Per-theme ─────────────────────────────────────────────────────────── */
+
+/* Parchment: handwritten despatches, numbered in rubric Roman. */
+[data-pf-ornament="double-rule"] .numberIndex {
+  display: none;
+}
+
+[data-pf-ornament="double-rule"] .numberRoman {
+  display: inline;
+  font-weight: 400;
+}
+
+[data-pf-ornament="double-rule"] .numberLabel {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-xs);
+  font-style: italic;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+[data-pf-ornament="double-rule"] .number {
+  border-right-style: dotted;
+}
+
+[data-pf-ornament="double-rule"] .slip {
+  border-color: var(--pf-border-strong);
+  box-shadow: inset 0 0 0 3px var(--pf-panel-inset), inset 0 0 0 4px var(--pf-border-subtle);
+}
+
+[data-pf-ornament="double-rule"] .text {
+  font-size: var(--pf-font-md);
+  font-style: italic;
+  line-height: 1.45;
+}
+
+[data-pf-ornament="double-rule"] .hintIcon {
+  border-radius: 50%;
+}
+
+/* Seraphim: an orange-stamped stub. */
+[data-pf-ornament="hazard"] .number {
+  background: repeating-linear-gradient(-45deg, var(--pf-accent-wash) 0 4px, transparent 4px 8px);
+}
+
+/* Phosphor: teletype slips with dashed tear lines. */
+[data-pf-glow="high"] .slip,
+[data-pf-glow="high"] .dispatchHint {
+  border-style: dashed;
+}
+
+[data-pf-glow="high"] .numberIndex {
+  font-size: 30px;
+  font-weight: 400;
 }

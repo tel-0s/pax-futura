@@ -1,0 +1,204 @@
+/* Minister seals and envoy medallions. One SVG carries every shape; the theme
+   decides which one is drawn (see Seal.tsx). The role tint flows through a
+   single custom property so each shape, legend and glyph agree. */
+
+.seal {
+  --pf-seal-tint: var(--pf-accent-base);
+
+  position: relative;
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  color: var(--pf-seal-tint);
+  line-height: 1;
+}
+
+.chancellor {
+  --pf-seal-tint: var(--pf-semantic-warning);
+}
+
+.marshal {
+  --pf-seal-tint: var(--pf-semantic-danger);
+}
+
+.spymaster {
+  --pf-seal-tint: var(--pf-semantic-info);
+}
+
+.advisor {
+  --pf-seal-tint: var(--pf-accent-base);
+}
+
+.art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.glyph {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Default: HUD ring (command deck, daylight) ────────────────────────── */
+
+.shapeWax,
+.shapePlate,
+.plateTab,
+.shapeBox {
+  display: none;
+}
+
+.shapeRing {
+  fill: color-mix(in srgb, var(--pf-seal-tint) 16%, var(--pf-surface-1));
+  stroke: var(--pf-seal-tint);
+  stroke-width: 2;
+}
+
+.inner {
+  fill: none;
+  stroke: color-mix(in srgb, var(--pf-seal-tint) 45%, transparent);
+  stroke-width: 1;
+}
+
+.legend {
+  fill: var(--pf-seal-tint);
+  font-family: var(--pf-font-mono);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* Command deck: a tick-marked reticle with a soft instrument glow. */
+[data-pf-ornament="brackets"] .inner {
+  stroke-dasharray: 1.6 2.6;
+  stroke-width: 1.4;
+}
+
+[data-pf-glow="low"] .art {
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--pf-seal-tint) 55%, transparent));
+}
+
+/* Daylight: a quiet enamel badge. */
+[data-pf-ornament="hairline"] .shapeRing {
+  fill: color-mix(in srgb, var(--pf-seal-tint) 12%, var(--pf-surface-1));
+  stroke-width: 1.5;
+}
+
+[data-pf-ornament="hairline"] .inner {
+  stroke: none;
+}
+
+/* ── Parchment: pressed wax ────────────────────────────────────────────── */
+
+[data-pf-ornament="double-rule"] .seal {
+  color: var(--pf-text-inverse);
+}
+
+/* The advisor's wax is umber, so it never reads as the marshal's red. */
+[data-pf-ornament="double-rule"] .advisor {
+  --pf-seal-tint: var(--pf-text-secondary);
+}
+
+[data-pf-ornament="double-rule"] .shapeRing {
+  display: none;
+}
+
+[data-pf-ornament="double-rule"] .shapeWax {
+  display: inline;
+  fill: var(--pf-seal-tint);
+  stroke: color-mix(in srgb, var(--pf-seal-tint) 70%, var(--pf-text-primary));
+  stroke-width: 0.8;
+}
+
+[data-pf-ornament="double-rule"] .inner {
+  stroke: color-mix(in srgb, var(--pf-text-inverse) 50%, transparent);
+  stroke-width: 1.3;
+}
+
+[data-pf-ornament="double-rule"] .legend {
+  fill: var(--pf-text-inverse);
+  font-family: var(--pf-font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+[data-pf-ornament="double-rule"] .art {
+  filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--pf-text-primary) 40%, transparent));
+}
+
+/* ── Seraphim: a machined plate with a cut corner and a tint tab ───────── */
+
+[data-pf-corners="chamfer"] .shapeRing,
+[data-pf-corners="chamfer"] .inner {
+  display: none;
+}
+
+[data-pf-corners="chamfer"] .shapePlate {
+  display: inline;
+  fill: color-mix(in srgb, var(--pf-seal-tint) 14%, var(--pf-surface-1));
+  stroke: var(--pf-seal-tint);
+  stroke-width: 2.4;
+}
+
+[data-pf-corners="chamfer"] .plateTab {
+  display: inline;
+  fill: var(--pf-seal-tint);
+}
+
+/* ── Phosphor: everything is the one green, boxed like a terminal field ── */
+
+[data-pf-glow="high"] .seal {
+  --pf-seal-tint: var(--pf-accent-base);
+}
+
+[data-pf-glow="high"] .shapeRing,
+[data-pf-glow="high"] .inner {
+  display: none;
+}
+
+[data-pf-glow="high"] .shapeBox {
+  display: inline;
+  fill: color-mix(in srgb, var(--pf-seal-tint) 10%, transparent);
+  stroke: var(--pf-seal-tint);
+  stroke-width: 2;
+}
+
+[data-pf-glow="high"] .art {
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--pf-seal-tint) 60%, transparent));
+}
+
+/* ── Envoy medallion ───────────────────────────────────────────────────── */
+
+.flagMark {
+  --pf-seal-tint: var(--pf-border-strong);
+
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1.5px solid var(--pf-seal-tint);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pf-seal-tint) 16%, var(--pf-panel-inset));
+  line-height: 1;
+}
+
+[data-pf-ornament="double-rule"] .flagMark {
+  border-width: 1px;
+  border-color: var(--pf-border-strong);
+  background: var(--pf-surface-1);
+  box-shadow:
+    inset 0 0 0 2px var(--pf-surface-1),
+    inset 0 0 0 3.5px var(--pf-seal-tint);
+}
+
+[data-pf-corners="chamfer"] .flagMark {
+  border-width: 2px;
+  border-radius: var(--pf-radius-sm);
+}
+
+[data-pf-glow="high"] .flagMark {
+  border-color: var(--pf-accent-base);
+  border-radius: 0;
+  background: var(--pf-accent-wash);
+}

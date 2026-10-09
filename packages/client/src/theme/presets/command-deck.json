@@ -1,34 +1,137 @@
 {
-  "meta": { "id": "command-deck", "name": "Command Deck", "scheme": "dark" },
+  "meta": {
+    "id": "command-deck",
+    "name": "Command Deck",
+    "scheme": "dark",
+    "tagline": "Strategic operations — glass, light and a turning globe"
+  },
   "color": {
-    "surface": ["#0b0e13", "#12161e", "#1a202b", "#242c3a"],
-    "text": { "primary": "#e6ebf2", "secondary": "#a8b2c1", "muted": "#6b7a8c", "inverse": "#0b0e13" },
-    "accent": { "base": "#4da3ff", "hover": "#74b8ff", "subtle": "#1d3a5c" },
-    "semantic": { "success": "#4ecb8f", "warning": "#e8b64c", "danger": "#e86a5e", "info": "#5cc8e8" },
-    "border": { "subtle": "#2a3342", "strong": "#3d4a5e", "focus": "#4da3ff" },
-    "loom": { "canonicalEdge": "#4da3ff", "siblingEdge": "#3d4a5e", "nodeCurrent": "#74b8ff", "nodePending": "#e8b64c" }
+    "surface": [
+      "#070b12",
+      "#0c121c",
+      "#131b28",
+      "#1b2636"
+    ],
+    "text": {
+      "primary": "#e8eef7",
+      "secondary": "#a3b3c8",
+      "muted": "#64778f",
+      "inverse": "#04070c"
+    },
+    "accent": {
+      "base": "#4aa8ff",
+      "hover": "#7cc0ff",
+      "subtle": "#11304f"
+    },
+    "semantic": {
+      "success": "#3fd69a",
+      "warning": "#f0b94d",
+      "danger": "#ff6b5e",
+      "info": "#53d0f0"
+    },
+    "border": {
+      "subtle": "#1d293a",
+      "strong": "#30425a",
+      "focus": "#4aa8ff"
+    },
+    "loom": {
+      "canonicalEdge": "#4aa8ff",
+      "siblingEdge": "#30425a",
+      "nodeCurrent": "#7cc0ff",
+      "nodePending": "#f0b94d"
+    }
   },
   "font": {
-    "ui": "'Inter', system-ui, sans-serif",
-    "display": "'Inter', system-ui, sans-serif",
-    "mono": "'JetBrains Mono', 'SF Mono', monospace",
-    "scale": { "xs": "11px", "sm": "12.5px", "md": "14px", "lg": "17px", "xl": "22px" }
+    "ui": "'Inter Variable', 'Inter', system-ui, sans-serif",
+    "display": "'Barlow Semi Condensed', 'Inter Variable', system-ui, sans-serif",
+    "mono": "'JetBrains Mono Variable', 'SF Mono', ui-monospace, monospace",
+    "scale": {
+      "xs": "11px",
+      "sm": "12.5px",
+      "md": "14px",
+      "lg": "17px",
+      "xl": "26px"
+    }
   },
-  "space": { "unit": 4 },
-  "radius": { "sm": "4px", "md": "8px", "lg": "14px" },
+  "space": {
+    "unit": 4
+  },
+  "radius": {
+    "sm": "4px",
+    "md": "7px",
+    "lg": "12px"
+  },
   "shadow": {
-    "raise": "0 2px 8px rgba(0,0,0,0.45)",
-    "overlay": "0 8px 40px rgba(0,0,0,0.65)"
+    "raise": "0 2px 10px rgba(0,0,0,0.5)",
+    "overlay": "0 18px 60px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.45)"
+  },
+  "style": {
+    "panelOpacity": 0.78,
+    "panelBlur": 18,
+    "corners": "round",
+    "ornament": "brackets",
+    "texture": "none",
+    "textureOpacity": 0,
+    "glow": 0.55,
+    "heading": {
+      "case": "uppercase",
+      "tracking": "0.14em",
+      "weight": 600
+    },
+    "fleuron": ""
   },
   "map": {
-    "water": "#0d1420",
-    "land": "#1c2431",
+    "water": "#050b15",
+    "land": "#131b27",
     "terrainTintOpacity": 0.25,
-    "boundary": { "line": "#3d4a5e", "disputed": "#e8b64c" },
-    "label": { "color": "#e6ebf2", "halo": "#0b0e13", "glyphStack": "sans" },
-    "graticule": "#1a202b",
-    "selectionOutline": "#74b8ff",
-    "hoverFill": "#1d3a5c",
-    "polityPalette": { "hueOffset": 0, "sat": [38, 62], "lum": [38, 55], "contested": "stripe" }
+    "boundary": {
+      "line": "#2a3b53",
+      "disputed": "#f0b94d"
+    },
+    "label": {
+      "color": "#e2ecf8",
+      "halo": "#04070c",
+      "glyphStack": "sans",
+      "font": "'Barlow Semi Condensed', sans-serif",
+      "case": "uppercase",
+      "tracking": "0.22em",
+      "italic": false
+    },
+    "graticule": "#10203a",
+    "selectionOutline": "#7cc0ff",
+    "hoverFill": "#4aa8ff",
+    "polityPalette": {
+      "hueOffset": 0,
+      "sat": [
+        40,
+        60
+      ],
+      "lum": [
+        34,
+        50
+      ],
+      "contested": "stripe",
+      "hueSpread": 1
+    },
+    "projection": "globe",
+    "atmosphere": {
+      "space": "#02050a",
+      "horizon": "#1f63b0",
+      "glow": 0.75
+    },
+    "coast": {
+      "style": "glow",
+      "color": "#3a8cff",
+      "width": 8,
+      "opacity": 0.32
+    },
+    "waterPattern": "grid",
+    "landTexture": "none",
+    "textureStrength": 0.2,
+    "fillOpacity": 0.8,
+    "borderBand": 2.5,
+    "boundaryDash": [],
+    "vignette": 0.5,
+    "ornament": "hud"
   }
 }

@@ -1,4 +1,8 @@
 .canvas {
+  /* Edge strokes thicken in world space as the tree zooms out, so lines
+     stay legible on screen (~0.75 of their natural width at worst). */
+  --pf-edge-k: max(1, calc(0.75 / var(--pf-tree-scale, 1)));
+
   position: relative;
   width: 100%;
   height: 100%;
@@ -16,6 +20,11 @@
   transform-origin: 0 0;
 }
 
+/* Programmatic moves (recenter, reveal, zoom buttons) ease; drag never does. */
+.gliding {
+  transition: transform 380ms var(--pf-ease-out);
+}
+
 .edges {
   position: absolute;
   overflow: visible;
@@ -24,12 +33,55 @@
   pointer-events: none;
 }
 
-.edge {
+/* Each edge is a <g> of three paths: halo (glow underlay), line, flow
+   (animated light). Only the line is drawn by default — callers light the
+   others per edge class. */
+.edge path {
   fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.edge [data-edge="line"] {
   stroke: var(--pf-loom-sibling-edge);
-  stroke-width: 1.5;
+  stroke-width: calc(1.5px * var(--pf-edge-k));
 }
 
 .node {
   position: absolute;
+}
+
+/* ── On-canvas zoom controls ───────────────────────────────────────────── */
+
+.controls {
+  position: absolute;
+  right: var(--pf-space-4);
+  bottom: var(--pf-space-4);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--pf-space-1);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-bg-solid);
+  box-shadow: var(--pf-shadow-raise);
+  cursor: default;
+}
+
+.zoomReadout {
+  min-width: 34px;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.controlRule {
+  width: 16px;
+  height: 1px;
+  margin: 2px 0;
+  background: var(--pf-border-subtle);
 }

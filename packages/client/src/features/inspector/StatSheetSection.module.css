@@ -1,100 +1,561 @@
-.sheet {
+/* The dossier's assessment: soft scores as segmented gauges (estimated),
+   relations as a measured ledger. Gauges carry their band as a local
+   --pf-gauge-* pair so every theme variant only restyles the instrument. */
+
+.section {
   display: flex;
   flex-direction: column;
-  gap: var(--pf-space-2);
+  gap: var(--pf-space-3);
+  margin-top: var(--pf-space-3);
+  animation: pf-fade-in var(--pf-dur) var(--pf-ease-out);
+  transition: opacity var(--pf-dur) ease;
 }
 
-.meter {
+.stale {
+  opacity: 0.55;
+}
+
+.spinning {
+  animation: pf-spin 0.9s linear infinite;
+}
+
+/* ── Gauges ────────────────────────────────────────────────────────────── */
+
+.gauges {
   display: flex;
-  align-items: center;
-  gap: var(--pf-space-2);
+  flex-direction: column;
+  gap: var(--pf-space-3);
+}
+
+.gauge {
+  --pf-gauge-fill: var(--pf-accent-base);
+  --pf-gauge-glow: var(--pf-glow-accent);
+
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  row-gap: 5px;
+}
+
+.mid {
+  --pf-gauge-fill: var(--pf-semantic-warning);
+  --pf-gauge-glow: 0 0 8px var(--pf-semantic-warning-wash);
+}
+
+.low {
+  --pf-gauge-fill: var(--pf-semantic-danger);
+  --pf-gauge-glow: 0 0 8px var(--pf-semantic-danger-wash);
+}
+
+.gaugeLabel {
+  color: var(--pf-text-secondary);
   font-size: var(--pf-font-sm);
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
-.meterLabel {
-  width: 72px;
-  color: var(--pf-text-muted);
-  flex-shrink: 0;
+.gaugeReading {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--pf-space-2);
 }
 
-.meterTrack {
-  flex: 1;
-  height: 8px;
-  border-radius: var(--pf-radius-sm);
-  background: var(--pf-surface-2);
-  overflow: hidden;
+.gaugeValue {
+  min-width: 2.2ch;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: calc(var(--pf-font-md) * 1.1);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: right;
 }
 
-.meterFill {
+.low .gaugeValue,
+.mid .gaugeValue {
+  color: var(--pf-gauge-fill);
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The instrument: a recessed channel cut into 20 cells (5 points each), with
+   a quartile scale engraved beneath. The mask cuts track and fill together. */
+.track {
+  position: relative;
+  grid-column: 1 / -1;
+  height: 7px;
+  background: color-mix(in srgb, var(--pf-text-muted) 22%, transparent);
+  mask-image: repeating-linear-gradient(
+    90deg,
+    currentcolor 0 calc(5% - 2px),
+    transparent calc(5% - 2px) 5%
+  );
+}
+
+.fill {
   display: block;
   height: 100%;
-  border-radius: var(--pf-radius-sm);
-  background: var(--pf-accent-base);
-  transition: width 300ms ease;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--pf-gauge-fill) 55%, transparent), var(--pf-gauge-fill));
+  box-shadow: var(--pf-gauge-glow);
+  transition: width var(--pf-dur-slow) var(--pf-ease-out);
 }
 
-.meterValue {
-  width: 28px;
-  text-align: right;
-  font-family: var(--pf-font-mono);
+/* Quartile ticks (25/50/75) hang below the channel. Drawn on a sibling layer
+   so the cell mask doesn't cut them. */
+.gauge::after {
+  content: "";
+  grid-column: 1 / -1;
+  height: 3px;
+  margin-top: -3px;
+  background:
+    linear-gradient(var(--pf-border-strong), var(--pf-border-strong)) 0 0 / 1px 3px no-repeat,
+    linear-gradient(var(--pf-border-strong), var(--pf-border-strong)) 25% 0 / 1px 3px no-repeat,
+    linear-gradient(var(--pf-border-strong), var(--pf-border-strong)) 50% 0 / 1px 3px no-repeat,
+    linear-gradient(var(--pf-border-strong), var(--pf-border-strong)) 75% 0 / 1px 3px no-repeat,
+    linear-gradient(var(--pf-border-strong), var(--pf-border-strong)) 100% 0 / 1px 3px no-repeat;
+}
+
+/* ── Loading skeleton ──────────────────────────────────────────────────── */
+
+.skeleton {
+  background: linear-gradient(
+      90deg,
+      transparent 20%,
+      var(--pf-accent-wash) 50%,
+      transparent 80%
+    )
+    0 0 / 250% 100%,
+    var(--pf-panel-inset);
+  animation: pf-shimmer 1.6s ease-in-out infinite;
+}
+
+.skeletonValue {
+  width: 22px;
+  height: 12px;
+  border-radius: var(--pf-radius-sm);
+}
+
+.waiting {
+  margin: 0;
+  color: var(--pf-text-muted);
   font-size: var(--pf-font-xs);
+  font-style: italic;
+}
+
+/* ── Economics ─────────────────────────────────────────────────────────── */
+
+.economics {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: var(--pf-space-2) var(--pf-space-3);
+}
+
+.figure + .figure {
+  border-left: 1px solid var(--pf-border-subtle);
+}
+
+.figureLabel {
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.figureValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.figureUnit {
+  overflow: hidden;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.good {
+  color: var(--pf-semantic-success);
+}
+
+.bad {
+  color: var(--pf-semantic-danger);
+}
+
+.warn {
+  color: var(--pf-semantic-warning);
+}
+
+.cool {
+  color: var(--pf-semantic-info);
+}
+
+.flat {
+  color: var(--pf-text-primary);
+}
+
+/* ── Prose ─────────────────────────────────────────────────────────────── */
+
+.prose {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pf-space-1);
 }
 
 .assessment {
-  margin: var(--pf-space-1) 0 0;
-  font-size: var(--pf-font-sm);
-  color: var(--pf-text-secondary);
-}
-
-.highlights {
+  max-width: 68ch;
   margin: 0;
-  padding-left: var(--pf-space-4);
-  font-size: var(--pf-font-xs);
   color: var(--pf-text-secondary);
-}
-
-.economics {
-  display: flex;
-  gap: var(--pf-space-4);
-  flex-wrap: wrap;
-  padding: var(--pf-space-2) var(--pf-space-3);
-  border: 1px solid var(--pf-border-subtle);
-  border-radius: var(--pf-radius-md);
-  background: var(--pf-surface-0);
   font-size: var(--pf-font-sm);
+  line-height: 1.6;
+  text-wrap: pretty;
 }
 
-.econItem {
+.clamped {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  mask-image: linear-gradient(180deg, currentcolor 60%, transparent);
+}
+
+.readOn {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.readOn:hover {
+  color: var(--pf-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.drivers {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-}
-
-.econLabel {
-  font-size: var(--pf-font-xs);
-  color: var(--pf-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.econUnit {
-  color: var(--pf-text-muted);
-  font-size: var(--pf-font-xs);
-}
-
-.footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--pf-space-2);
 }
 
-.hard {
-  font-size: var(--pf-font-xs);
-  color: var(--pf-text-muted);
+.subKicker {
+  font-size: 10px;
 }
 
-.note {
+.driverList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.driverList li {
+  position: relative;
+  padding-left: var(--pf-space-4);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* A small lozenge bullet in the accent ink. */
+.driverList li::before {
+  content: "";
+  position: absolute;
+  top: 0.6em;
+  left: 2px;
+  width: 5px;
+  height: 5px;
+  background: var(--pf-accent-base);
+  transform: rotate(45deg);
+}
+
+/* ── Relations ─────────────────────────────────────────────────────────── */
+
+.quiet {
+  margin: 0;
   color: var(--pf-text-muted);
   font-size: var(--pf-font-sm);
+  font-style: italic;
+}
+
+.relationRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pf-space-3);
+}
+
+.relationBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+.relationLabel {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.war {
+  color: var(--pf-semantic-danger);
+}
+
+.count {
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--pf-surface-3);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  line-height: 16px;
+  letter-spacing: 0;
+}
+
+.enemies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pf-space-1);
+}
+
+.enemy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px var(--pf-space-2) 2px 4px;
+  border: 1px solid color-mix(in srgb, var(--pf-semantic-danger) 55%, transparent);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-semantic-danger-wash);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-xs);
+  font-weight: 500;
+}
+
+.treaties {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.treaties li {
+  padding: 6px var(--pf-space-3);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.4;
+}
+
+.treaties li + li {
+  border-top: 1px solid var(--pf-border-subtle);
+}
+
+/* ── Errors ────────────────────────────────────────────────────────────── */
+
+.errorCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-4);
+  border: 1px dashed var(--pf-semantic-danger);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-semantic-danger-wash);
+  color: var(--pf-semantic-danger);
+  text-align: center;
+}
+
+.errorCard p {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+}
+
+.inlineError {
+  margin: 0;
+  color: var(--pf-semantic-danger);
+  font-size: var(--pf-font-xs);
+}
+
+/* ── Theme instruments ─────────────────────────────────────────────────── */
+
+/* Atlas: an inked rule, not a lit channel — continuous, with a scale. */
+:global([data-pf-ornament="double-rule"]) .track {
+  height: 5px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--pf-border-strong);
+  mask-image: none;
+}
+
+:global([data-pf-ornament="double-rule"]) .fill {
+  background: var(--pf-gauge-fill);
+  box-shadow: none;
+}
+
+:global([data-pf-ornament="double-rule"]) .gaugeValue,
+:global([data-pf-ornament="double-rule"]) .figureValue {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-lg);
+  font-weight: 500;
+  font-variant-numeric: oldstyle-nums tabular-nums;
+}
+
+:global([data-pf-ornament="double-rule"]) .gaugeLabel {
+  font-variant-caps: all-small-caps;
+  font-size: var(--pf-font-md);
+  letter-spacing: 0.08em;
+}
+
+:global([data-pf-ornament="double-rule"]) .figureLabel,
+:global([data-pf-ornament="double-rule"]) .relationLabel {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.1em;
+  text-transform: none;
+}
+
+:global([data-pf-ornament="double-rule"]) .assessment {
+  font-size: var(--pf-font-md);
+  hyphens: auto;
+  text-align: justify;
+}
+
+:global([data-pf-ornament="double-rule"]) .driverList li {
+  font-size: var(--pf-font-sm);
+}
+
+:global([data-pf-ornament="double-rule"]) .driverList li::before {
+  content: var(--pf-fleuron);
+  top: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  background: none;
+  color: var(--pf-accent-base);
+  font-size: 0.8em;
+  transform: none;
+}
+
+:global([data-pf-ornament="double-rule"]) .economics,
+:global([data-pf-ornament="double-rule"]) .treaties {
+  background: transparent;
+  border-color: var(--pf-border-strong);
+}
+
+/* Machined: cells cut at an angle, like a hardware bar graph. */
+:global([data-pf-corners="chamfer"]) .track {
+  height: 9px;
+  mask-image: repeating-linear-gradient(
+    105deg,
+    currentcolor 0 calc(5% - 3px),
+    transparent calc(5% - 3px) 5%
+  );
+}
+
+:global([data-pf-corners="chamfer"]) .economics {
+  clip-path: polygon(0 0, calc(100% - var(--pf-cut-sm)) 0, 100% var(--pf-cut-sm), 100% 100%, 0 100%);
+}
+
+/* CRT: chunky character-cell blocks, the readout itself glows. */
+:global([data-pf-glow="high"]) .track {
+  height: 10px;
+  box-shadow: none;
+  background: var(--pf-accent-wash);
+  mask-image: repeating-linear-gradient(
+    90deg,
+    currentcolor 0 calc(4% - 3px),
+    transparent calc(4% - 3px) 4%
+  );
+}
+
+:global([data-pf-glow="high"]) .fill {
+  background: var(--pf-gauge-fill);
+}
+
+:global([data-pf-glow="high"]) .gaugeValue,
+:global([data-pf-glow="high"]) .figureValue {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-lg);
+  font-weight: 400;
+  text-shadow: var(--pf-text-glow);
+}
+
+:global([data-pf-glow="high"]) .gauge::after {
+  display: none;
+}
+
+/* Editorial: a soft continuous pill — the numbers carry the precision. */
+:global([data-pf-ornament="hairline"]) .track {
+  height: 6px;
+  border-radius: 3px;
+  box-shadow: none;
+  background: var(--pf-surface-3);
+  mask-image: none;
+}
+
+:global([data-pf-ornament="hairline"]) .fill {
+  border-radius: 3px;
+  background: var(--pf-gauge-fill);
+  box-shadow: none;
+}
+
+:global([data-pf-ornament="hairline"]) .gaugeValue,
+:global([data-pf-ornament="hairline"]) .figureValue {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-lg);
+  font-weight: 600;
+}
+
+:global([data-pf-ornament="double-rule"]) .count {
+  background: transparent;
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-numeric: oldstyle-nums;
+  box-shadow: inset 0 0 0 1px var(--pf-border-strong);
 }

@@ -9,3 +9,6 @@ saves/
 .DS_Store
 coverage/
 assets/
+
+# Provider config may hold API keys (llm.example.json is the template)
+config/llm.json

@@ -1,50 +1,105 @@
 .button {
+  position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--pf-space-2);
-  padding: var(--pf-space-2) var(--pf-space-4);
+  min-height: 32px;
+  padding: 0 var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-md);
-  border: 1px solid transparent;
   background: var(--pf-surface-2);
   color: var(--pf-text-primary);
   font-size: var(--pf-font-sm);
   font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur) ease,
+    transform var(--pf-dur-fast) ease;
+}
+
+.button svg {
+  flex-shrink: 0;
 }
 
 .button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .button:hover:not(:disabled) {
   background: var(--pf-surface-3);
+  border-color: var(--pf-border-strong);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .primary {
+  border-color: var(--pf-accent-base);
   background: var(--pf-accent-base);
   color: var(--pf-text-inverse);
+  font-weight: 600;
+  text-shadow: none;
+  box-shadow: var(--pf-glow-accent);
 }
 
 .primary:hover:not(:disabled) {
+  border-color: var(--pf-accent-hover);
   background: var(--pf-accent-hover);
 }
 
 .danger {
-  background: transparent;
   border-color: var(--pf-semantic-danger);
+  background: transparent;
   color: var(--pf-semantic-danger);
 }
 
 .danger:hover:not(:disabled) {
-  background: var(--pf-surface-2);
+  border-color: var(--pf-semantic-danger);
+  background: var(--pf-semantic-danger-wash);
 }
 
 .ghost {
+  border-color: transparent;
   background: transparent;
+  color: var(--pf-text-secondary);
 }
 
 .ghost:hover:not(:disabled) {
-  background: var(--pf-surface-2);
+  border-color: transparent;
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+}
+
+.sm {
+  min-height: 26px;
+  padding: 0 var(--pf-space-2);
+  font-size: var(--pf-font-xs);
+  gap: var(--pf-space-1);
+}
+
+.lg {
+  min-height: 42px;
+  padding: 0 var(--pf-space-5);
+  font-size: var(--pf-font-md);
+}
+
+.icon {
+  width: 32px;
+  padding: 0;
+}
+
+.icon.sm {
+  width: 26px;
+}
+
+.icon.lg {
+  width: 42px;
 }

@@ -254,6 +254,24 @@ export const createApp = (manager: GameManager): Hono => {
     return c.json(sheet);
   });
 
+  /**
+   * A polity's leader psyche as of a node: read from the NEAREST ancestor
+   * that has a rollup (extraction runs behind turns and can fail without
+   * wiping history), null when the extractor has never profiled them.
+   */
+  app.get("/api/games/:g/nodes/:n/psyche/:p", (c) => {
+    const game = manager.get(c.req.param("g"));
+    const polity = c.req.param("p");
+    let nodeId: string | null = c.req.param("n");
+    if (!game.port.getNodeMeta(nodeId)) return c.json({ error: "Unknown node" }, 404);
+    while (nodeId) {
+      const rollup = game.port.getRollup(nodeId);
+      if (rollup) return c.json(rollup.psyches[polity] ?? null);
+      nodeId = game.port.getNodeMeta(nodeId)?.parentId ?? null;
+    }
+    return c.json(null);
+  });
+
   app.get("/api/games/:g/nodes/:n/chronicle", (c) => {
     const game = manager.get(c.req.param("g"));
     return c.json(collectChronicle(game.port, c.req.param("n")));

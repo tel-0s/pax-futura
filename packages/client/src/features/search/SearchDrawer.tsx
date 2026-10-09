@@ -1,7 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import {
+  CircleAlert,
+  GitBranch,
+  LoaderCircle,
+  MessagesSquare,
+  Newspaper,
+  Search,
+  SearchX,
+  Sparkles,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import type { SearchHit } from "@pax/domain";
+import { Badge } from "../../components/Badge.tsx";
 import { Drawer } from "../../components/Drawer.tsx";
 import { api } from "../../lib/api.ts";
+import { parseDigestLine } from "../../lib/factLine.ts";
+import { formatGameDate } from "../../lib/dates.ts";
 import { useConversationsStore } from "../../stores/conversations.ts";
 import { useLoomStore } from "../../stores/loom.ts";
 import { useSessionStore } from "../../stores/session.ts";
@@ -12,14 +27,47 @@ const DEBOUNCE_MS = 250;
 /** Mirrors the route's own floor (GET /games/:g/search) — matched here only
  *  to skip firing a request that the server would answer empty anyway. */
 const MIN_QUERY_LENGTH = 2;
+/** The route's per-kind cap (searchSave's limit): a full group may hide older matches. */
+const KIND_CAP = 20;
 
 type Status = "idle" | "loading" | "ready" | "error";
+type Scope = "all" | SearchHit["kind"];
 
-const GROUPS: ReadonlyArray<{ kind: SearchHit["kind"]; label: string }> = [
-  { kind: "event", label: "Events" },
-  { kind: "fact", label: "Facts" },
-  { kind: "message", label: "Messages" },
+const GROUPS: ReadonlyArray<{ kind: SearchHit["kind"]; label: string; icon: LucideIcon }> = [
+  { kind: "event", label: "Events", icon: Newspaper },
+  { kind: "fact", label: "Facts", icon: Sparkles },
+  { kind: "message", label: "Messages", icon: MessagesSquare },
 ];
+
+/** Fact snippets are windows into the stored JSON payload — read them as prose. */
+const cleanFactSnippet = (snippet: string): string =>
+  snippet
+    .replace(/"([A-Za-z_]+)":/g, "$1: ")
+    .replace(/[{}[\]"]/g, "")
+    .replace(/,(?=\s*[A-Za-z_]+:)/g, " · ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** The matched phrase picked out with <mark> — the server matches the whole phrase. */
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query) return <>{text}</>;
+  const parts = text.split(new RegExp(`(${escapeRegExp(query)})`, "gi"));
+  return (
+    <>
+      {parts.map((part, index) =>
+        index % 2 === 1 ? (
+          <mark key={index} className={styles.mark}>
+            {part}
+          </mark>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
 
 /**
  * Save-wide search across events, facts, and conversation messages.
@@ -33,11 +81,18 @@ const GROUPS: ReadonlyArray<{ kind: SearchHit["kind"]; label: string }> = [
 export function SearchDrawer() {
   const gameId = useSessionStore((state) => state.gameId);
   const setLeftDrawer = useUiStore((state) => state.setLeftDrawer);
+  const nodes = useLoomStore((state) => state.nodes);
+  const currentNodeId = useLoomStore((state) => state.currentNodeId);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
+  // The phrase the CURRENT hits answer — highlights must not follow keystrokes
+  // that haven't been searched yet.
+  const [hitsQuery, setHitsQuery] = useState("");
+  const [scope, setScope] = useState<Scope>("all");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -50,6 +105,7 @@ export function SearchDrawer() {
     const trimmed = query.trim();
     if (trimmed.length < MIN_QUERY_LENGTH) {
       setHits([]);
+      setHitsQuery("");
       setStatus("idle");
       return;
     }
@@ -64,6 +120,7 @@ export function SearchDrawer() {
         .then((response) => {
           if (!live) return;
           setHits(response.hits);
+          setHitsQuery(trimmed);
           setStatus("ready");
         })
         .catch((cause: unknown) => {
@@ -77,6 +134,17 @@ export function SearchDrawer() {
       window.clearTimeout(timer);
     };
   }, [gameId, query]);
+
+  // The checked-out path, so hits from other branches can say so.
+  const onPath = useMemo(() => {
+    const path = new Set<string>();
+    let cursor = currentNodeId ? nodes[currentNodeId] : undefined;
+    while (cursor && !path.has(cursor.id)) {
+      path.add(cursor.id);
+      cursor = cursor.parentId ? nodes[cursor.parentId] : undefined;
+    }
+    return path;
+  }, [nodes, currentNodeId]);
 
   const selectHit = async (hit: SearchHit) => {
     if (!gameId) return;
@@ -107,59 +175,273 @@ export function SearchDrawer() {
   if (!gameId) return null;
 
   const trimmed = query.trim();
-  const isEmpty = status === "ready" && hits.length === 0;
+  const counts = Object.fromEntries(
+    GROUPS.map(({ kind }) => [kind, hits.filter((hit) => hit.kind === kind).length]),
+  ) as Record<SearchHit["kind"], number>;
+  const visible = scope === "all" ? hits : hits.filter((hit) => hit.kind === scope);
+  const hasResults = hits.length > 0;
+  const isEmpty = status === "ready" && visible.length === 0;
+  const scopeLabel = GROUPS.find((group) => group.kind === scope)?.label.toLowerCase();
+
+  // Arrow keys walk the result list from the field and between results.
+  const onListKeys = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    const buttons = [...(resultsRef.current?.querySelectorAll<HTMLButtonElement>("button[data-hit]") ?? [])];
+    if (buttons.length === 0) return;
+    event.preventDefault();
+    const at = buttons.indexOf(document.activeElement as HTMLButtonElement);
+    if (event.key === "ArrowDown") (buttons[at + 1] ?? buttons[0])?.focus();
+    else if (at <= 0) inputRef.current?.focus();
+    else buttons[at - 1]?.focus();
+  };
 
   return (
-    <Drawer side="left" title="Search" onClose={() => setLeftDrawer(null)}>
-      <input
-        ref={inputRef}
-        type="text"
-        className={styles.input}
-        placeholder="Search events, facts, messages…"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" && hits[0]) void selectHit(hits[0]);
-        }}
-      />
+    <Drawer
+      side="left"
+      title="Search"
+      kicker="Every branch of the timeline"
+      icon={<Search size={16} />}
+      onClose={() => setLeftDrawer(null)}
+    >
+      <div className={styles.field} role="search">
+        {status === "loading" ? (
+          <LoaderCircle size={16} className={`${styles.fieldIcon} ${styles.spin}`} aria-hidden />
+        ) : (
+          <Search size={16} className={styles.fieldIcon} aria-hidden />
+        )}
+        <input
+          ref={inputRef}
+          type="text"
+          className={styles.input}
+          aria-label="Search events, facts and messages"
+          placeholder="Search events, facts, messages…"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && visible[0]) void selectHit(visible[0]);
+            // The stage's Escape-closes-drawer shortcut ignores text fields:
+            // first Escape clears the phrase, the second closes the panel.
+            if (event.key === "Escape") {
+              if (query) setQuery("");
+              else setLeftDrawer(null);
+            }
+            onListKeys(event);
+          }}
+        />
+        {query ? (
+          <button
+            type="button"
+            className={styles.clear}
+            aria-label="Clear search"
+            title="Clear (Esc)"
+            onClick={() => {
+              setQuery("");
+              inputRef.current?.focus();
+            }}
+          >
+            <X size={14} />
+          </button>
+        ) : null}
+      </div>
+
+      <div className={styles.scopes} role="group" aria-label="Result types">
+        <ScopeChip active={scope === "all"} onClick={() => setScope("all")} count={hasResults ? hits.length : null}>
+          All
+        </ScopeChip>
+        {GROUPS.map(({ kind, label, icon: Icon }) => (
+          <ScopeChip
+            key={kind}
+            active={scope === kind}
+            onClick={() => setScope(kind)}
+            count={hasResults ? counts[kind] : null}
+          >
+            <Icon size={13} aria-hidden /> {label}
+          </ScopeChip>
+        ))}
+      </div>
 
       {trimmed.length > 0 && trimmed.length < MIN_QUERY_LENGTH ? (
         <p className={styles.hint}>Keep typing — at least {MIN_QUERY_LENGTH} characters.</p>
       ) : null}
-      {status === "loading" ? <p className={styles.hint}>Searching…</p> : null}
-      {status === "error" && error ? <p className={styles.error}>{error}</p> : null}
-      {isEmpty ? <p className={styles.hint}>No matches for "{trimmed}".</p> : null}
-      {status === "idle" && trimmed.length === 0 ? (
-        <p className={styles.hint}>
-          Search across every turn's events, facts, and conversations. Selecting a result checks out
-          the turn it happened at.
+      {status === "error" && error ? (
+        <p className={styles.error} role="alert">
+          <CircleAlert size={15} aria-hidden /> {error}
         </p>
       ) : null}
 
-      <div className={styles.groups}>
-        {GROUPS.map(({ kind, label }) => {
+      {isEmpty ? (
+        <div className={styles.empty}>
+          <SearchX size={24} aria-hidden />
+          <p>
+            {scope !== "all" && hasResults
+              ? `No ${scopeLabel} match “${hitsQuery}” — see the other tabs.`
+              : `No matches for “${hitsQuery}”.`}
+          </p>
+          <p className={styles.emptySub}>Search matches the exact phrase — try a single name or word.</p>
+        </div>
+      ) : null}
+
+      {status === "idle" && trimmed.length === 0 ? (
+        <div className={styles.empty}>
+          <Search size={24} aria-hidden />
+          <p>
+            Search across every turn's events, facts, and conversations. Selecting a result checks out
+            the turn it happened at.
+          </p>
+          <ul className={styles.keys}>
+            <li>
+              <kbd>Enter</kbd> open the first result
+            </li>
+            <li>
+              <kbd>↑</kbd>
+              <kbd>↓</kbd> move through results
+            </li>
+            <li>
+              <kbd>Esc</kbd> clear, then close
+            </li>
+          </ul>
+        </div>
+      ) : null}
+
+      <div
+        ref={resultsRef}
+        className={`${styles.groups} ${status === "loading" ? styles.stale : ""}`}
+        aria-busy={status === "loading"}
+        onKeyDown={onListKeys}
+      >
+        {GROUPS.map(({ kind, label, icon: Icon }) => {
+          if (scope !== "all" && scope !== kind) return null;
           const group = hits.filter((hit) => hit.kind === kind);
           if (group.length === 0) return null;
           return (
             <section key={kind} className={styles.section}>
-              <h3 className={styles.sectionTitle}>{label}</h3>
+              <header className={styles.sectionHead}>
+                <Icon size={13} aria-hidden className={styles.sectionIcon} />
+                <span className="pfKicker">{label}</span>
+                <span className={styles.count}>{group.length}</span>
+              </header>
               <ul className={styles.hits}>
                 {group.map((hit, index) => (
                   <li key={`${hit.kind}:${hit.nodeId}:${index}`}>
-                    <button type="button" className={styles.hit} onClick={() => void selectHit(hit)}>
-                      <span className={styles.hitTop}>
-                        <span className={styles.hitTitle}>{hit.title}</span>
-                        {hit.gameDate ? <span className={styles.hitDate}>{hit.gameDate}</span> : null}
-                      </span>
-                      {hit.snippet ? <span className={styles.hitSnippet}>{hit.snippet}</span> : null}
-                    </button>
+                    <HitRow
+                      hit={hit}
+                      query={hitsQuery}
+                      depth={nodes[hit.nodeId]?.depth}
+                      settled={nodes[hit.nodeId]?.status === "complete"}
+                      here={hit.nodeId === currentNodeId}
+                      offPath={!onPath.has(hit.nodeId)}
+                      onSelect={() => void selectHit(hit)}
+                    />
                   </li>
                 ))}
               </ul>
+              {group.length >= KIND_CAP ? (
+                <p className={styles.capNote}>Newest {KIND_CAP} shown — refine the phrase to reach older ones.</p>
+              ) : null}
             </section>
           );
         })}
       </div>
     </Drawer>
+  );
+}
+
+function ScopeChip({
+  active,
+  count,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  count: number | null;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      className={`${styles.scope} ${active ? styles.scopeActive : ""}`}
+      aria-pressed={active}
+      onClick={onClick}
+    >
+      {children}
+      {count !== null ? (
+        <span className={`${styles.scopeCount} ${count === 0 ? styles.scopeCountZero : ""}`}>{count}</span>
+      ) : null}
+    </button>
+  );
+}
+
+function HitRow({
+  hit,
+  query,
+  depth,
+  settled,
+  here,
+  offPath,
+  onSelect,
+}: {
+  hit: SearchHit;
+  query: string;
+  depth: number | undefined;
+  settled: boolean;
+  here: boolean;
+  offPath: boolean;
+  onSelect: () => void;
+}) {
+  const needle = query.toLowerCase();
+  // When the title matched, the server's snippet is a window of the title
+  // itself — only show it when the match lives elsewhere.
+  const showSnippet = Boolean(hit.snippet) && !hit.title.toLowerCase().includes(needle);
+  const snippet = hit.kind === "fact" ? cleanFactSnippet(hit.snippet) : hit.snippet;
+
+  return (
+    <button
+      type="button"
+      data-hit
+      className={`${styles.hit} ${styles[hit.kind] ?? ""}`}
+      disabled={!settled}
+      title={settled ? "Check out this turn" : "This turn is not settled yet"}
+      onClick={onSelect}
+    >
+      <span className={styles.hitMeta}>
+        {hit.gameDate ? <span className={styles.hitDate}>{formatGameDate(hit.gameDate)}</span> : null}
+        {depth !== undefined ? <span className={styles.hitTurn}>Turn {depth}</span> : null}
+        {here ? <Badge tone="accent">here</Badge> : null}
+        {!here && offPath ? (
+          <span className={styles.hitBranch} title="On another branch of the timeline">
+            <GitBranch size={11} aria-hidden /> other branch
+          </span>
+        ) : null}
+      </span>
+      {hit.kind === "fact" ? (
+        <FactTitle line={hit.title} query={query} />
+      ) : (
+        <span className={styles.hitTitle}>
+          <Highlight text={hit.title} query={query} />
+        </span>
+      )}
+      {showSnippet ? (
+        <span className={styles.hitSnippet}>
+          <Highlight text={snippet} query={query} />
+        </span>
+      ) : null}
+    </button>
+  );
+}
+
+/** A fact hit's title is its digest line: lift the intel mark and category. */
+function FactTitle({ line, query }: { line: string; query: string }) {
+  const { confidence, category, body } = parseDigestLine(line);
+  return (
+    <span className={styles.hitTitle}>
+      {category ? <span className={styles.factCategory}>{category.replace("_", " ")}</span> : null}
+      {confidence ? (
+        <>
+          <Badge tone={confidence === "rumor" ? "warning" : "info"}>{confidence}</Badge>{" "}
+        </>
+      ) : null}
+      <Highlight text={body} query={query} />
+    </span>
   );
 }

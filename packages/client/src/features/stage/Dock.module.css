@@ -1,0 +1,472 @@
+.dock {
+  position: relative;
+  z-index: 38;
+  display: flex;
+  flex-direction: column;
+  margin: 0 var(--pf-space-2) var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-lg);
+}
+
+/* ── Dispatches ────────────────────────────────────────────────────────── */
+
+.dispatches {
+  border-top: 1px solid var(--pf-border-subtle);
+}
+
+.dispatchHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  width: 100%;
+  padding: var(--pf-space-2) var(--pf-space-4) var(--pf-space-1);
+  border: none;
+  background: none;
+  color: var(--pf-text-secondary);
+  cursor: pointer;
+}
+
+.dispatchCount {
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--pf-surface-3);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  line-height: 16px;
+}
+
+.dispatchMajor {
+  color: var(--pf-semantic-warning);
+  font-size: var(--pf-font-xs);
+}
+
+.dispatchToggle {
+  display: grid;
+  margin-left: auto;
+  color: var(--pf-text-muted);
+}
+
+.dispatchHeader:hover .dispatchToggle {
+  color: var(--pf-text-primary);
+}
+
+.ticker {
+  display: flex;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-1) var(--pf-space-4) var(--pf-space-3);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  mask-image: linear-gradient(90deg, transparent, var(--pf-surface-0) 16px, var(--pf-surface-0) calc(100% - 24px), transparent);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex: 0 0 248px;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 62px;
+  padding: var(--pf-space-2) var(--pf-space-3) var(--pf-space-2) calc(var(--pf-space-3) + 3px);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-primary);
+  text-align: left;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    background var(--pf-dur-fast) ease,
+    transform var(--pf-dur-fast) ease;
+}
+
+/* Importance rail on the card's left edge. */
+.card::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--pf-border-strong);
+}
+
+.card:hover {
+  border-color: var(--pf-border-strong);
+  background: var(--pf-accent-wash);
+  transform: translateY(-1px);
+}
+
+.major::before {
+  background: var(--pf-semantic-warning);
+}
+
+.pivotal::before {
+  background: var(--pf-semantic-danger);
+  box-shadow: 0 0 8px var(--pf-semantic-danger);
+}
+
+.mine {
+  border-color: var(--pf-accent-line);
+}
+
+.cardActive {
+  border-color: var(--pf-accent-base);
+  background: var(--pf-accent-wash);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+
+.cardDot {
+  display: none;
+}
+
+.cardYou {
+  padding: 0 4px;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cardPin {
+  margin-left: auto;
+  color: var(--pf-text-muted);
+}
+
+.cardTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--pf-font-sm);
+  font-weight: 500;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* ── Command line ──────────────────────────────────────────────────────── */
+
+.command {
+  display: flex;
+  align-items: stretch;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-3);
+  border-top: 1px solid var(--pf-border-subtle);
+}
+
+.composer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  min-width: 0;
+  padding: var(--pf-space-1) var(--pf-space-2) var(--pf-space-1) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur-fast) ease;
+}
+
+.composer:focus-within {
+  border-color: var(--pf-border-focus);
+  box-shadow: 0 0 0 3px var(--pf-accent-wash);
+}
+
+.composerBlocked {
+  opacity: 0.6;
+}
+
+.prompt {
+  align-self: center;
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-lg);
+  line-height: 1;
+}
+
+.orders {
+  flex: 1;
+  min-width: 0;
+  min-height: 24px;
+  padding: var(--pf-space-2) 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-md);
+  line-height: 1.4;
+  resize: none;
+}
+
+.queueChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px var(--pf-space-2);
+  border: 1px solid var(--pf-accent-line);
+  border-radius: 12px;
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.queueChip:hover {
+  border-color: var(--pf-accent-base);
+}
+
+/* The end-turn button: the one big, unmistakable thing on screen. */
+.advance {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+  min-width: 196px;
+  padding: 0 var(--pf-space-5) 0 var(--pf-space-4);
+  border: 1px solid var(--pf-accent-base);
+  border-radius: var(--pf-radius-md);
+  background:
+    linear-gradient(180deg, var(--pf-accent-hover), var(--pf-accent-base));
+  color: var(--pf-text-inverse);
+  text-align: left;
+  text-shadow: none;
+  box-shadow:
+    var(--pf-glow-accent),
+    inset 0 1px 0 var(--pf-panel-highlight);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform var(--pf-dur-fast) ease,
+    filter var(--pf-dur-fast) ease;
+}
+
+/* A slow sheen sweeping across, so the call to action feels alive. */
+.advance::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, var(--pf-panel-highlight) 50%, transparent 65%);
+  background-size: 250% 100%;
+  animation: pf-shimmer 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.advance:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.advance:disabled::after {
+  animation: none;
+}
+
+.advance:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.advance:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.advanceText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.advanceLabel {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+  font-weight: 700;
+  letter-spacing: var(--pf-heading-tracking);
+  line-height: 1.1;
+  text-transform: var(--pf-heading-transform);
+  font-variant-caps: var(--pf-heading-variant);
+}
+
+.advanceSub {
+  font-size: 10.5px;
+  font-weight: 500;
+  opacity: 0.78;
+}
+
+/* ── Progress ──────────────────────────────────────────────────────────── */
+
+.progress {
+  align-items: center;
+}
+
+.progressBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  min-width: 0;
+}
+
+.phases {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-4);
+  font-size: var(--pf-font-xs);
+}
+
+.phase {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--pf-text-muted);
+  letter-spacing: 0.04em;
+}
+
+.phaseDot {
+  width: 7px;
+  height: 7px;
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+}
+
+.phaseDone {
+  color: var(--pf-text-secondary);
+}
+
+.phaseDone .phaseDot {
+  background: currentcolor;
+}
+
+.phaseNow {
+  color: var(--pf-accent-base);
+  font-weight: 600;
+}
+
+.phaseNow .phaseDot {
+  background: currentcolor;
+  box-shadow: 0 0 8px currentcolor;
+  animation: pf-pulse 1.2s ease-in-out infinite;
+}
+
+.chars {
+  margin-left: auto;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  position: relative;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--pf-border-subtle);
+}
+
+.barFill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--pf-accent-base), transparent);
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  animation: pf-shimmer 1.6s linear infinite;
+}
+
+.headline {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pf-space-2);
+  min-width: 0;
+  font-size: var(--pf-font-sm);
+}
+
+.headlineText {
+  overflow: hidden;
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: pf-rise-in var(--pf-dur-slow) var(--pf-ease-out);
+}
+
+.headlineWait {
+  color: var(--pf-text-muted);
+  font-style: italic;
+}
+
+/* ── Ghost (scouted turn) ──────────────────────────────────────────────── */
+
+.ghostBar {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-2) var(--pf-space-4);
+  border-top: 1px solid var(--pf-semantic-warning);
+  background: var(--pf-semantic-warning-wash);
+  font-size: var(--pf-font-sm);
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.ghostLabel {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  color: var(--pf-semantic-warning);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ghostDate {
+  flex-shrink: 0;
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+}
+
+.ghostSummary {
+  flex: 1;
+  overflow: hidden;
+  color: var(--pf-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ghostActions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--pf-space-2);
+}
+
+@media (width <= 1100px) {
+  .advance {
+    min-width: 0;
+  }
+
+  .advanceSub {
+    display: none;
+  }
+}

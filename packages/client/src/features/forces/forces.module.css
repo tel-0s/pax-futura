@@ -1,94 +1,222 @@
+/* Order of battle: a theatre summary, then one formation block per power —
+   arms (land / sea / air) as counter rows, structures as a kind tally. */
+
 .empty {
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-8) var(--pf-space-4);
   color: var(--pf-text-muted);
-  font-size: var(--pf-font-sm);
-  line-height: 1.5;
+  text-align: center;
 }
+
+.empty p {
+  max-width: 34ch;
+  margin: 0;
+  font-size: var(--pf-font-sm);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* ── Theatre summary ───────────────────────────────────────────────────── */
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 0 var(--pf-space-5);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border-left: 1px solid var(--pf-border-subtle);
+}
+
+.stat:first-child {
+  border-left: 0;
+}
+
+.statLabel {
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.statValue {
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 1.1;
+}
+
+.statAlert .statValue {
+  color: var(--pf-semantic-danger);
+}
+
+/* ── Formation block ───────────────────────────────────────────────────── */
 
 .groups {
   display: flex;
   flex-direction: column;
-  gap: var(--pf-space-4);
+  gap: var(--pf-space-6);
 }
 
 .group {
   display: flex;
   flex-direction: column;
-  gap: var(--pf-space-1);
+  gap: var(--pf-space-3);
 }
 
+/* The owner header sticks while its formations scroll beneath it. */
 .groupHead {
+  position: sticky;
+  top: calc(-1 * var(--pf-space-4));
+  z-index: 1;
   display: flex;
   align-items: center;
-  gap: var(--pf-space-2);
-  padding: var(--pf-space-1) var(--pf-space-2);
-  border-left: 2px solid var(--pf-border-subtle);
-  background: var(--pf-surface-1);
-  border-radius: var(--pf-radius-sm);
-}
-
-/* The owner clicked on the map keeps an accent rule so it reads first. */
-.groupSelected .groupHead {
-  border-left-color: var(--pf-accent-base);
-  background: var(--pf-accent-subtle);
-}
-
-.flag {
-  height: 14px;
-  width: 20px;
-  object-fit: cover;
-  border-radius: var(--pf-radius-sm);
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-2) var(--pf-space-3);
   border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-bg-solid);
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur) ease;
+}
+
+.groupPlayer .groupHead {
+  border-color: var(--pf-border-strong);
+}
+
+/* The owner clicked on the map keeps an accent frame so it reads first. */
+.groupSelected .groupHead {
+  border-color: var(--pf-accent-line);
+  background:
+    linear-gradient(var(--pf-accent-wash), var(--pf-accent-wash)),
+    var(--pf-panel-bg-solid);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.flagSlot {
+  display: grid;
+  flex: none;
+  color: var(--pf-text-muted);
+}
+
+.groupTitle {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 
 .groupName {
-  font-family: var(--pf-font-display);
-  font-size: var(--pf-font-sm);
-  color: var(--pf-text-primary);
   overflow: hidden;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.you {
-  font-size: var(--pf-font-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--pf-accent-base);
-}
-
-.groupStats {
-  margin-left: auto;
-  font-family: var(--pf-font-mono);
-  font-size: var(--pf-font-xs);
+.groupMeta {
   color: var(--pf-text-muted);
-  white-space: nowrap;
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
 }
 
-.units {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.groupStrength {
+  flex: none;
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--pf-text-glow);
+}
+
+.groupStrength::before {
+  content: "Σ ";
+  color: var(--pf-text-muted);
+  font-weight: 400;
+  text-shadow: none;
+}
+
+/* ── Arms ──────────────────────────────────────────────────────────────── */
+
+.branch,
+.structures {
   display: flex;
   flex-direction: column;
+  gap: var(--pf-space-1);
 }
 
-.unit {
-  width: 100%;
+.branchHead {
   display: flex;
   align-items: center;
   gap: var(--pf-space-2);
-  padding: var(--pf-space-1) var(--pf-space-2);
-  border: 0;
-  border-bottom: 1px solid var(--pf-border-subtle);
+  padding: 0 var(--pf-space-1);
+}
+
+.branchRule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--pf-border-strong), transparent);
+}
+
+.branchStats {
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.units {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.unit {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+  width: 100%;
+  padding: 6px var(--pf-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--pf-radius-md);
   background: transparent;
   color: var(--pf-text-primary);
   text-align: left;
   cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease;
 }
 
 .unit:hover {
-  background: var(--pf-surface-2);
+  border-color: var(--pf-border-strong);
+  background: var(--pf-accent-wash);
 }
 
 .unit:focus-visible {
@@ -96,66 +224,109 @@
   outline-offset: -2px;
 }
 
-.glyph {
-  font-size: var(--pf-font-md);
-  line-height: 1;
+.unitDefeated {
+  opacity: 0.55;
+}
+
+.symbol {
+  display: grid;
+  flex: none;
+  place-items: center;
 }
 
 .unitText {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 1px;
   min-width: 0;
-  flex: 1;
 }
 
 .unitName {
-  font-size: var(--pf-font-sm);
   overflow: hidden;
+  font-size: var(--pf-font-sm);
+  font-weight: 500;
+  line-height: 1.3;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .unitMeta {
-  font-size: var(--pf-font-xs);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
   color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.unitType {
+  flex: none;
+  text-transform: capitalize;
+}
+
+.metaPin {
+  flex: none;
+  margin-left: 4px;
+  opacity: 0.8;
+}
+
+.unitRegion {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.strength {
+.unitSide {
   display: flex;
+  flex: none;
   flex-direction: column;
   align-items: flex-end;
-  gap: 3px;
-  width: 76px;
-  flex: none;
+  gap: 4px;
+  width: 92px;
+}
+
+.unitTop {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--pf-space-2);
+}
+
+.idle {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
 }
 
 .strengthValue {
+  min-width: 3ch;
+  color: var(--pf-text-primary);
   font-family: var(--pf-font-mono);
   font-size: var(--pf-font-xs);
-  color: var(--pf-text-secondary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 /* Strength bar: track is full width, fill is strength / UNIT_STRENGTH_MAX. */
 .bar {
   width: 100%;
-  height: 3px;
-  border-radius: var(--pf-radius-sm);
-  background: var(--pf-surface-3);
+  height: 4px;
   overflow: hidden;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-border-subtle);
 }
 
 .barFill {
   display: block;
   height: 100%;
+  border-radius: inherit;
   background: var(--pf-accent-base);
 }
 
 .toneNeutral {
   background: var(--pf-accent-base);
+  box-shadow: 0 0 6px var(--pf-accent-line);
 }
 
 .toneWarning {
@@ -164,4 +335,174 @@
 
 .toneDanger {
   background: var(--pf-semantic-danger);
+}
+
+/* ── Structures ────────────────────────────────────────────────────────── */
+
+.kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pf-space-1);
+  padding: var(--pf-space-1) 0 0;
+}
+
+.kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease;
+}
+
+.kind:hover {
+  border-color: var(--pf-border-strong);
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+}
+
+.kindActive {
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.kindLabel {
+  text-transform: capitalize;
+}
+
+.kindCount {
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sites {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px var(--pf-space-2);
+  margin: var(--pf-space-1) 0 0;
+  padding: var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  list-style: none;
+  animation: pf-fade-in var(--pf-dur) ease;
+}
+
+.site {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 3px var(--pf-space-1);
+  border: 0;
+  border-radius: var(--pf-radius-sm);
+  background: none;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  text-align: left;
+  cursor: pointer;
+}
+
+.site:hover {
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+}
+
+.siteIcon {
+  flex: none;
+  color: var(--pf-text-muted);
+}
+
+.site:hover .siteIcon {
+  color: var(--pf-accent-base);
+}
+
+.siteName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Per-theme ─────────────────────────────────────────────────────────── */
+
+/* Parchment: a muster roll — small-capital labels, no glow, ruled rows. */
+[data-pf-ornament="double-rule"] .statLabel,
+[data-pf-ornament="double-rule"] .branchStats,
+[data-pf-ornament="double-rule"] .kindCount {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+[data-pf-ornament="double-rule"] .statValue {
+  font-weight: 400;
+  font-variant-numeric: oldstyle-nums tabular-nums;
+}
+
+[data-pf-ornament="double-rule"] .groupName {
+  font-weight: 400;
+}
+
+[data-pf-ornament="double-rule"] .groupStrength,
+[data-pf-ornament="double-rule"] .strengthValue {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-numeric: oldstyle-nums tabular-nums;
+}
+
+[data-pf-ornament="double-rule"] .units {
+  gap: 0;
+}
+
+[data-pf-ornament="double-rule"] .unit {
+  border-radius: 0;
+  border-bottom-color: var(--pf-border-subtle);
+}
+
+[data-pf-ornament="double-rule"] .toneNeutral {
+  box-shadow: none;
+}
+
+[data-pf-ornament="double-rule"] .summary {
+  border-top: 3px double var(--pf-border-strong);
+  border-bottom: 3px double var(--pf-border-strong);
+  border-right: 0;
+  border-left: 0;
+  background: none;
+}
+
+/* Phosphor: dashed printout rules, square bars. */
+[data-pf-glow="high"] .summary,
+[data-pf-glow="high"] .sites {
+  border-style: dashed;
+}
+
+[data-pf-glow="high"] .statValue,
+[data-pf-glow="high"] .groupName {
+  font-weight: 400;
+}
+
+/* Seraphim: skewed hazard-style strength bars. */
+[data-pf-ornament="hazard"] .bar {
+  height: 5px;
+  border-radius: 0;
+  background: repeating-linear-gradient(-60deg, var(--pf-border-subtle) 0 3px, transparent 3px 5px);
+}
+
+[data-pf-ornament="hazard"] .groupStrength::before {
+  content: "STR ";
 }

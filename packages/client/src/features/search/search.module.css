@@ -1,112 +1,433 @@
+/* Save-wide search: a proper field, scope chips, grouped result lists with
+   the matched phrase marked in the accent wash. */
+
+/* ── Field ─────────────────────────────────────────────────────────────── */
+
+.field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: 0 var(--pf-space-1) 0 var(--pf-space-3);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur-fast) ease;
+}
+
+.field:focus-within {
+  border-color: var(--pf-border-focus);
+  box-shadow: 0 0 0 3px var(--pf-accent-wash);
+}
+
+.fieldIcon {
+  flex: none;
+  color: var(--pf-text-muted);
+}
+
+.field:focus-within .fieldIcon {
+  color: var(--pf-accent-base);
+}
+
+.spin {
+  animation: pf-spin 0.9s linear infinite;
+}
+
 .input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: var(--pf-space-2) var(--pf-space-3);
-  margin-bottom: var(--pf-space-3);
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-md);
+}
+
+.clear {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-muted);
+  cursor: pointer;
+}
+
+.clear:hover {
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+}
+
+/* ── Scope chips (segmented) ───────────────────────────────────────────── */
+
+.scopes {
+  display: flex;
+  gap: 2px;
+  margin: var(--pf-space-3) 0 var(--pf-space-4);
+  padding: 2px;
   border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-md);
-  background: var(--pf-surface-0);
+  background: var(--pf-panel-inset);
+}
+
+.scope {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 5px var(--pf-space-2);
+  border: 1px solid transparent;
+  border-radius: calc(var(--pf-radius-md) - 2px);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease;
+}
+
+.scope:hover {
+  background: var(--pf-accent-wash);
   color: var(--pf-text-primary);
-  font-size: var(--pf-font-sm);
 }
 
-.input:focus-visible {
-  outline: 2px solid var(--pf-border-focus);
-  outline-offset: -2px;
+.scopeActive {
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  box-shadow: var(--pf-glow-accent);
 }
 
-.hint,
-.error {
-  margin: 0 0 var(--pf-space-3);
+.scopeCount {
   color: var(--pf-text-muted);
-  font-size: var(--pf-font-sm);
-  line-height: 1.5;
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.scopeActive .scopeCount {
+  color: var(--pf-accent-base);
+}
+
+.scopeCountZero {
+  opacity: 0.5;
+}
+
+/* ── States ────────────────────────────────────────────────────────────── */
+
+.hint {
+  margin: calc(-1 * var(--pf-space-2)) 0 var(--pf-space-3);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
 }
 
 .error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pf-space-2);
+  margin: 0 0 var(--pf-space-4);
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-semantic-danger);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-semantic-danger-wash);
   color: var(--pf-semantic-danger);
+  font-size: var(--pf-font-sm);
+  line-height: 1.45;
 }
+
+.error svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-7) var(--pf-space-3);
+  color: var(--pf-text-muted);
+  text-align: center;
+}
+
+.empty p {
+  max-width: 34ch;
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.empty .emptySub {
+  margin-top: calc(-1 * var(--pf-space-1));
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.keys {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  margin: var(--pf-space-2) 0 0;
+  padding: var(--pf-space-3) var(--pf-space-4);
+  border: 1px dashed var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  list-style: none;
+  text-align: left;
+}
+
+.keys kbd {
+  margin-right: 3px;
+}
+
+/* ── Results ───────────────────────────────────────────────────────────── */
 
 .groups {
   display: flex;
   flex-direction: column;
-  gap: var(--pf-space-4);
+  gap: var(--pf-space-5);
+  transition: opacity var(--pf-dur) ease;
+}
+
+/* Previous results stay put while the next phrase is fetched, dimmed. */
+.stale {
+  opacity: 0.55;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: var(--pf-space-1);
+  gap: var(--pf-space-2);
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
 }
 
-.sectionTitle {
-  margin: 0 0 var(--pf-space-1);
-  font-family: var(--pf-font-display);
-  font-size: var(--pf-font-xs);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+}
+
+.sectionIcon {
+  color: var(--pf-accent-base);
+}
+
+.count {
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--pf-surface-3);
   color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 16px;
 }
 
 .hits {
-  margin: 0;
-  padding: 0;
-  list-style: none;
   display: flex;
   flex-direction: column;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  list-style: none;
+}
+
+.hits li + li {
+  border-top: 1px solid var(--pf-border-subtle);
 }
 
 .hit {
-  width: 100%;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: var(--pf-space-2);
+  gap: 3px;
+  width: 100%;
+  padding: var(--pf-space-2) var(--pf-space-3);
   border: 0;
-  border-bottom: 1px solid var(--pf-border-subtle);
   background: transparent;
   color: var(--pf-text-primary);
   text-align: left;
   cursor: pointer;
+  transition: background var(--pf-dur-fast) ease;
 }
 
-.hit:hover {
-  background: var(--pf-surface-2);
+.hit::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: transparent;
+  transition: background var(--pf-dur-fast) ease;
+}
+
+.hit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .hit:focus-visible {
-  outline: 2px solid var(--pf-border-focus);
-  outline-offset: -2px;
+  outline: none;
+  background: var(--pf-accent-wash);
 }
 
-.hitTop {
+.hit:focus-visible::before {
+  background: var(--pf-accent-base);
+}
+
+.hit:hover:not(:disabled) {
+  background: var(--pf-accent-wash);
+}
+
+.hit:hover:not(:disabled)::before {
+  background: var(--pf-accent-base);
+}
+
+.hitMeta {
   display: flex;
-  align-items: baseline;
-  gap: var(--pf-space-2);
-}
-
-.hitTitle {
-  flex: 1;
-  min-width: 0;
-  font-size: var(--pf-font-sm);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px var(--pf-space-2);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
 }
 
 .hitDate {
-  flex: none;
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  letter-spacing: 0.02em;
+}
+
+.hitTurn {
   font-family: var(--pf-font-mono);
-  font-size: var(--pf-font-xs);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hitBranch {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--pf-loom-sibling-edge);
+}
+
+.hitTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--pf-font-sm);
+  font-weight: 500;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.event .hitTitle {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+  line-height: 1.3;
+}
+
+.message .hitTitle {
+  font-style: italic;
+}
+
+.factCategory {
+  margin-right: 6px;
   color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .hitSnippet {
-  font-size: var(--pf-font-xs);
-  line-height: 1.4;
-  color: var(--pf-text-muted);
+  display: -webkit-box;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.message .hitSnippet {
+  padding-left: var(--pf-space-2);
+  border-left: 2px solid var(--pf-border-strong);
+}
+
+/* The matched phrase: an accent wash with an ink underline. */
+.mark {
+  padding: 0 1px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--pf-accent-base) 24%, transparent);
+  color: var(--pf-text-primary);
+  box-shadow: inset 0 -1px 0 var(--pf-accent-line);
+}
+
+.capNote {
+  margin: 0;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  font-style: italic;
+}
+
+/* ── Per-theme ─────────────────────────────────────────────────────────── */
+
+/* Parchment: an index at the back of the book — ruled, small capitals, the
+   match underlined in rubric rather than washed. */
+[data-pf-ornament="double-rule"] .factCategory {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-caps: all-small-caps;
+  text-transform: none;
+}
+
+[data-pf-ornament="double-rule"] .hitTitle,
+[data-pf-ornament="double-rule"] .hitSnippet {
+  font-size: var(--pf-font-sm);
+}
+
+[data-pf-ornament="double-rule"] .mark {
+  background: color-mix(in srgb, var(--pf-accent-base) 14%, transparent);
+  color: var(--pf-accent-base);
+  box-shadow: inset 0 -1px 0 var(--pf-accent-base);
+}
+
+[data-pf-ornament="double-rule"] .scopeActive {
+  box-shadow: none;
+}
+
+/* Phosphor: an inverse-video highlight, the CRT's own selection. */
+[data-pf-glow="high"] .mark {
+  background: var(--pf-accent-base);
+  color: var(--pf-text-inverse);
+  text-shadow: none;
+  box-shadow: none;
+}
+
+[data-pf-glow="high"] .hits,
+[data-pf-glow="high"] .scopes {
+  border-style: dashed;
 }

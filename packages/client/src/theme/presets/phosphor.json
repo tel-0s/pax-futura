@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "id": "phosphor",
+    "name": "Phosphor",
+    "scheme": "dark",
+    "tagline": "Situation room — P1 green on a cathode-ray big board"
+  },
+  "color": {
+    "surface": [
+      "#020603",
+      "#051009",
+      "#09170d",
+      "#0f2214"
+    ],
+    "text": {
+      "primary": "#b2ffc0",
+      "secondary": "#6ad682",
+      "muted": "#3c8a50",
+      "inverse": "#020603"
+    },
+    "accent": {
+      "base": "#4dff7c",
+      "hover": "#93ffb0",
+      "subtle": "#0e361b"
+    },
+    "semantic": {
+      "success": "#4dff7c",
+      "warning": "#ffb52e",
+      "danger": "#ff5a4a",
+      "info": "#5ce1ff"
+    },
+    "border": {
+      "subtle": "#123220",
+      "strong": "#1f5c30",
+      "focus": "#4dff7c"
+    },
+    "loom": {
+      "canonicalEdge": "#4dff7c",
+      "siblingEdge": "#1f5c30",
+      "nodeCurrent": "#93ffb0",
+      "nodePending": "#ffb52e"
+    }
+  },
+  "font": {
+    "ui": "'IBM Plex Mono', ui-monospace, monospace",
+    "display": "'VT323', 'IBM Plex Mono', monospace",
+    "mono": "'IBM Plex Mono', ui-monospace, monospace",
+    "scale": {
+      "xs": "11px",
+      "sm": "12.5px",
+      "md": "13.5px",
+      "lg": "19px",
+      "xl": "30px"
+    },
+    "displayAdjust": 0.58
+  },
+  "space": {
+    "unit": 4
+  },
+  "radius": {
+    "sm": "0px",
+    "md": "0px",
+    "lg": "0px"
+  },
+  "shadow": {
+    "raise": "0 0 0 1px rgba(77,255,124,0.1)",
+    "overlay": "0 0 48px rgba(77,255,124,0.08), 0 0 0 1px rgba(77,255,124,0.2)"
+  },
+  "style": {
+    "panelOpacity": 0.9,
+    "panelBlur": 4,
+    "corners": "square",
+    "ornament": "brackets",
+    "texture": "scanlines",
+    "textureOpacity": 0.4,
+    "glow": 1,
+    "heading": {
+      "case": "uppercase",
+      "tracking": "0.08em",
+      "weight": 400
+    },
+    "fleuron": "▪"
+  },
+  "map": {
+    "water": "#010402",
+    "land": "#03100a",
+    "terrainTintOpacity": 0,
+    "boundary": {
+      "line": "#2a9e4c",
+      "disputed": "#ffb52e"
+    },
+    "label": {
+      "color": "#93ffb0",
+      "halo": "#010402",
+      "glyphStack": "mono-condensed",
+      "font": "'VT323', monospace",
+      "case": "uppercase",
+      "tracking": "0.16em",
+      "italic": false,
+      "scale": 1.4
+    },
+    "graticule": "#0a2412",
+    "selectionOutline": "#ffb52e",
+    "hoverFill": "#4dff7c",
+    "polityPalette": {
+      "hueOffset": 70,
+      "sat": [
+        60,
+        85
+      ],
+      "lum": [
+        13,
+        22
+      ],
+      "contested": "stripe",
+      "hueSpread": 0.42
+    },
+    "projection": "mercator",
+    "atmosphere": {
+      "space": "#010302",
+      "horizon": "#2bd35c",
+      "glow": 0.6
+    },
+    "coast": {
+      "style": "glow",
+      "color": "#4dff7c",
+      "width": 6,
+      "opacity": 0.6
+    },
+    "waterPattern": "grid",
+    "landTexture": "none",
+    "textureStrength": 0,
+    "fillOpacity": 0.6,
+    "borderBand": 2,
+    "boundaryDash": [],
+    "vignette": 0.75,
+    "ornament": "hud"
+  }
+}

@@ -1,68 +1,730 @@
-.titleRow {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--pf-space-2);
-}
+/* The nation dossier. The polity's map color arrives as a local --pf-polity
+   (set inline from buildPolityPalette) and tints the banner, plate, band
+   and note rule; every rule falls back to the accent when it's absent. */
 
-.flag {
-  height: 20px;
-  width: 28px;
-  object-fit: cover;
-  border-radius: var(--pf-radius-sm);
-  border: 1px solid var(--pf-border-subtle);
-}
-
-.body {
+.dossier {
   display: flex;
   flex-direction: column;
   gap: var(--pf-space-3);
 }
 
-.tags {
-  display: flex;
-  gap: var(--pf-space-1);
-  flex-wrap: wrap;
+/* ── Banner ────────────────────────────────────────────────────────────── */
+
+.banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
+  gap: var(--pf-space-4);
+  padding: var(--pf-space-4) var(--pf-space-4) calc(var(--pf-space-4) + 4px);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background:
+    radial-gradient(
+      120% 150% at 0% 0%,
+      color-mix(in srgb, var(--pf-polity, var(--pf-accent-base)) 24%, transparent),
+      transparent 70%
+    ),
+    var(--pf-panel-inset);
+  overflow: hidden;
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
+}
+
+/* The band: the polity's own map color, worn along the banner's foot. */
+.banner::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: var(--pf-polity, var(--pf-accent-base));
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--pf-polity, var(--pf-accent-base)) 40%, transparent);
+}
+
+.player {
+  border-color: var(--pf-accent-line);
+}
+
+.plate {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border: 1px solid color-mix(in srgb, var(--pf-polity, var(--pf-border-strong)) 70%, transparent);
+  border-radius: var(--pf-radius-md);
+  background: color-mix(in srgb, var(--pf-polity, var(--pf-surface-2)) 14%, var(--pf-surface-1));
+  box-shadow:
+    inset 0 1px 0 var(--pf-panel-highlight),
+    0 0 0 3px color-mix(in srgb, var(--pf-surface-0) 50%, transparent);
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.standing {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.player .standing {
+  color: var(--pf-accent-base);
+}
+
+.name {
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-size: calc(var(--pf-font-lg) * 1.18);
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.idLine {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  margin-top: 4px;
+}
+
+.code {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 7px 1px 5px;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-2);
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  letter-spacing: 0.06em;
+  line-height: 18px;
+}
+
+.swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: var(--pf-polity, var(--pf-accent-base));
+  box-shadow: 0 0 0 1px var(--pf-border-strong);
 }
 
 .locate {
   margin-left: auto;
+}
+
+.miss {
+  margin: calc(var(--pf-space-1) * -1) 0 0;
+  color: var(--pf-semantic-warning);
+  font-size: var(--pf-font-xs);
+  animation: pf-fade-in var(--pf-dur) var(--pf-ease-out);
+}
+
+/* ── Tags + note ───────────────────────────────────────────────────────── */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  padding: 1px var(--pf-space-2);
   border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-sm);
-  background: transparent;
+  background: var(--pf-panel-inset);
   color: var(--pf-text-secondary);
-  cursor: pointer;
-  padding: 1px var(--pf-space-2);
   font-size: var(--pf-font-xs);
-}
-
-.locate:hover {
-  color: var(--pf-accent-base);
-  border-color: var(--pf-border-strong);
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--pf-space-3);
-  font-size: var(--pf-font-sm);
-  padding: var(--pf-space-1) 0;
-  border-bottom: 1px solid var(--pf-border-subtle);
-}
-
-.rowLabel {
-  color: var(--pf-text-muted);
+  line-height: 1.6;
 }
 
 .note {
+  max-width: 68ch;
+  margin: 0;
+  padding: 2px 0 2px var(--pf-space-3);
+  border-left: 2px solid var(--pf-polity, var(--pf-accent-line));
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* ── Sections ──────────────────────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+  margin-top: var(--pf-space-3);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  min-height: 26px;
+  padding-bottom: var(--pf-space-1);
+  border-bottom: 1px solid var(--pf-border-subtle);
+}
+
+.headIcon {
+  flex-shrink: 0;
+  color: var(--pf-accent-base);
+}
+
+/* Provenance stamps: dashed = estimated by a model, solid = counted. */
+.provenance {
+  padding: 0 6px;
+  border: 1px dashed var(--pf-border-strong);
+  border-radius: var(--pf-radius-sm);
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  line-height: 16px;
+  text-transform: uppercase;
+  cursor: help;
+}
+
+.measured {
+  border-style: solid;
+  color: var(--pf-text-secondary);
+}
+
+.headAside {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* ── Standing ledger ───────────────────────────────────────────────────── */
+
+.ledger {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+}
+
+.ledgerRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.ledgerLabel {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+}
+
+/* Dot leaders, as in a printed ledger. */
+.leader {
+  flex: 1;
+  min-width: 16px;
+  border-bottom: 1px dotted var(--pf-border-strong);
+  transform: translateY(-3px);
+}
+
+.ledgerValue {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ledgerMuted {
+  color: var(--pf-text-muted);
+  font-style: italic;
+}
+
+.miniMeter {
+  display: block;
+  width: 46px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--pf-surface-3);
+}
+
+.miniMeter > span {
+  display: block;
+  height: 100%;
+  background: var(--pf-accent-base);
+}
+
+.forces {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pf-space-3);
+  width: 100%;
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease;
+}
+
+.forces:hover {
+  border-color: var(--pf-border-strong);
+  background: var(--pf-accent-wash);
+}
+
+.composition {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pf-space-1) var(--pf-space-3);
+}
+
+.unitCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.forcesLink {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  white-space: nowrap;
+  transition: color var(--pf-dur-fast) ease;
+}
+
+.forces:hover .forcesLink {
+  color: var(--pf-accent-base);
+}
+
+/* ── Selected province ─────────────────────────────────────────────────── */
+
+.province {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-3);
+  border: 1px solid var(--pf-accent-line);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-accent-wash);
+  animation: pf-fade-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.provinceIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--pf-accent-base);
+}
+
+.provinceBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.provinceName {
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+  line-height: 1.25;
+}
+
+.provinceMeta {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.contested {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: var(--pf-semantic-warning);
+  font-size: var(--pf-font-xs);
+}
+
+.claimant {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px 0 3px;
+  border: 1px solid color-mix(in srgb, var(--pf-semantic-warning) 60%, transparent);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-semantic-warning-wash);
+  color: var(--pf-text-primary);
+}
+
+/* ── Terra incognita / empty ───────────────────────────────────────────── */
+
+.unknown {
+  border-style: dashed;
+  border-color: var(--pf-border-strong);
+  background:
+    repeating-linear-gradient(135deg, var(--pf-accent-wash) 0 1px, transparent 1px 9px),
+    var(--pf-panel-inset);
+}
+
+.unknown::after {
+  display: none;
+}
+
+.unknownPlate {
+  border-style: dashed;
+  border-color: var(--pf-border-strong);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-muted);
+}
+
+.callout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--pf-space-2) var(--pf-space-3);
+  padding: var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.callout p {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+}
+
+.callout > :last-child {
+  grid-column: 2;
+  justify-self: start;
+}
+
+.calloutIcon {
+  margin-top: 2px;
+  color: var(--pf-accent-base);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-8) var(--pf-space-4);
+  color: var(--pf-text-muted);
+  text-align: center;
+}
+
+.empty p {
+  max-width: 26ch;
+  margin: 0;
   color: var(--pf-text-secondary);
   font-size: var(--pf-font-sm);
 }
 
-.heading {
-  margin: var(--pf-space-3) 0 0;
+/* ── Atlas: a herald's dossier ─────────────────────────────────────────── */
+
+/* Centered achievement: the arms above, the name set beneath, double-ruled. */
+:global([data-pf-ornament="double-rule"]) .banner {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-5) var(--pf-space-4) var(--pf-space-5);
+  border-color: var(--pf-border-strong);
+  background:
+    radial-gradient(70% 90% at 50% 0%, color-mix(in srgb, var(--pf-polity, var(--pf-accent-base)) 16%, transparent), transparent 75%);
+  outline: 1px solid var(--pf-border-strong);
+  outline-offset: -5px;
+  text-align: center;
+}
+
+:global([data-pf-ornament="double-rule"]) .banner::after {
+  left: 18%;
+  right: 18%;
+  bottom: 12px;
+  height: 3px;
+  box-shadow: none;
+}
+
+:global([data-pf-ornament="double-rule"]) .identity {
+  align-items: center;
+}
+
+:global([data-pf-ornament="double-rule"]) .plate {
+  width: 70px;
+  height: 70px;
+  border: 1px solid var(--pf-border-strong);
+  border-radius: 0;
+  background: transparent;
+  box-shadow:
+    0 0 0 3px var(--pf-surface-1),
+    0 0 0 4px var(--pf-border-strong);
+}
+
+:global([data-pf-ornament="double-rule"]) .name {
+  font-size: var(--pf-font-xl);
+}
+
+:global([data-pf-ornament="double-rule"]) .standing,
+:global([data-pf-ornament="double-rule"]) .provenance {
+  font-family: var(--pf-font-ui);
   font-size: var(--pf-font-sm);
-  color: var(--pf-text-muted);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+:global([data-pf-ornament="double-rule"]) .idLine {
+  justify-content: center;
+  margin-top: var(--pf-space-1);
+  margin-bottom: var(--pf-space-2);
+}
+
+:global([data-pf-ornament="double-rule"]) .locate {
+  margin-left: 0;
+}
+
+:global([data-pf-ornament="double-rule"]) .code {
+  border-color: var(--pf-border-strong);
+  background: transparent;
+}
+
+:global([data-pf-ornament="double-rule"]) .tags {
+  justify-content: center;
+}
+
+:global([data-pf-ornament="double-rule"]) .tag {
+  border: none;
+  background: none;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  font-style: italic;
+}
+
+:global([data-pf-ornament="double-rule"]) .tag + .tag::before {
+  content: var(--pf-fleuron);
+  margin-right: 12px;
+  color: var(--pf-accent-base);
+  font-size: 0.8em;
+  font-style: normal;
+}
+
+:global([data-pf-ornament="double-rule"]) .note {
+  border-left: none;
+  padding: 0;
+  font-size: var(--pf-font-md);
+  font-style: italic;
+  text-align: center;
+}
+
+:global([data-pf-ornament="double-rule"]) .ledgerLabel {
+  font-size: var(--pf-font-md);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+}
+
+:global([data-pf-ornament="double-rule"]) .ledgerValue {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-md);
+  font-variant-numeric: oldstyle-nums tabular-nums;
+}
+
+:global([data-pf-ornament="double-rule"]) .forces,
+:global([data-pf-ornament="double-rule"]) .callout {
+  border-color: var(--pf-border-strong);
+  background: transparent;
+}
+
+:global([data-pf-ornament="double-rule"]) .province {
+  border-color: var(--pf-border-strong);
+  background: color-mix(in srgb, var(--pf-accent-base) 6%, transparent);
+}
+
+/* ── Machined: a stamped ID plate ──────────────────────────────────────── */
+
+:global([data-pf-corners="chamfer"]) .banner {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--pf-cut)) 0,
+    100% var(--pf-cut),
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Hazard-hatched band in the polity's color. */
+:global([data-pf-corners="chamfer"]) .banner::after {
+  height: 5px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--pf-polity, var(--pf-accent-base)) 0 6px,
+    color-mix(in srgb, var(--pf-polity, var(--pf-accent-base)) 35%, transparent) 6px 10px
+  );
+  box-shadow: none;
+}
+
+:global([data-pf-corners="chamfer"]) .plate,
+:global([data-pf-corners="chamfer"]) .forces,
+:global([data-pf-corners="chamfer"]) .province {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--pf-cut-sm)) 0,
+    100% var(--pf-cut-sm),
+    100% 100%,
+    var(--pf-cut-sm) 100%,
+    0 calc(100% - var(--pf-cut-sm))
+  );
+}
+
+:global([data-pf-corners="chamfer"]) .standing {
+  color: var(--pf-text-secondary);
+}
+
+:global([data-pf-corners="chamfer"]) .player .standing {
+  color: var(--pf-accent-base);
+}
+
+:global([data-pf-corners="chamfer"]) .tag {
+  border-left: 2px solid var(--pf-accent-line);
+  border-radius: 0;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+}
+
+/* ── CRT: a teletype file ──────────────────────────────────────────────── */
+
+:global([data-pf-glow="high"]) .banner {
+  border-style: dashed;
+  border-color: var(--pf-accent-line);
+  background: var(--pf-panel-inset);
+}
+
+:global([data-pf-glow="high"]) .banner::after {
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--pf-polity, var(--pf-accent-base)) 0 8px,
+    transparent 8px 12px
+  );
+  box-shadow: none;
+}
+
+:global([data-pf-glow="high"]) .plate {
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+}
+
+:global([data-pf-glow="high"]) .name {
+  font-size: calc(var(--pf-font-lg) * 1.3);
+  line-height: 1;
+}
+
+:global([data-pf-glow="high"]) .tag {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--pf-text-secondary);
+}
+
+:global([data-pf-glow="high"]) .tags .tag::before {
+  content: "[";
+  color: var(--pf-text-muted);
+}
+
+:global([data-pf-glow="high"]) .tags .tag::after {
+  content: "]";
+  color: var(--pf-text-muted);
+}
+
+:global([data-pf-glow="high"]) .note {
+  border-left-style: dashed;
+}
+
+:global([data-pf-glow="high"]) .leader {
+  border-bottom-style: dashed;
+}
+
+/* ── Editorial: a clean factsheet ──────────────────────────────────────── */
+
+:global([data-pf-ornament="hairline"]) .banner {
+  border-color: var(--pf-border-subtle);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--pf-polity, var(--pf-accent-base)) 12%, transparent),
+      transparent 80%
+    ),
+    var(--pf-surface-1);
+  box-shadow: var(--pf-shadow-raise);
+}
+
+:global([data-pf-ornament="hairline"]) .banner::after {
+  top: 0;
+  bottom: auto;
+  height: 3px;
+  box-shadow: none;
+}
+
+:global([data-pf-ornament="hairline"]) .plate {
+  border-radius: 50%;
+  border-color: var(--pf-border-subtle);
+  background: var(--pf-surface-2);
+  box-shadow: none;
+}
+
+:global([data-pf-ornament="hairline"]) .name {
+  font-size: calc(var(--pf-font-lg) * 1.3);
+  letter-spacing: -0.01em;
+}
+
+:global([data-pf-ornament="hairline"]) .identity .standing {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+:global([data-pf-ornament="hairline"]) .tag {
+  border-radius: 999px;
+  padding: 1px 10px;
+  border-color: transparent;
+  background: var(--pf-surface-3);
+}
+
+:global([data-pf-ornament="hairline"]) .ledgerValue {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-weight: 500;
 }

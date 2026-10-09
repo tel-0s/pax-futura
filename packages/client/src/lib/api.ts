@@ -1,6 +1,7 @@
 import {
   ChronicleResponseSchema,
   ConversationAtNodeSchema,
+  ConversationSchema,
   ConversationTreeSchema,
   DivergenceReportSchema,
   GameEventSchema,
@@ -9,6 +10,7 @@ import {
   LlmConfigSchema,
   NodeDetailSchema,
   NodeFingerprintSchema,
+  PsycheSheetSchema,
   ReassessProposalSchema,
   SavedPolitySchema,
   SearchResponseSchema,
@@ -32,6 +34,7 @@ import {
   type PublishScenarioRequest,
   type Message,
   type NodeDetail,
+  type PsycheSheet,
   type ReassessProposal,
   type NodeFingerprint,
   type SavedPolity,
@@ -124,6 +127,13 @@ export const api = {
 
   getNode: (gameId: string, nodeId: string): Promise<NodeDetail> =>
     request(`/games/${gameId}/nodes/${nodeId}`, NodeDetailSchema),
+
+  /** Leader psyche as of a node (nearest profiled ancestor); null if never profiled. */
+  getPsyche: (gameId: string, nodeId: string, polity: string): Promise<PsycheSheet | null> =>
+    request(
+      `/games/${gameId}/nodes/${nodeId}/psyche/${encodeURIComponent(polity)}`,
+      PsycheSheetSchema.nullable(),
+    ),
 
   getWorld: (gameId: string, nodeId: string): Promise<WorldState> =>
     request(`/games/${gameId}/nodes/${nodeId}/world`, WorldStateSchema),
@@ -259,8 +269,8 @@ export const api = {
     gameId: string,
     nodeId: string,
     body: { kind: "advisor" | "diplomacy"; title?: string; participants?: string[] },
-  ) =>
-    request<Conversation>(`/games/${gameId}/nodes/${nodeId}/conversations`, null, {
+  ): Promise<Conversation> =>
+    request(`/games/${gameId}/nodes/${nodeId}/conversations`, ConversationSchema, {
       method: "POST",
       body: JSON.stringify(body),
     }),

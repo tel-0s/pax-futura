@@ -1,135 +1,462 @@
+/* The loom: a full-bleed instrument over the live map. Layers, bottom-up:
+   scrim (dims + softens the map, which still previews the selection) →
+   tree canvas (grid backdrop that pans/zooms with the tree) → floating
+   header bar and selection plate. */
+
 .overlay {
   position: absolute;
   inset: 0;
   z-index: 40;
-  display: flex;
-  flex-direction: column;
-  background: color-mix(in srgb, var(--pf-surface-0) 72%, transparent);
-  backdrop-filter: blur(2px);
+  overflow: hidden;
+  animation: pf-fade-in var(--pf-dur) var(--pf-ease-out);
 }
 
+/* ── Scrim ─────────────────────────────────────────────────────────────── */
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 75% 65% at 50% 48%,
+      color-mix(in srgb, var(--pf-surface-0) 52%, transparent),
+      color-mix(in srgb, var(--pf-surface-0) 88%, transparent)
+    );
+  backdrop-filter: blur(3px) saturate(70%);
+  pointer-events: none;
+}
+
+/* The atlas reads as vellum laid over the map, not a dark glass. */
+[data-pf-texture="paper"] .scrim {
+  background:
+    radial-gradient(
+      ellipse 75% 65% at 50% 48%,
+      color-mix(in srgb, var(--pf-surface-1) 58%, transparent),
+      color-mix(in srgb, var(--pf-surface-1) 88%, transparent)
+    );
+  backdrop-filter: blur(1.5px) sepia(30%);
+}
+
+[data-pf-scheme="light"] .scrim {
+  backdrop-filter: blur(5px) saturate(60%);
+}
+
+/* ── Canvas backdrop: a grid that travels with the tree ────────────────── */
+
+/* The grid scales with zoom but bottoms out at half size, so a far view
+   stays a grid instead of turning into noise. */
+
+.canvas {
+  --pf-grid: max(14px, calc(28px * var(--pf-tree-scale, 1)));
+
+  background-image: radial-gradient(circle, var(--pf-border-strong) 1px, transparent 1.6px);
+  background-position: var(--pf-tree-x, 0) var(--pf-tree-y, 0);
+  background-size: var(--pf-grid) var(--pf-grid);
+}
+
+/* Machined: a drafting grid. */
+[data-pf-corners="chamfer"] .canvas {
+  --pf-grid: max(18px, calc(36px * var(--pf-tree-scale, 1)));
+
+  background-image:
+    linear-gradient(var(--pf-border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--pf-border-subtle) 1px, transparent 1px);
+}
+
+/* CRT: an oscilloscope graticule. */
+[data-pf-texture="scanlines"] .canvas {
+  --pf-grid: max(24px, calc(48px * var(--pf-tree-scale, 1)));
+
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--pf-border-strong) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--pf-border-strong) 55%, transparent) 1px, transparent 1px);
+}
+
+/* The atlas: a clean page — the chart's ink lines carry it. */
+[data-pf-ornament="double-rule"] .canvas {
+  background-image: none;
+}
+
+/* ── Edges ─────────────────────────────────────────────────────────────── */
+
+/* The present line: root → checkout, lit in the canonical colour. */
+.canvas .canonicalEdge [data-edge="line"] {
+  stroke: var(--pf-loom-canonical-edge);
+  stroke-width: calc(2.5px * var(--pf-edge-k, 1));
+}
+
+.canvas .canonicalEdge [data-edge="halo"] {
+  stroke: var(--pf-loom-canonical-edge);
+  stroke-width: calc(10px * var(--pf-edge-k, 1));
+  opacity: 0.16;
+}
+
+/* Remembered children beyond the checkout: the same thread, not yet walked. */
+.canvas .futureEdge [data-edge="line"] {
+  stroke: var(--pf-loom-canonical-edge);
+  stroke-width: calc(1.75px * var(--pf-edge-k, 1));
+  stroke-dasharray: 5 5;
+  opacity: 0.7;
+}
+
+.canvas .ghostEdge [data-edge="line"] {
+  stroke: var(--pf-semantic-warning);
+  stroke-width: calc(1.5px * var(--pf-edge-k, 1));
+  stroke-dasharray: 2 4;
+  opacity: 0.8;
+}
+
+.canvas .pendingEdge [data-edge="line"] {
+  stroke: var(--pf-loom-node-pending);
+  stroke-width: calc(2px * var(--pf-edge-k, 1));
+  stroke-dasharray: 4 6;
+  animation: loom-flow 0.9s linear infinite;
+}
+
+/* Light running along the present line on luminous themes. */
+[data-pf-glow="low"] .canvas .canonicalEdge [data-edge="flow"],
+[data-pf-glow="high"] .canvas .canonicalEdge [data-edge="flow"] {
+  stroke: var(--pf-accent-hover);
+  stroke-width: calc(2.5px * var(--pf-edge-k, 1));
+  stroke-dasharray: 2 26;
+  animation: loom-flow 1.8s linear infinite;
+}
+
+[data-pf-glow="high"] .canvas .canonicalEdge [data-edge="halo"] {
+  stroke-width: calc(8px * var(--pf-edge-k, 1));
+  opacity: 0.28;
+}
+
+[data-pf-glow="none"] .canvas .canonicalEdge [data-edge="halo"] {
+  stroke-width: calc(7px * var(--pf-edge-k, 1));
+  opacity: 0.12;
+}
+
+/* The atlas draws the present line as a rubric double rule. */
+[data-pf-ornament="double-rule"] .canvas .canonicalEdge [data-edge="halo"] {
+  stroke-width: calc(5px * var(--pf-edge-k, 1));
+  opacity: 1;
+  stroke-linecap: square;
+}
+
+[data-pf-ornament="double-rule"] .canvas .canonicalEdge [data-edge="line"] {
+  stroke: var(--pf-surface-1);
+  stroke-width: calc(1.6px * var(--pf-edge-k, 1));
+  stroke-linecap: square;
+}
+
+[data-pf-ornament="double-rule"] .canvas [data-edge] {
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+@keyframes loom-flow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+/* ── Header bar ────────────────────────────────────────────────────────── */
+
 .header {
+  position: absolute;
+  top: var(--pf-space-3);
+  left: var(--pf-space-3);
+  right: var(--pf-space-3);
+  z-index: 3;
   display: flex;
   align-items: center;
   gap: var(--pf-space-4);
-  padding: var(--pf-space-2) var(--pf-space-4);
+  min-height: 60px;
+  padding: var(--pf-space-2) var(--pf-space-2) var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-lg);
+  animation: pf-fade-in var(--pf-dur-slow) var(--pf-ease-out);
+}
+
+.mark {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--pf-accent-line);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  box-shadow: var(--pf-glow-accent);
+}
+
+[data-pf-ornament="double-rule"] .mark {
+  border-radius: 50%;
+  border-width: 1.5px;
+  border-color: var(--pf-accent-base);
+  background: transparent;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 
 .title {
-  font-family: var(--pf-font-display);
+  margin: 0;
+  color: var(--pf-text-primary);
   font-size: var(--pf-font-lg);
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
-.hint {
-  flex: 1;
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-4);
+  margin: 0 0 0 var(--pf-space-2);
+  padding: 0 0 0 var(--pf-space-5);
+  border-left: 1px solid var(--pf-border-subtle);
   color: var(--pf-text-muted);
   font-size: var(--pf-font-xs);
+  list-style: none;
 }
 
-.canonicalEdge {
-  stroke: var(--pf-loom-canonical-edge);
-  stroke-width: 2.5;
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  white-space: nowrap;
+}
+
+.legendLine {
+  width: 22px;
+  border-top: 1.5px solid var(--pf-loom-sibling-edge);
+}
+
+.legendCanon {
+  border-top: 2.5px solid var(--pf-loom-canonical-edge);
+  box-shadow: 0 0 6px var(--pf-loom-canonical-edge);
+}
+
+[data-pf-glow="none"] .legendCanon {
+  box-shadow: none;
+}
+
+[data-pf-ornament="double-rule"] .legendCanon {
+  height: 5px;
+  border-top: 1.5px solid var(--pf-loom-canonical-edge);
+  border-bottom: 1.5px solid var(--pf-loom-canonical-edge);
+}
+
+.legendFuture {
+  border-top: 2px dashed var(--pf-loom-canonical-edge);
+  opacity: 0.75;
+}
+
+.keys {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-4);
+  margin-left: auto;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  white-space: nowrap;
+}
+
+.keys span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.keys kbd + kbd {
+  margin-left: 1px;
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-1);
+}
+
+.toolRule {
+  width: 1px;
+  height: 22px;
+  margin: 0 var(--pf-space-1);
+  background: var(--pf-border-subtle);
+}
+
+@media (width < 1320px) {
+  .legend {
+    display: none;
+  }
+}
+
+@media (width < 1040px) {
+  .keys {
+    display: none;
+  }
+
+  .tools {
+    margin-left: auto;
+  }
+}
+
+/* ── Node cards ────────────────────────────────────────────────────────── */
+
+.slot {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .card {
+  --pf-card-edge: var(--pf-border-subtle);
+
+  position: relative;
   display: flex;
   flex-direction: column;
+  gap: 6px;
   width: 100%;
   height: 100%;
-  padding: var(--pf-space-2) var(--pf-space-3);
-  background: var(--pf-surface-1);
-  border: 1px solid var(--pf-border-subtle);
+  padding: var(--pf-space-2) var(--pf-space-3) 6px;
+  border: 1px solid var(--pf-card-edge);
   border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-bg-solid);
+  box-shadow:
+    var(--pf-shadow-raise),
+    inset 0 1px 0 var(--pf-panel-highlight);
+  color: var(--pf-text-primary);
   cursor: pointer;
-  overflow: hidden;
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur-fast) ease,
+    opacity var(--pf-dur-fast) ease,
+    transform var(--pf-dur-fast) ease;
 }
 
 .card:hover {
-  border-color: var(--pf-border-strong);
+  --pf-card-edge: var(--pf-border-strong);
+
+  transform: translateY(-1px);
 }
 
-.current {
-  border-color: var(--pf-loom-node-current);
-  box-shadow: 0 0 0 2px var(--pf-loom-node-current);
+/* Machined: terminal tags — the top-right corner is cut, with the cut
+   edge drawn in the card's edge colour so the frame reads continuous. */
+[data-pf-corners="chamfer"] .card {
+  border-radius: 0;
+  background:
+    linear-gradient(
+        to top right,
+        transparent calc(50% - 1px),
+        var(--pf-card-edge) calc(50% - 1px) calc(50% + 0.5px),
+        transparent calc(50% + 0.5px)
+      )
+      top right / 12px 12px no-repeat,
+    var(--pf-panel-bg-solid);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
 }
 
-.selected {
-  border-color: var(--pf-border-focus);
-}
+/* The atlas: a ruled entry in a family chart. */
+[data-pf-ornament="double-rule"] .card {
+  --pf-card-edge: var(--pf-border-strong);
 
-.offPath {
-  opacity: 0.65;
-}
-
-.failed {
-  border-color: var(--pf-semantic-danger);
-}
-
-.generating {
-  border-style: dashed;
-  border-color: var(--pf-loom-node-pending);
+  box-shadow: none;
 }
 
 .cardTop {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: var(--pf-space-1);
-}
-
-.cardTopRight {
-  display: flex;
-  align-items: center;
-  gap: var(--pf-space-1);
+  gap: 6px;
   min-width: 0;
+  height: 16px;
 }
 
-.anchorButton {
-  border: none;
-  background: transparent;
-  color: var(--pf-text-muted);
-  cursor: pointer;
-  padding: 0 var(--pf-space-1);
-  border-radius: var(--pf-radius-sm);
-  font-size: var(--pf-font-xs);
-  max-width: 100px;
+.date {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
   overflow: hidden;
+  font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.anchorButton:hover {
-  background: var(--pf-surface-2);
-  color: var(--pf-text-primary);
-}
-
-.anchorSet {
-  color: var(--pf-accent-base);
-}
-
-.date {
+.presentTag,
+.ghostTag,
+.branchTag {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 3px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: var(--pf-radius-sm);
   font-family: var(--pf-font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.presentTag {
+  background: var(--pf-loom-node-current);
+  color: var(--pf-text-inverse);
+  text-shadow: none;
+  box-shadow: var(--pf-glow-accent);
+}
+
+.ghostTag {
+  border: 1px solid var(--pf-semantic-warning);
+  background: var(--pf-semantic-warning-wash);
+  color: var(--pf-semantic-warning);
+}
+
+.branchTag {
+  border: 1px solid var(--pf-accent-line);
+  color: var(--pf-accent-base);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* The atlas letters its tags in small capitals, not typewriter caps. */
+[data-pf-ornament="double-rule"] .presentTag,
+[data-pf-ornament="double-rule"] .ghostTag,
+[data-pf-ornament="double-rule"] .branchTag {
+  border-radius: 0;
+  font-family: var(--pf-font-ui);
   font-size: var(--pf-font-xs);
-  color: var(--pf-text-muted);
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: none;
 }
 
 .summary {
-  flex: 1;
-  font-size: var(--pf-font-sm);
-  line-height: 1.3;
-  overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.38;
   -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
-.fingerprintBar {
+.fingerprintBar,
+.fingerprintBlank {
   display: flex;
-  height: 4px;
   flex-shrink: 0;
-  border: 1px solid var(--pf-border-subtle);
-  border-radius: var(--pf-radius-sm);
+  gap: 1px;
+  height: 5px;
   overflow: hidden;
+  border-radius: 3px;
+  background: var(--pf-border-subtle);
 }
 
 .fingerprintSegment {
@@ -137,29 +464,551 @@
   min-width: 2px;
 }
 
-.cardBottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: var(--pf-font-xs);
-  color: var(--pf-text-secondary);
+[data-pf-ornament="double-rule"] .fingerprintBar {
+  height: 4px;
+  border-radius: 0;
+  outline: 0.5px solid var(--pf-border-strong);
 }
 
+.cardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 22px;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.counts {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.counts > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.counts > .presentTag,
+.counts > .ghostTag {
+  gap: 3px;
+  margin-right: calc(-1 * var(--pf-space-1));
+}
+
+/* Hover-revealed actions; always shown on the selection and on failures. */
 .actions {
   display: flex;
-  gap: var(--pf-space-1);
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--pf-dur-fast) ease;
+}
+
+.selected .actions,
+.failed .actions,
+.card:hover .actions,
+.card:focus-within .actions {
+  opacity: 1;
 }
 
 .iconButton {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
   border: none;
-  background: transparent;
-  color: var(--pf-text-secondary);
-  cursor: pointer;
-  padding: 0 var(--pf-space-1);
   border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-muted);
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease;
 }
 
 .iconButton:hover {
-  background: var(--pf-surface-2);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+}
+
+.iconDanger:hover {
+  background: var(--pf-semantic-danger-wash);
+  color: var(--pf-semantic-danger);
+}
+
+.iconButtonLit {
+  color: var(--pf-semantic-danger);
+}
+
+/* ── Card states ───────────────────────────────────────────────────────── */
+
+/* Branches off the present line recede until looked at. */
+.offPath {
+  opacity: 0.6;
+}
+
+.offPath .summary {
+  color: var(--pf-text-secondary);
+}
+
+.offPath:hover,
+.offPath.selected {
+  opacity: 1;
+}
+
+/* Work in flight and failures want attention wherever they hang. */
+.offPath.generating,
+.offPath.failed {
+  opacity: 0.92;
+}
+
+.future {
+  opacity: 0.85;
+}
+
+/* The checkout: ringed and lit in the loom's current colour. */
+.current {
+  --pf-card-edge: var(--pf-loom-node-current);
+
+  box-shadow:
+    0 0 0 1px var(--pf-loom-node-current),
+    0 0 0 5px var(--pf-accent-wash),
+    var(--pf-glow-accent),
+    var(--pf-shadow-raise);
+}
+
+.current::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: var(--pf-space-3);
+  right: var(--pf-space-3);
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--pf-loom-node-current);
+  box-shadow: 0 0 10px var(--pf-loom-node-current);
+}
+
+[data-pf-glow="none"] .current::before {
+  box-shadow: none;
+}
+
+[data-pf-corners="chamfer"] .current {
+  background:
+    linear-gradient(
+        to top right,
+        transparent calc(50% - 1px),
+        var(--pf-card-edge) calc(50% - 1px) calc(50% + 0.5px),
+        transparent calc(50% + 0.5px)
+      )
+      top right / 12px 12px no-repeat,
+    linear-gradient(180deg, var(--pf-accent-wash), transparent 70%),
+    var(--pf-panel-bg-solid);
+  box-shadow: inset 0 0 0 1px var(--pf-loom-node-current);
+}
+
+/* Machined: a hazard-taped tag instead of a glowing lip. */
+[data-pf-corners="chamfer"] .current::before {
+  top: 0;
+  left: 0;
+  right: auto;
+  width: 56px;
+  height: 3px;
+  border-radius: 0;
+  background: repeating-linear-gradient(-45deg, var(--pf-accent-base) 0 4px, transparent 4px 8px);
+  box-shadow: none;
+}
+
+/* The atlas: the present entry is boxed in a rubric double rule. */
+[data-pf-ornament="double-rule"] .current {
+  box-shadow:
+    0 0 0 3px var(--pf-surface-1),
+    0 0 0 4.5px var(--pf-loom-node-current);
+}
+
+[data-pf-ornament="double-rule"] .current::before {
+  display: none;
+}
+
+/* Scouted, not yet canon. */
+.ghost {
+  --pf-card-edge: var(--pf-semantic-warning);
+
+  border-style: dashed;
+  background: color-mix(in srgb, var(--pf-panel-bg-solid) 72%, transparent);
+  box-shadow: none;
+}
+
+.failed {
+  --pf-card-edge: color-mix(in srgb, var(--pf-semantic-danger) 55%, var(--pf-border-subtle));
+
+  padding-left: calc(var(--pf-space-3) + 3px);
+}
+
+.failed::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: -1px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--pf-semantic-danger);
+  box-shadow: 0 0 8px var(--pf-semantic-danger);
+}
+
+.failed .date,
+.failed .summary {
+  color: var(--pf-semantic-danger);
+}
+
+.generating {
+  --pf-card-edge: var(--pf-loom-node-pending);
+
+  border-style: dashed;
+}
+
+.generating .date {
+  color: var(--pf-loom-node-pending);
+}
+
+.generating .summary {
+  color: var(--pf-text-secondary);
+  font-style: italic;
+}
+
+.generating::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    color-mix(in srgb, var(--pf-loom-node-pending) 20%, transparent) 50%,
+    transparent 65%
+  );
+  background-size: 250% 100%;
+  animation: pf-shimmer 1.8s linear infinite;
+  pointer-events: none;
+}
+
+.spin {
+  flex-shrink: 0;
+  animation: pf-spin 1s linear infinite;
+}
+
+/* ── Selection lock: corner brackets around the selected card ─────────── */
+
+.lock {
+  --pf-lock: var(--pf-text-primary);
+
+  position: absolute;
+  inset: -7px;
+  z-index: 2;
+  background:
+    linear-gradient(var(--pf-lock), var(--pf-lock)) top left / 13px 1.5px,
+    linear-gradient(var(--pf-lock), var(--pf-lock)) top left / 1.5px 13px,
+    linear-gradient(var(--pf-lock), var(--pf-lock)) top right / 13px 1.5px,
+    linear-gradient(var(--pf-lock), var(--pf-lock)) top right / 1.5px 13px,
+    linear-gradient(var(--pf-lock), var(--pf-lock)) bottom left / 13px 1.5px,
+    linear-gradient(var(--pf-lock), var(--pf-lock)) bottom left / 1.5px 13px,
+    linear-gradient(var(--pf-lock), var(--pf-lock)) bottom right / 13px 1.5px,
+    linear-gradient(var(--pf-lock), var(--pf-lock)) bottom right / 1.5px 13px;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  animation: loom-lock var(--pf-dur) var(--pf-ease-out);
+}
+
+@keyframes loom-lock {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+/* Editorial: a quiet rounded focus ring instead of HUD brackets. */
+[data-pf-ornament="hairline"] .lock {
+  inset: -6px;
+  border: 1.5px solid var(--pf-text-secondary);
+  border-radius: calc(var(--pf-radius-md) + 6px);
+  background: none;
+}
+
+/* ── Anchor ribbon: a bookmark tab on the card's top edge ──────────────── */
+
+.ribbon {
+  position: absolute;
+  bottom: calc(100% - 1px);
+  left: var(--pf-space-3);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100% - 2 * var(--pf-space-3));
+  height: 20px;
+  padding: 0 var(--pf-space-3) 0 var(--pf-space-2);
+  border-radius: var(--pf-radius-sm) var(--pf-radius-sm) 0 0;
+  background: var(--pf-accent-base);
+  color: var(--pf-text-inverse);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-shadow: none;
+  box-shadow: var(--pf-glow-accent);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 50%, 100% 100%, 0 100%);
+}
+
+.ribbon svg {
+  flex-shrink: 0;
+}
+
+.ribbonText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The atlas: a silk ribbon in rubric, set in the book face. */
+[data-pf-ornament="double-rule"] .ribbon {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-xs);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* ── Zoomed out: cards collapse to their ownership threads ─────────────── */
+
+.canvas[data-zoom="far"] .cardTop,
+.canvas[data-zoom="far"] .summary,
+.canvas[data-zoom="far"] .cardBottom {
+  display: none;
+}
+
+.canvas[data-zoom="far"] .card {
+  padding: var(--pf-space-3);
+}
+
+.canvas[data-zoom="far"] .fingerprintBar,
+.canvas[data-zoom="far"] .fingerprintBlank {
+  flex: 1;
+  height: auto;
+  border-radius: var(--pf-radius-sm);
+}
+
+.canvas[data-zoom="far"] .ribbon {
+  height: 34px;
+  font-size: 22px;
+}
+
+/* From afar the present needs a beacon, not a hairline ring. */
+.canvas[data-zoom="far"] .current {
+  box-shadow:
+    0 0 0 calc(2px * var(--pf-edge-k, 1)) var(--pf-loom-node-current),
+    0 0 0 calc(7px * var(--pf-edge-k, 1)) var(--pf-accent-wash),
+    var(--pf-glow-accent);
+}
+
+.canvas[data-zoom="far"] .lock {
+  inset: calc(-5px * var(--pf-edge-k, 1));
+  background-size:
+    calc(13px * var(--pf-edge-k, 1)) calc(1.5px * var(--pf-edge-k, 1)),
+    calc(1.5px * var(--pf-edge-k, 1)) calc(13px * var(--pf-edge-k, 1));
+}
+
+/* ── Selection plate ───────────────────────────────────────────────────── */
+
+.plate {
+  position: absolute;
+  left: 50%;
+  bottom: var(--pf-space-4);
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(200px, max-content) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--pf-space-2) var(--pf-space-5);
+  width: min(940px, calc(100% - 200px));
+  padding: var(--pf-space-3) var(--pf-space-4) var(--pf-space-3) var(--pf-space-5);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-lg);
+  translate: -50% 0;
+  animation: pf-fade-in var(--pf-dur-fast) var(--pf-ease-out);
+}
+
+.plateDanger {
+  border-color: var(--pf-semantic-danger);
+}
+
+.plateIdentity {
+  display: flex;
+  flex-direction: column;
+  grid-row: 1 / span 2;
+  gap: 2px;
+  min-width: 0;
+  padding-right: var(--pf-space-5);
+  border-right: 1px solid var(--pf-border-subtle);
+}
+
+.plateKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  white-space: nowrap;
+}
+
+.plateDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pf-border-strong);
+}
+
+.plateCurrent .plateDot {
+  background: var(--pf-loom-node-current);
+  box-shadow: 0 0 8px var(--pf-loom-node-current);
+}
+
+.plateGhost .plateDot {
+  background: var(--pf-semantic-warning);
+}
+
+.plateFailed .plateDot {
+  background: var(--pf-semantic-danger);
+}
+
+.plateGenerating .plateDot {
+  background: var(--pf-loom-node-pending);
+  animation: pf-pulse 1.2s ease-in-out infinite;
+}
+
+.plateDate {
+  margin: 0;
   color: var(--pf-text-primary);
+  font-size: var(--pf-font-xl);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.plateAnchor {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 280px;
+  overflow: hidden;
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plateSummary {
+  display: -webkit-box;
+  max-width: 76ch;
+  margin: 0;
+  overflow: hidden;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-md);
+  line-height: 1.5;
+  text-wrap: pretty;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.plateActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--pf-space-1);
+}
+
+.here {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 var(--pf-space-3) 0 var(--pf-space-2);
+  border: 1px solid var(--pf-accent-line);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+}
+
+.plateActions .dangerGhost:hover:not(:disabled) {
+  background: var(--pf-semantic-danger-wash);
+  color: var(--pf-semantic-danger);
+}
+
+.plateError {
+  grid-column: 2;
+  margin: 0;
+  color: var(--pf-semantic-danger);
+  font-size: var(--pf-font-xs);
+}
+
+/* Inline anchor naming. */
+.anchorForm {
+  display: flex;
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-items: center;
+  gap: var(--pf-space-3);
+  min-width: 0;
+}
+
+.anchorField {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--pf-space-2);
+  min-width: 0;
+  height: 38px;
+  padding: 0 var(--pf-space-3);
+  border: 1px solid var(--pf-border-focus);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-accent-base);
+  box-shadow: 0 0 0 3px var(--pf-accent-wash);
+}
+
+.anchorInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-md);
+}
+
+/* Delete confirmation. */
+.confirm {
+  display: flex;
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-items: center;
+  gap: var(--pf-space-3);
+  min-width: 0;
+}
+
+.confirmIcon {
+  flex-shrink: 0;
+  color: var(--pf-semantic-danger);
+}
+
+.confirmText {
+  flex: 1;
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.45;
 }

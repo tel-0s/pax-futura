@@ -1,100 +1,637 @@
-.body {
-  padding-top: var(--pf-space-4);
-  min-width: 460px;
+/* ── Frame: section nav + content ─────────────────────────────────────── */
+
+.layout {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  gap: var(--pf-space-6);
+
+  /* Fill the modal's max height (minus its header, footer and padding) so
+     switching sections never makes the dialog jump. */
+  min-height: calc(min(860px, 90vh) - 200px);
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  align-self: start;
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--pf-radius-md);
+  background: none;
+  color: var(--pf-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    border-color var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease;
+}
+
+.navItem:hover {
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+}
+
+.navActive {
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.navActive::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--pf-accent-base);
+}
+
+.navIcon {
+  flex-shrink: 0;
+  color: var(--pf-text-muted);
+}
+
+.navActive .navIcon {
+  color: var(--pf-accent-base);
+}
+
+.navText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.navLabel {
+  font-size: var(--pf-font-sm);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.navHint {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.3;
+}
+
+.navStatus {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  margin-top: var(--pf-space-5);
+  padding: var(--pf-space-3);
+  border-top: 1px solid var(--pf-border-subtle);
+}
+
+.health {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+}
+
+.healthDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.healthLive {
+  background: var(--pf-semantic-success);
+  box-shadow: 0 0 0 3px var(--pf-semantic-success-wash);
+}
+
+.healthFake {
+  background: var(--pf-semantic-warning);
+  box-shadow: 0 0 0 3px var(--pf-semantic-warning-wash);
+}
+
+.content {
+  min-width: 0;
+  animation: pf-fade-in var(--pf-dur) ease;
+}
+
+.loading {
+  padding: var(--pf-space-8) 0;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+  text-align: center;
 }
 
 .section {
   display: flex;
   flex-direction: column;
   gap: var(--pf-space-3);
-  align-items: flex-start;
 }
 
-.row {
+.sectionHead {
+  margin-top: var(--pf-space-3);
+}
+
+.sectionHead:first-child {
+  margin-top: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-lg);
+  line-height: 1.2;
+}
+
+.sectionHelp {
+  max-width: 64ch;
+  margin: var(--pf-space-1) 0 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* ── Appearance ───────────────────────────────────────────────────────── */
+
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--pf-space-3);
+}
+
+.themeSlot {
+  position: relative;
+  display: flex;
+}
+
+.themeCard {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--pf-space-2) var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    background var(--pf-dur-fast) ease,
+    transform var(--pf-dur-fast) ease,
+    box-shadow var(--pf-dur) ease;
+}
+
+.themeCard:hover {
+  border-color: var(--pf-border-strong);
+  background: var(--pf-accent-wash);
+  transform: translateY(-1px);
+}
+
+.themeActive {
+  border-color: var(--pf-accent-base);
+  background: var(--pf-accent-wash);
+  box-shadow: var(--pf-glow-accent);
+}
+
+.themeName {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-1);
+  margin: var(--pf-space-1) var(--pf-space-1) 0;
+  font-size: var(--pf-font-md);
+  line-height: 1.2;
+}
+
+.themeCheck {
+  color: var(--pf-accent-base);
+}
+
+.themeTagline {
+  margin: 0 var(--pf-space-1);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.35;
+}
+
+.themeBadge {
+  margin-left: auto;
+  font-family: var(--pf-font-ui);
+}
+
+.themeRemove {
+  position: absolute;
+  top: var(--pf-space-3);
+  right: var(--pf-space-3);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-panel-bg-solid);
+  color: var(--pf-semantic-danger);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--pf-dur-fast) ease;
+}
+
+.themeRemove:focus-visible,
+.themeSlot:hover .themeRemove {
+  opacity: 1;
+}
+
+.importCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pf-space-1);
+  min-height: 150px;
+  padding: var(--pf-space-4);
+  border: 1px dashed var(--pf-border-strong);
+  border-radius: var(--pf-radius-md);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease,
+    background var(--pf-dur-fast) ease;
+}
+
+.importCard:hover {
+  border-color: var(--pf-accent-base);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+}
+
+.importTitle {
+  font-size: var(--pf-font-sm);
+  font-weight: 600;
+}
+
+.segmented {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 3px;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  cursor: pointer;
+}
+
+.segment:hover {
+  color: var(--pf-text-primary);
+}
+
+.segmentActive {
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  box-shadow: inset 0 0 0 1px var(--pf-accent-line);
+}
+
+/* ── Providers ────────────────────────────────────────────────────────── */
+
+.statusCard {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-4);
+  padding: var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-left-width: 3px;
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.statusLive {
+  border-left-color: var(--pf-semantic-success);
+}
+
+.statusFake {
+  border-left-color: var(--pf-semantic-warning);
+}
+
+.statusIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--pf-radius-md);
+}
+
+.statusLive .statusIcon {
+  background: var(--pf-semantic-success-wash);
+  color: var(--pf-semantic-success);
+}
+
+.statusFake .statusIcon {
+  background: var(--pf-semantic-warning-wash);
+  color: var(--pf-semantic-warning);
+}
+
+.statusText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.statusProvider {
+  overflow: hidden;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusHelp {
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+}
+
+.connection,
+.role {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.connHead {
   display: flex;
   align-items: center;
   gap: var(--pf-space-3);
 }
 
-.status {
-  font-size: var(--pf-font-sm);
-  color: var(--pf-text-secondary);
-}
-
-.heading {
-  margin: var(--pf-space-2) 0 0;
-  font-size: var(--pf-font-sm);
-  color: var(--pf-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.connection {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--pf-space-2);
-  padding: var(--pf-space-3);
+.connIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-2);
+  color: var(--pf-accent-base);
 }
 
-.connRow {
+.connTitle {
   display: flex;
-  align-items: flex-end;
-  gap: var(--pf-space-2);
+  flex-direction: column;
+  min-width: 0;
 }
 
-.kind {
+.connName {
+  overflow: hidden;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.connKind {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.connBadges {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--pf-space-1);
+}
+
+.formGrid,
+.roleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--pf-space-3);
+}
+
+.formGrid input,
+.roleGrid input,
+.selectField select {
+  width: 100%;
+  min-height: 36px;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.selectField {
   display: flex;
   flex-direction: column;
   gap: var(--pf-space-1);
-  font-size: var(--pf-font-xs);
-  color: var(--pf-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
-.roleRow {
+/* Mirrors the shared Field label so selects sit flush with inputs. */
+.fieldLabel {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.secret {
+  position: relative;
+}
+
+.secret input {
+  padding-right: 40px;
+  font-family: var(--pf-font-mono);
+}
+
+.reveal {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-muted);
+  cursor: pointer;
+}
+
+.reveal:hover {
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+}
+
+.addCard {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--pf-space-2);
-  width: 100%;
+  padding: var(--pf-space-3);
+  border: 1px dashed var(--pf-border-strong);
+  border-radius: var(--pf-radius-md);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  cursor: pointer;
+}
+
+.addCard:hover {
+  border-color: var(--pf-accent-base);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+}
+
+.roleHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .roleName {
-  width: 76px;
-  font-size: var(--pf-font-sm);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-md);
+}
+
+.roleHelp {
   color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.45;
 }
 
-.model {
-  flex: 1;
-  padding: var(--pf-space-1) var(--pf-space-2);
+.inherits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  margin-top: var(--pf-space-2);
+}
+
+.inheritList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pf-space-2);
+}
+
+.inherit {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-1) var(--pf-space-3);
   border: 1px solid var(--pf-border-subtle);
-  border-radius: var(--pf-radius-sm);
-  background: var(--pf-surface-0);
-  color: var(--pf-text-primary);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  font-size: var(--pf-font-sm);
 }
 
-.num {
-  width: 90px;
-  padding: var(--pf-space-1) var(--pf-space-2);
-  border: 1px solid var(--pf-border-subtle);
-  border-radius: var(--pf-radius-sm);
-  background: var(--pf-surface-0);
+.inheritRole {
   color: var(--pf-text-primary);
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
-.muted {
+.inheritArrow {
   color: var(--pf-text-muted);
   font-size: var(--pf-font-xs);
 }
 
-.footerRow {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
+.inheritFrom {
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+}
+
+/* ── Footer save bar ──────────────────────────────────────────────────── */
+
+.saveState {
+  flex: 1;
+  min-width: 0;
+  margin-right: auto;
+  font-size: var(--pf-font-sm);
+}
+
+.ok {
+  color: var(--pf-semantic-success);
+}
+
+.bad {
+  color: var(--pf-semantic-danger);
+}
+
+.quiet {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.pending {
+  display: inline-flex;
   align-items: center;
-  margin-top: var(--pf-space-2);
+  gap: var(--pf-space-2);
+  color: var(--pf-semantic-warning);
+}
+
+.pendingDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pf-semantic-warning);
+  animation: pf-pulse 1.6s ease-in-out infinite;
+}
+
+@media (width <= 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .nav {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .navHint,
+  .navStatus {
+    display: none;
+  }
+
+  .formGrid,
+  .roleGrid {
+    grid-template-columns: 1fr;
+  }
 }

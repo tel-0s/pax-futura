@@ -6,6 +6,8 @@ export default {
     "custom-property-pattern": "^pf-[a-z0-9-]+$",
     // CSS modules classes are camelCase so they read naturally from TSX.
     "selector-class-pattern": "^[a-z][a-zA-Z0-9]*$",
+    // CSS modules: :global(.pfHook) reaches the theme skin's hook classes.
+    "selector-pseudo-class-no-unknown": [true, { ignorePseudoClasses: ["global"] }],
   },
   overrides: [
     {
@@ -17,7 +19,9 @@ export default {
         "function-disallowed-list": ["rgb", "rgba", "hsl", "hsla", "oklch"],
         "declaration-property-value-disallowed-list": {
           "/^(color|background|background-color|border|border-color|outline|outline-color|fill|stroke|box-shadow)$/":
-            [/^(?!.*var\(--pf-)(?!.*(?:inherit|transparent|currentColor|none|initial|unset)|0$).*$/],
+            // currentcolor in either case: stylelint-config-standard's
+            // value-keyword-case demands the lowercase spelling.
+            [/^(?!.*var\(--pf-)(?!.*(?:inherit|transparent|[cC]urrent[cC]olor|none|initial|unset)|0$).*$/],
         },
       },
     },

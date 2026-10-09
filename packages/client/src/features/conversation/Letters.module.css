@@ -1,0 +1,753 @@
+/* The thread: incoming replies are letters (signed, set as prose); the
+   player's own words are compact notes on the right in the accent ink. */
+
+/* ── Letter ────────────────────────────────────────────────────────────── */
+
+.letter {
+  --pf-letter-tint: var(--pf-accent-base);
+
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-3) var(--pf-space-4) var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.tintChancellor {
+  --pf-letter-tint: var(--pf-semantic-warning);
+}
+
+.tintMarshal {
+  --pf-letter-tint: var(--pf-semantic-danger);
+}
+
+.tintSpymaster {
+  --pf-letter-tint: var(--pf-semantic-info);
+}
+
+.tintAdvisor {
+  --pf-letter-tint: var(--pf-accent-base);
+}
+
+/* Signature line: seal, name, office — with a rule in the sender's tint
+   fading out beneath it. */
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+  min-width: 0;
+  padding-bottom: var(--pf-space-3);
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, var(--pf-letter-tint), var(--pf-border-subtle) 45%, transparent) 1;
+}
+
+.from {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fromName {
+  overflow: hidden;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+  font-weight: var(--pf-heading-weight);
+  letter-spacing: var(--pf-heading-tracking);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  text-transform: var(--pf-heading-transform);
+  font-variant-caps: var(--pf-heading-variant);
+  white-space: nowrap;
+}
+
+.fromRole {
+  overflow: hidden;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fromStatus {
+  color: var(--pf-letter-tint);
+  animation: pf-pulse 1.6s ease-in-out infinite;
+}
+
+.tools {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--pf-space-1);
+}
+
+/* Quiet icon controls: present for keyboard and touch, visible on hover. */
+.tool {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--pf-dur-fast) ease,
+    background var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease;
+}
+
+.tool:hover {
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+}
+
+.letter:hover .tool,
+.letter:focus-within .tool,
+.noteWrap:hover .tool,
+.noteWrap:focus-within .tool {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .tool {
+    opacity: 1;
+  }
+}
+
+/* Branch indicator: this is how players find edited/regenerated alternatives,
+   so it must read as a control, not as metadata — always visible. */
+.siblings {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 1px;
+  border: 1px solid var(--pf-accent-line);
+  border-radius: var(--pf-radius-lg);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.siblings button {
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  padding: 0;
+  border: none;
+  border-radius: var(--pf-radius-md);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.siblings button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.siblings button:hover:not(:disabled) {
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-hover);
+}
+
+.siblingCount {
+  padding: 0 2px;
+  font-weight: 600;
+}
+
+/* ── Letter body: typeset prose ────────────────────────────────────────── */
+
+.body {
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.62;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+.body > :first-child {
+  margin-top: 0;
+}
+
+.body > :last-child {
+  margin-bottom: 0;
+}
+
+.body p {
+  margin: 0 0 0.8em;
+}
+
+.body strong {
+  color: var(--pf-text-primary);
+  font-weight: 600;
+}
+
+.body em {
+  font-style: italic;
+}
+
+.body ul,
+.body ol {
+  margin: 0 0 0.85em;
+  padding-left: 1.4em;
+}
+
+.body li {
+  margin: 0.32em 0;
+  padding-left: 0.15em;
+}
+
+.body li > p {
+  margin: 0 0 0.4em;
+}
+
+.body li::marker {
+  color: var(--pf-letter-tint);
+}
+
+.body ol > li::marker {
+  font-family: var(--pf-font-mono);
+  font-size: 0.88em;
+  font-variant-numeric: tabular-nums;
+}
+
+.body h1,
+.body h2,
+.body h3,
+.body h4 {
+  margin: 1.15em 0 0.45em;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.3;
+}
+
+.body blockquote {
+  margin: 0 0 0.85em;
+  padding: 2px 0 2px var(--pf-space-3);
+  border-left: 2px solid var(--pf-letter-tint);
+  color: var(--pf-text-secondary);
+  font-style: italic;
+}
+
+.body blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.body hr {
+  height: 1px;
+  margin: 1.1em 0;
+  border: none;
+  background: linear-gradient(90deg, transparent, var(--pf-border-strong), transparent);
+}
+
+.body code {
+  padding: 0 3px;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-accent-wash);
+  font-size: 0.9em;
+}
+
+.body pre {
+  overflow-x: auto;
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-0);
+}
+
+.body table {
+  width: 100%;
+  margin: 0 0 0.85em;
+  border-collapse: collapse;
+  font-size: var(--pf-font-xs);
+}
+
+.body th,
+.body td {
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--pf-border-subtle);
+  text-align: left;
+}
+
+/* ── Composing & streaming ─────────────────────────────────────────────── */
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.skeleton span {
+  height: 7px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--pf-border-subtle) 30%,
+    color-mix(in srgb, var(--pf-letter-tint) 45%, var(--pf-border-subtle)) 50%,
+    var(--pf-border-subtle) 70%
+  );
+  background-size: 300% 100%;
+  animation: pf-shimmer 2.2s linear infinite;
+}
+
+.skeleton span:nth-child(1) {
+  width: 94%;
+}
+
+.skeleton span:nth-child(2) {
+  width: 81%;
+  animation-delay: 0.15s;
+}
+
+.skeleton span:nth-child(3) {
+  width: 56%;
+  animation-delay: 0.3s;
+}
+
+/* A filament sweeps the top edge while the pen moves. */
+.streaming::before,
+.composing::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--pf-letter-tint), transparent) no-repeat;
+  background-size: 45% 100%;
+  animation: pf-shimmer 1.8s linear infinite;
+  pointer-events: none;
+}
+
+/* The live caret rides the end of the last line written. */
+.streaming .body > :last-child:not(ul, ol)::after,
+.streaming .body > :is(ul, ol):last-child > li:last-child::after,
+.streaming .body:empty::after {
+  content: "";
+  display: inline-block;
+  width: 0.48em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--pf-letter-tint);
+  box-shadow: var(--pf-glow-accent);
+  animation: caret 1s steps(1) infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ── Notes (the player's own messages) ─────────────────────────────────── */
+
+.noteWrap {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: flex-end;
+  gap: var(--pf-space-1);
+  max-width: 86%;
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.note {
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid color-mix(in srgb, var(--pf-accent-base) 28%, transparent);
+  border-right: 2px solid var(--pf-accent-base);
+  border-radius: var(--pf-radius-md) var(--pf-radius-sm) var(--pf-radius-sm) var(--pf-radius-md);
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.notePending {
+  opacity: 0.72;
+}
+
+.noteMeta {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.noteTools {
+  position: absolute;
+  top: 3px;
+  right: calc(100% + var(--pf-space-1));
+}
+
+/* Edit-and-fork: the note widens into an editor. */
+.editor {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-3);
+  border: 1px solid var(--pf-accent-line);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-accent-wash);
+  animation: pf-fade-in var(--pf-dur) ease;
+}
+
+.editorLabel {
+  color: var(--pf-accent-base);
+}
+
+.editInput {
+  width: 100%;
+  min-height: 72px;
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-panel-inset);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.editInput:focus {
+  border-color: var(--pf-border-focus);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--pf-accent-wash);
+}
+
+.editActions {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+}
+
+.editHint {
+  flex: 1;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.3;
+}
+
+/* ── Thread furniture ──────────────────────────────────────────────────── */
+
+/* Long threads mount only their tail; this reveals the rest. */
+.showEarlier {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--pf-space-2);
+  width: 100%;
+  padding: var(--pf-space-1) 0;
+  border: none;
+  background: none;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--pf-dur-fast) ease;
+}
+
+.showEarlier::before,
+.showEarlier::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--pf-border-subtle);
+}
+
+.showEarlier:hover {
+  color: var(--pf-accent-base);
+}
+
+/* First page of an empty channel. */
+.letterhead {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pf-space-1);
+  margin: auto 0;
+  padding: var(--pf-space-6) var(--pf-space-4);
+  text-align: center;
+  animation: pf-fade-in var(--pf-dur-slow) ease;
+}
+
+.letterheadName {
+  margin-top: var(--pf-space-3);
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-lg);
+  font-weight: var(--pf-heading-weight);
+  letter-spacing: var(--pf-heading-tracking);
+  line-height: 1.2;
+  text-transform: var(--pf-heading-transform);
+  font-variant-caps: var(--pf-heading-variant);
+}
+
+.letterheadRole {
+  color: var(--pf-text-muted);
+}
+
+.letterheadHint {
+  max-width: 32ch;
+  margin-top: var(--pf-space-2);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.letterheadRule {
+  width: 58%;
+  margin: var(--pf-space-4) 0 var(--pf-space-2);
+}
+
+.letterheadPrompt {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+/* A reply that never came: clearly marked, not alarming. */
+.failure {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-3);
+  border: 1px solid color-mix(in srgb, var(--pf-semantic-warning) 40%, transparent);
+  border-left: 3px solid var(--pf-semantic-warning);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-semantic-warning-wash);
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.failureIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--pf-semantic-warning);
+}
+
+.failureText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.failureTitle {
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  font-weight: 600;
+}
+
+.failureDetail {
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: 10.5px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.failureHint {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.failureActions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ══ Theme personalities ═════════════════════════════════════════════════ */
+
+/* Command deck & phosphor: HUD corner brackets on each letter. */
+[data-pf-ornament="brackets"] .letter {
+  border-radius: var(--pf-radius-sm);
+}
+
+[data-pf-ornament="brackets"] .letter::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background:
+    linear-gradient(var(--pf-accent-line), var(--pf-accent-line)) top left / 9px 1px no-repeat,
+    linear-gradient(var(--pf-accent-line), var(--pf-accent-line)) top left / 1px 9px no-repeat,
+    linear-gradient(var(--pf-accent-line), var(--pf-accent-line)) bottom right / 9px 1px no-repeat,
+    linear-gradient(var(--pf-accent-line), var(--pf-accent-line)) bottom right / 1px 9px no-repeat;
+  pointer-events: none;
+}
+
+/* Seraphim: machined slips with the sender's tint as an edge rail. */
+[data-pf-corners="chamfer"] .letter {
+  border-left: 3px solid var(--pf-letter-tint);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--pf-letter-tint) 7%, transparent), transparent 64px),
+    var(--pf-panel-inset);
+}
+
+[data-pf-corners="chamfer"] .fromRole {
+  color: var(--pf-letter-tint);
+}
+
+[data-pf-corners="chamfer"] .note {
+  border-right-width: 3px;
+}
+
+/* Daylight: frosted cards with a soft lift. */
+[data-pf-ornament="hairline"] .letter {
+  border-color: var(--pf-border-subtle);
+  border-radius: var(--pf-radius-lg);
+  background: var(--pf-panel-bg-solid);
+  box-shadow: var(--pf-shadow-raise);
+}
+
+[data-pf-ornament="hairline"] .note {
+  border-color: transparent;
+  border-radius: var(--pf-radius-lg) var(--pf-radius-lg) var(--pf-radius-sm) var(--pf-radius-lg);
+  background: var(--pf-accent-subtle);
+  color: var(--pf-text-primary);
+}
+
+/* Parchment: letters on a brighter sheet, set in book type, with a rubric
+   drop cap; the player's own words go down in rubric ink. */
+[data-pf-ornament="double-rule"] .tintAdvisor {
+  --pf-letter-tint: var(--pf-text-secondary);
+}
+
+[data-pf-ornament="double-rule"] .letter {
+  border-color: var(--pf-border-subtle);
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--pf-surface-1) 55%, var(--pf-text-inverse));
+  box-shadow:
+    0 1px 1px color-mix(in srgb, var(--pf-text-primary) 10%, transparent),
+    0 8px 16px -10px color-mix(in srgb, var(--pf-text-primary) 35%, transparent);
+}
+
+[data-pf-ornament="double-rule"] .head {
+  border-bottom: 3px double var(--pf-border-strong);
+  border-image: none;
+}
+
+[data-pf-ornament="double-rule"] .fromRole {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-xs);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+[data-pf-ornament="double-rule"] .body {
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-md);
+  line-height: 1.5;
+  hyphens: auto;
+}
+
+[data-pf-ornament="double-rule"] .body p + p {
+  text-indent: 1.2em;
+}
+
+[data-pf-ornament="double-rule"] .body > p:first-child::first-letter {
+  float: left;
+  margin: 0.04em 0.08em 0 0;
+  color: var(--pf-accent-base);
+  font-family: var(--pf-font-display);
+  font-size: 3.15em;
+  line-height: 0.8;
+}
+
+/* A one-line opening paragraph mustn't let the cap hang into the next. */
+[data-pf-ornament="double-rule"] .body > p:first-child + * {
+  clear: left;
+}
+
+[data-pf-ornament="double-rule"] .body ol > li::marker {
+  font-family: var(--pf-font-ui);
+  font-size: 1em;
+  font-variant-numeric: oldstyle-nums;
+}
+
+[data-pf-ornament="double-rule"] .body h1,
+[data-pf-ornament="double-rule"] .body h2,
+[data-pf-ornament="double-rule"] .body h3,
+[data-pf-ornament="double-rule"] .body h4 {
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-md);
+}
+
+[data-pf-ornament="double-rule"] .note {
+  border-color: transparent;
+  border-right: 2px solid var(--pf-accent-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-md);
+  font-style: italic;
+  line-height: 1.4;
+  text-align: right;
+}
+
+/* Phosphor: a teletype — no cards, just framed transmissions in one green. */
+[data-pf-glow="high"] .letter,
+[data-pf-glow="high"] .skeleton span {
+  --pf-letter-tint: var(--pf-accent-base);
+}
+
+[data-pf-glow="high"] .letter {
+  background: color-mix(in srgb, var(--pf-accent-base) 3%, transparent);
+}
+
+[data-pf-glow="high"] .head {
+  border-bottom: 1px dashed var(--pf-border-strong);
+  border-image: none;
+}
+
+[data-pf-glow="high"] .fromName::before {
+  content: "» ";
+  color: var(--pf-accent-base);
+}
+
+[data-pf-glow="high"] .body {
+  color: var(--pf-text-primary);
+}
+
+[data-pf-glow="high"] .note {
+  border: 1px dashed var(--pf-accent-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--pf-accent-hover);
+}
+
+[data-pf-glow="high"] .note::before {
+  content: "> ";
+  color: var(--pf-accent-base);
+}

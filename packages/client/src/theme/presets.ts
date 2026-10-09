@@ -3,6 +3,7 @@ import commandDeck from "./presets/command-deck.json";
 import parchment from "./presets/parchment.json";
 import daylight from "./presets/daylight.json";
 import seraphim from "./presets/seraphim.json";
+import phosphor from "./presets/phosphor.json";
 
 /** Shipped presets, validated at module load so a bad edit fails loudly. */
 export const PRESET_THEMES: readonly Theme[] = [
@@ -10,6 +11,7 @@ export const PRESET_THEMES: readonly Theme[] = [
   ThemeSchema.parse(seraphim),
   ThemeSchema.parse(parchment),
   ThemeSchema.parse(daylight),
+  ThemeSchema.parse(phosphor),
 ];
 
 export const DEFAULT_THEME_ID = "command-deck";

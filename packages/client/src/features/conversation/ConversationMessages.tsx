@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { ChevronUp } from "lucide-react";
 import type { ConversationAtNode, Message } from "@pax/domain";
-import { Button } from "../../components/Button.tsx";
 import { api } from "../../lib/api.ts";
 import {
   selectDeepestDescendant,
@@ -11,8 +11,11 @@ import {
 } from "../../stores/conversations.ts";
 import { useLoomStore } from "../../stores/loom.ts";
 import { useSessionStore } from "../../stores/session.ts";
+import { describeError, useChatFailures } from "./chatFailures.ts";
+import type { Correspondent } from "./correspondents.ts";
+import { Letterhead } from "./LetterParts.tsx";
 import { MessageBubble } from "./MessageBubble.tsx";
-import styles from "./ConversationsDrawer.module.css";
+import styles from "./Letters.module.css";
 
 /** Only the tail of a long thread is mounted; the rest is one click away. */
 const WINDOW = 80;
@@ -42,10 +45,21 @@ function regenerate(conversationId: string, message: Message) {
   const where = chatTarget();
   if (!where) return;
   const { markSending, clearSending } = useConversationsStore.getState();
+  const failures = useChatFailures.getState();
+  failures.dismiss(conversationId);
   markSending(conversationId);
   void api
     .regenerateReply(where.gameId, where.nodeId, conversationId, message.id)
-    .catch(() => clearSending(conversationId));
+    .catch((error: unknown) => {
+      clearSending(conversationId);
+      // Said in the thread, with a retry: a failed redraft used to vanish
+      // silently, leaving the player unsure whether anything happened.
+      failures.report(conversationId, {
+        action: "regenerate",
+        detail: describeError(error),
+        retry: () => regenerate(conversationId, message),
+      });
+    });
 }
 
 /**
@@ -54,9 +68,12 @@ function regenerate(conversationId: string, message: Message) {
  */
 export function ConversationMessages({
   conversation,
+  who,
   scroller,
 }: {
   conversation: ConversationAtNode;
+  /** Referentially stable per channel — every bubble's memo depends on it. */
+  who: Correspondent;
   scroller: RefObject<HTMLDivElement | null>;
 }) {
   const conversationId = conversation.id;
@@ -111,6 +128,8 @@ export function ConversationMessages({
       const where = chatTarget();
       if (!where) return;
       const { markSending, clearSending } = useConversationsStore.getState();
+      const failures = useChatFailures.getState();
+      failures.dismiss(conversationId);
       savingRef.current = true;
       setEditing(null);
       // Pass the revised text: the optimistic bubble must show the edit, not
@@ -125,7 +144,7 @@ export function ConversationMessages({
         } catch (error) {
           clearSending(conversationId);
           setEditing({ id: message.id, text }); // give the edit back on failure
-          alert(error instanceof Error ? error.message : String(error));
+          failures.report(conversationId, { action: "edit", detail: describeError(error) });
         } finally {
           savingRef.current = false;
         }
@@ -148,17 +167,18 @@ export function ConversationMessages({
 
   return (
     <>
+      {conversation.headMessageId === null ? <Letterhead who={who} /> : null}
       {hidden > 0 ? (
-        <div className={styles.showEarlier}>
-          <Button variant="ghost" onClick={() => setExpanded(true)}>
-            Show {hidden} earlier message{hidden === 1 ? "" : "s"}
-          </Button>
-        </div>
+        <button type="button" className={styles.showEarlier} onClick={() => setExpanded(true)}>
+          <ChevronUp size={13} />
+          {hidden} earlier message{hidden === 1 ? "" : "s"}
+        </button>
       ) : null}
       {visible.map((message) => (
         <MessageBubble
           key={message.id}
           message={message}
+          who={who}
           siblingIndex={positions.get(message.id)?.index ?? 0}
           siblingCount={positions.get(message.id)?.count ?? 1}
           showEdit={message.role === "user" && !busy}

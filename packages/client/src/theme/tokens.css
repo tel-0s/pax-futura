@@ -2,8 +2,21 @@
    All values come from --pf-* variables set by applyTheme(); the fallbacks
    here match the command-deck preset so a pre-theme flash stays coherent. */
 
+:root {
+  --pf-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --pf-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --pf-dur-fast: 120ms;
+  --pf-dur: 220ms;
+  --pf-dur-slow: 420ms;
+  --pf-rail-width: 56px;
+  --pf-topbar-h: 56px;
+  --pf-dock-h: 0px;
+}
+
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pf-border-strong) transparent;
 }
 
 html,
@@ -16,9 +29,25 @@ body,
 body {
   font-family: var(--pf-font-ui, system-ui, sans-serif);
   font-size: var(--pf-font-md, 14px);
+  line-height: 1.45;
   color: var(--pf-text-primary, #e6ebf2);
   background: var(--pf-surface-0, #0b0e13);
+  text-shadow: var(--pf-body-glow, none);
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: "kern", "liga", "calt";
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust, none);
+  font-weight: var(--pf-heading-weight, 600);
+  letter-spacing: var(--pf-heading-tracking, 0);
+  text-transform: var(--pf-heading-transform, none);
+  font-variant-caps: var(--pf-heading-variant, normal);
 }
 
 button,
@@ -27,6 +56,21 @@ textarea,
 select {
   font: inherit;
   color: inherit;
+  text-shadow: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+textarea,
+input {
+  caret-color: var(--pf-accent-base);
+}
+
+::placeholder {
+  color: var(--pf-text-muted);
+  opacity: 1;
 }
 
 /* Selects get themed chrome instead of the native (OS-colored) control.
@@ -37,7 +81,7 @@ select {
   padding: var(--pf-space-1) calc(var(--pf-space-6) + 6px) var(--pf-space-1) var(--pf-space-2);
   border: 1px solid var(--pf-border-subtle);
   border-radius: var(--pf-radius-md);
-  background-color: var(--pf-surface-0);
+  background-color: var(--pf-panel-inset, var(--pf-surface-0));
   background-image:
     linear-gradient(45deg, transparent 50%, currentcolor 50%),
     linear-gradient(135deg, currentcolor 50%, transparent 50%);
@@ -50,6 +94,7 @@ select {
   background-repeat: no-repeat;
   color: var(--pf-text-primary);
   cursor: pointer;
+  transition: border-color var(--pf-dur-fast) ease;
 }
 
 select:hover {
@@ -70,13 +115,147 @@ select option {
 
 a {
   color: var(--pf-accent-base);
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--pf-accent-hover);
+}
+
+code,
+kbd {
+  font-family: var(--pf-font-mono);
+  font-size: 0.92em;
+}
+
+kbd {
+  padding: 0 4px;
+  border: 1px solid var(--pf-border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-2);
+  color: var(--pf-text-secondary);
+  font-size: 0.8em;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--pf-border-subtle);
 }
 
 ::selection {
   background: var(--pf-accent-subtle);
+  color: var(--pf-text-primary);
 }
 
 :focus-visible {
   outline: 2px solid var(--pf-border-focus);
   outline-offset: 1px;
+}
+
+/* Thin themed scrollbars everywhere (see `*` above for Firefox): the default
+   chunky OS bars break every theme's material. */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: var(--pf-border-strong);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--pf-text-muted);
+}
+
+/* ── Shared motion ─────────────────────────────────────────────────────── */
+
+@keyframes pf-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pf-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes pf-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
+@keyframes pf-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+}
+
+@keyframes pf-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+
+@keyframes pf-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes pf-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pf-ping {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes pf-shimmer {
+  from {
+    background-position: -200% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
 }

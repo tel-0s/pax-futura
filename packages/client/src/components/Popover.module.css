@@ -1,0 +1,38 @@
+.anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.panel {
+  position: absolute;
+  z-index: 80;
+  min-width: 220px;
+  padding: var(--pf-space-2);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-lg);
+
+  /* Solid: a backdrop-filter nested in the (glass) top bar can't see the map. */
+  background: var(--pf-panel-bg-solid);
+  animation: pf-pop-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.bottom {
+  top: calc(100% + 8px);
+}
+
+.top {
+  bottom: calc(100% + 8px);
+}
+
+.end {
+  right: 0;
+}
+
+.start {
+  left: 0;
+}
+
+.center {
+  left: 50%;
+  translate: -50% 0;
+}

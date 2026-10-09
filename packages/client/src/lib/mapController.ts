@@ -11,10 +11,61 @@ let mapRef: MapRef | null = null;
 
 export const setMapRef = (ref: MapRef | null): void => {
   mapRef = ref;
+  // Dev-only handle for poking the live map from the console / test drivers.
+  if (import.meta.env.DEV) (window as unknown as { __paxMap?: unknown }).__paxMap = ref?.getMap() ?? null;
+};
+
+/**
+ * How much of the map each side's chrome hides, in px. Panels that float over
+ * the map mark themselves `data-occludes="top|bottom|left|right"` (top bar,
+ * dock, rail, drawers, the event card); camera moves aim for the centre of
+ * what's actually visible instead of the canvas centre.
+ */
+export const occlusion = (): { top: number; bottom: number; left: number; right: number } => {
+  const pad = { top: 0, bottom: 0, left: 0, right: 0 };
+  const map = mapRef?.getMap();
+  if (!map) return pad;
+  const box = map.getContainer().getBoundingClientRect();
+  for (const element of document.querySelectorAll<HTMLElement>("[data-occludes]")) {
+    const rect = element.getBoundingClientRect();
+    if (!rect.width || !rect.height) continue;
+    const side = element.dataset.occludes;
+    if (side === "top") pad.top = Math.max(pad.top, rect.bottom - box.top);
+    else if (side === "bottom") pad.bottom = Math.max(pad.bottom, box.bottom - rect.top);
+    else if (side === "left") pad.left = Math.max(pad.left, rect.right - box.left);
+    else if (side === "right") pad.right = Math.max(pad.right, box.right - rect.left);
+  }
+  // Never let chrome claim more than ~70% of an axis — keep a usable window.
+  const fit = (a: number, b: number, size: number): [number, number] => {
+    const limit = size * 0.7;
+    const total = a + b;
+    return total > limit ? [(a * limit) / total, (b * limit) / total] : [a, b];
+  };
+  [pad.top, pad.bottom] = fit(pad.top, pad.bottom, box.height);
+  [pad.left, pad.right] = fit(pad.left, pad.right, box.width);
+  return pad;
+};
+
+/**
+ * Camera moves run a frame late so a panel that opens in the same action
+ * (the event card, the inspector) has laid out before we measure around it.
+ */
+const afterLayout = (run: () => void): void => {
+  requestAnimationFrame(() => requestAnimationFrame(run));
 };
 
 export const flyTo = (lng: number, lat: number, zoom = 4.5): void => {
-  mapRef?.getMap().flyTo({ center: [lng, lat], zoom, duration: 1200 });
+  afterLayout(() => {
+    const map = mapRef?.getMap();
+    if (!map) return;
+    const pad = occlusion();
+    map.flyTo({
+      center: [lng, lat],
+      zoom,
+      duration: 1200,
+      offset: [(pad.left - pad.right) / 2, (pad.top - pad.bottom) / 2],
+    });
+  });
 };
 
 /** Fit the camera to a country's rendered geometry (GID_0). */
@@ -136,12 +187,19 @@ const focusFeatures = (
       maxLng = maxShift;
     }
   }
-  map.fitBounds(
-    [
-      [minLng, minLat],
-      [maxLng, maxLat],
-    ],
-    { padding: 120, maxZoom: 6, duration: 1200 },
-  );
+  afterLayout(() => {
+    const pad = occlusion();
+    map.fitBounds(
+      [
+        [minLng, minLat],
+        [maxLng, maxLat],
+      ],
+      {
+        padding: { top: pad.top + 60, bottom: pad.bottom + 60, left: pad.left + 60, right: pad.right + 60 },
+        maxZoom: 6,
+        duration: 1200,
+      },
+    );
+  });
   return true;
 };

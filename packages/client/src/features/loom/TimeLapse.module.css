@@ -1,117 +1,372 @@
-.card {
+/* The time-lapse is a film over the live map: a title card for the frame's
+   date up top, a transport deck below. The player itself is click-through
+   so the map stays pannable while it plays; only the deck takes pointers. */
+
+/* Two classes of specificity: the stage's `.canvas > *` rule re-enables
+   pointer events on its direct children. */
+.player[data-passthrough] {
   position: absolute;
-  left: 50%;
-  bottom: var(--pf-space-6);
-  transform: translateX(-50%);
-  width: min(480px, calc(100% - 120px));
+  inset: 0;
   z-index: 45;
+  pointer-events: none;
+  animation: pf-fade-in var(--pf-dur-slow) var(--pf-ease-out);
+}
+
+.letterbox {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--pf-surface-0) 82%, transparent) 0%,
+      color-mix(in srgb, var(--pf-surface-0) 55%, transparent) 28%,
+      transparent 46%,
+      transparent 70%,
+      color-mix(in srgb, var(--pf-surface-0) 55%, transparent) 100%
+    );
+}
+
+[data-pf-scheme="light"] .letterbox {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--pf-surface-1) 90%, transparent) 0%,
+      color-mix(in srgb, var(--pf-surface-1) 66%, transparent) 30%,
+      transparent 48%,
+      transparent 72%,
+      color-mix(in srgb, var(--pf-surface-1) 50%, transparent) 100%
+    );
+}
+
+/* ── Title card ────────────────────────────────────────────────────────── */
+
+.titleCard {
+  position: absolute;
+  top: var(--pf-space-6);
+  left: 50%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--pf-space-2);
-  padding: var(--pf-space-3) var(--pf-space-4);
-  background: var(--pf-surface-1);
-  border: 1px solid var(--pf-border-strong);
-  border-radius: var(--pf-radius-lg);
-  box-shadow: var(--pf-shadow-overlay);
+  width: min(780px, calc(100% - 160px));
+  text-align: center;
+  translate: -50% 0;
 }
 
-.info {
-  display: flex;
-  align-items: baseline;
-  gap: var(--pf-space-3);
-}
-
-.date {
-  font-family: var(--pf-font-mono);
-  font-size: var(--pf-font-sm);
-  color: var(--pf-text-primary);
-}
-
-.turn {
-  font-size: var(--pf-font-xs);
-  color: var(--pf-text-muted);
-}
-
-.anchor {
-  margin-left: auto;
-  font-size: var(--pf-font-xs);
-  color: var(--pf-accent-base);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 40ch;
-}
-
-.progress {
-  height: 3px;
-  border-radius: var(--pf-radius-sm);
-  background: var(--pf-surface-2);
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  background: var(--pf-accent-base);
-  transition: width 120ms ease;
-}
-
-.controls {
-  display: flex;
+.reel {
+  display: inline-flex;
   align-items: center;
   gap: var(--pf-space-2);
 }
 
-.iconButton {
-  border: none;
-  background: transparent;
+.recDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pf-text-muted);
+}
+
+.recLive {
+  background: var(--pf-semantic-danger);
+  box-shadow: 0 0 8px var(--pf-semantic-danger);
+  animation: pf-pulse 1.4s ease-in-out infinite;
+}
+
+.frameDate {
+  color: var(--pf-text-primary);
+  font-size: calc(var(--pf-font-xl) * 1.85);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.frameAnchor {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 2px var(--pf-space-3);
+  overflow: hidden;
+  border: 1px solid var(--pf-accent-line);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-accent-wash);
+  color: var(--pf-accent-base);
+  font-size: var(--pf-font-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.frameSummary {
+  display: -webkit-box;
+  max-width: 64ch;
+  margin: 0;
+  overflow: hidden;
   color: var(--pf-text-secondary);
-  cursor: pointer;
   font-size: var(--pf-font-md);
-  padding: var(--pf-space-1) var(--pf-space-2);
+  line-height: 1.55;
+  text-shadow:
+    0 0 10px var(--pf-surface-0),
+    0 0 3px var(--pf-surface-0);
+  text-wrap: balance;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  animation: pf-fade-in var(--pf-dur-slow) var(--pf-ease-out);
+}
+
+/* ── Transport deck ────────────────────────────────────────────────────── */
+
+.deck {
+  position: absolute;
+  bottom: var(--pf-space-5);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-4);
+  width: min(940px, calc(100% - 140px));
+  padding: var(--pf-space-3) var(--pf-space-3) var(--pf-space-3) var(--pf-space-4);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-lg);
+  translate: -50% 0;
+  pointer-events: auto;
+  animation: pf-rise-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.transport {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--pf-space-1);
+}
+
+.play {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--pf-accent-base);
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--pf-accent-hover), var(--pf-accent-base));
+  color: var(--pf-text-inverse);
+  text-shadow: none;
+  box-shadow:
+    var(--pf-glow-accent),
+    inset 0 1px 0 var(--pf-panel-highlight);
+  cursor: pointer;
+  transition:
+    filter var(--pf-dur-fast) ease,
+    transform var(--pf-dur-fast) ease;
+}
+
+.play:hover {
+  filter: brightness(1.08);
+  transform: scale(1.04);
+}
+
+.play:active {
+  transform: scale(0.97);
+}
+
+[data-pf-corners="square"] .play,
+[data-pf-corners="chamfer"] .play {
   border-radius: var(--pf-radius-sm);
 }
 
-.iconButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+/* Scrubber: one tick per turn, a bookmark over each anchored one. */
+.scrubber {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
-.iconButton:hover:not(:disabled) {
-  background: var(--pf-surface-2);
-  color: var(--pf-text-primary);
+.track {
+  position: relative;
+  height: 30px;
+  margin: 0 7px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.rail,
+.fill {
+  position: absolute;
+  top: 60%;
+  left: 0;
+  height: 3px;
+  border-radius: 2px;
+  translate: 0 -50%;
+}
+
+.rail {
+  right: 0;
+  background: var(--pf-border-subtle);
+}
+
+.fill {
+  background: linear-gradient(90deg, var(--pf-accent-line), var(--pf-accent-base));
+  box-shadow: var(--pf-glow-accent);
+  transition: width var(--pf-dur) var(--pf-ease-out);
+}
+
+.tick {
+  position: absolute;
+  top: 60%;
+  width: 1.5px;
+  height: 9px;
+  background: var(--pf-border-strong);
+  translate: -50% -50%;
+}
+
+.tickPast {
+  background: var(--pf-accent-line);
+}
+
+.anchorMark {
+  position: absolute;
+  top: -1px;
+  display: grid;
+  color: var(--pf-text-muted);
+  translate: -50% 0;
+}
+
+.anchorPast {
+  color: var(--pf-accent-base);
+}
+
+.playhead {
+  position: absolute;
+  top: 60%;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--pf-accent-base);
+  border-radius: 50%;
+  background: var(--pf-surface-1);
+  box-shadow:
+    0 0 0 4px var(--pf-accent-wash),
+    var(--pf-glow-accent);
+  translate: -50% -50%;
+  transition: left var(--pf-dur) var(--pf-ease-out);
+  pointer-events: none;
+}
+
+[data-pf-corners="square"] .playhead,
+[data-pf-corners="chamfer"] .playhead {
+  border-radius: var(--pf-radius-sm);
+  rotate: 45deg;
+}
+
+.track:hover .playhead {
+  background: var(--pf-accent-base);
+}
+
+.scale {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 7px;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .speeds {
-  display: flex;
-  gap: 2px;
-  margin-left: var(--pf-space-2);
-}
-
-.speedButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  overflow: hidden;
   border: 1px solid var(--pf-border-subtle);
-  background: transparent;
-  color: var(--pf-text-secondary);
-  cursor: pointer;
-  font-size: var(--pf-font-xs);
-  font-family: var(--pf-font-mono);
-  padding: 2px var(--pf-space-2);
   border-radius: var(--pf-radius-sm);
 }
 
-.speedButton:hover {
-  border-color: var(--pf-border-strong);
+.speed {
+  min-width: 34px;
+  height: 26px;
+  padding: 0 var(--pf-space-2);
+  border: none;
+  background: transparent;
+  color: var(--pf-text-secondary);
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background var(--pf-dur-fast) ease,
+    color var(--pf-dur-fast) ease;
+}
+
+.speed + .speed {
+  border-left: 1px solid var(--pf-border-subtle);
+}
+
+.speed:hover {
   color: var(--pf-text-primary);
 }
 
 .speedActive {
-  background: var(--pf-accent-subtle);
-  border-color: var(--pf-accent-base);
+  background: var(--pf-accent-wash);
   color: var(--pf-accent-base);
+  font-weight: 600;
 }
 
-.step {
-  margin-left: auto;
+.counter {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 58px;
+  justify-content: flex-end;
+  font-variant-numeric: tabular-nums;
+}
+
+.counterNow {
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-lg);
+  line-height: 1;
+}
+
+.counterOf {
+  color: var(--pf-text-muted);
   font-family: var(--pf-font-mono);
   font-size: var(--pf-font-xs);
+}
+
+.deckRule {
+  width: 1px;
+  height: 26px;
+  background: var(--pf-border-subtle);
+}
+
+/* ── Empty ─────────────────────────────────────────────────────────────── */
+
+.empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pf-space-3);
+  width: min(360px, calc(100% - 48px));
+  padding: var(--pf-space-6) var(--pf-space-5) var(--pf-space-5);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-lg);
+  text-align: center;
+  translate: -50% -50%;
+}
+
+.emptyIcon {
   color: var(--pf-text-muted);
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
 }

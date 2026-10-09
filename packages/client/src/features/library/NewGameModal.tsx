@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from "react";
+import { Palette, Play, Sparkles, Trash, Upload } from "lucide-react";
 import { DIFFICULTIES, type CustomPolity, type SavedPolity } from "@pax/domain";
 import { api, type ScenarioSummary } from "../../lib/api.ts";
 import { Button } from "../../components/Button.tsx";
 import { Field, TextAreaField } from "../../components/Field.tsx";
 import { Modal } from "../../components/Modal.tsx";
+import { PolityFlag } from "../../components/PolityFlag.tsx";
+import { formatGameDate } from "../../lib/dates.ts";
+import { useUiStore } from "../../stores/ui.ts";
+import { selectTheme, useThemesStore } from "../../stores/themes.ts";
+import { polityFillColor } from "../../theme/palette.ts";
+import { ERA_THEME, eraOf } from "./eras.ts";
 import styles from "./NewGameModal.module.css";
 
 const CUSTOM = "__custom__";
@@ -23,6 +30,10 @@ export function NewGameModal({
   const [playAs, setPlayAs] = useState("");
   const [difficulty, setDifficulty] = useState("standard");
   const [error, setError] = useState<string | null>(null);
+  const themeId = useUiStore((state) => state.themeId);
+  const setThemeId = useUiStore((state) => state.setThemeId);
+  const themes = useThemesStore((state) => state.themes);
+  const theme = selectTheme(themes, themeId);
 
   // Custom nation/organization fields
   const [customName, setCustomName] = useState("");
@@ -131,177 +142,268 @@ export function NewGameModal({
     }
   };
 
+  const era = eraOf(scenario?.startDate);
+  const EraIcon = era.icon;
+  const chosenName = isCustom
+    ? customName.trim() || "a nation of your own"
+    : polities.find((entry) => entry.code === chosen)?.name ?? chosen;
+  const level = DIFFICULTIES.find((entry) => entry.id === difficulty);
+  const suggested = themes.find((entry) => entry.meta.id === ERA_THEME[era.id]);
+
   return (
     <Modal
-      title="New game"
+      title="Begin a campaign"
+      kicker="New game"
+      size="xl"
       onClose={onClose}
       footer={
-        <>
+        <div className={styles.footer}>
+          <span className={styles.summary}>
+            {scenario ? (
+              <>
+                Playing <strong>{chosenName}</strong> in <strong>{scenario.name}</strong> ·{" "}
+                {level?.label ?? difficulty}
+              </>
+            ) : null}
+          </span>
           <Button onClick={onClose}>Cancel</Button>
-          <Button variant="primary" onClick={() => void submit()} disabled={!scenarioId || !chosen}>
-            Start
+          <Button variant="primary" size="lg" onClick={() => void submit()} disabled={!scenarioId || !chosen}>
+            <Play size={15} /> Begin
           </Button>
-        </>
+        </div>
       }
     >
-      <div className={styles.form}>
-        <label className={styles.select}>
-          Scenario
-          <select value={scenarioId} onChange={(event) => setScenarioId(event.target.value)}>
-            {scenarios.map((entry) => (
-              <option key={entry.id} value={entry.id}>
-                {entry.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={styles.select}>
-          Play as
-          <select value={chosen} onChange={(event) => setPlayAs(event.target.value)}>
-            {polities.map((entry) => (
-              <option key={entry.code} value={entry.code}>
-                {entry.name}
-              </option>
-            ))}
-            <option value={CUSTOM}>✦ Custom nation / organization…</option>
-          </select>
-        </label>
+      <div className={styles.layout}>
+        <nav className={styles.scenarios} aria-label="Scenarios">
+          <span className="pfKicker">Choose an era</span>
+          {[...scenarios]
+            .sort((a, b) => parseInt(a.startDate, 10) - parseInt(b.startDate, 10) || a.name.localeCompare(b.name))
+            .map((entry) => {
+            const entryEra = eraOf(entry.startDate);
+            const Icon = entryEra.icon;
+            return (
+              <button
+                key={entry.id}
+                className={`${styles.scenario} ${entry.id === scenarioId ? styles.scenarioActive : ""}`}
+                onClick={() => {
+                  setScenarioId(entry.id);
+                  // A nation code from the old scenario means nothing in the
+                  // new one; a custom nation in progress survives the switch.
+                  setPlayAs((previous) => (previous === CUSTOM ? CUSTOM : ""));
+                  setBaseCode("");
+                }}
+              >
+                <span className={styles.scenarioIcon}>
+                  <Icon size={16} />
+                </span>
+                <span className={styles.scenarioText}>
+                  <span className={styles.scenarioName}>{entry.name}</span>
+                  <span className={styles.scenarioEra}>{entryEra.name}</span>
+                </span>
+                <span className={styles.scenarioYear}>{yearOf(entry.startDate)}</span>
+              </button>
+            );
+          })}
+        </nav>
 
-        {isCustom ? (
-          <div className={styles.creator}>
-            {saved.length > 0 ? (
-              <div className={styles.savedRow}>
+        <div className={styles.detail}>
+          {scenario ? (
+            <header className={styles.scenarioHead} key={scenario.id}>
+              <span className={styles.eraLine}>
+                <EraIcon size={14} /> {era.name} · {formatGameDate(scenario.startDate)}
+              </span>
+              <h3 className={`${styles.scenarioTitle} pfTitle`}>{scenario.name}</h3>
+              <p className={styles.scenarioDescription}>{scenario.description}</p>
+              {suggested && suggested.meta.id !== themeId ? (
+                <button
+                  className={styles.themeHint}
+                  onClick={() => setThemeId(suggested.meta.id)}
+                  title={suggested.meta.tagline}
+                >
+                  <Palette size={13} /> This era looks its best in{" "}
+                  <strong style={{ fontFamily: suggested.font.display }}>{suggested.meta.name}</strong> — apply
+                </button>
+              ) : null}
+            </header>
+          ) : null}
+
+          <section className={styles.section}>
+            <span className="pfKicker">Play as</span>
+            <div className={styles.nations}>
+              {polities.map((entry) => (
+                <button
+                  key={entry.code}
+                  className={`${styles.nation} ${chosen === entry.code ? styles.nationActive : ""}`}
+                  onClick={() => setPlayAs(entry.code)}
+                >
+                  <PolityFlag color={polityFillColor(theme, entry.code)} size={22} />
+                  <span className={styles.nationName}>{entry.name}</span>
+                  <span className={styles.nationCode}>{entry.code}</span>
+                </button>
+              ))}
+              <button
+                className={`${styles.nation} ${styles.nationCustom} ${isCustom ? styles.nationActive : ""}`}
+                onClick={() => setPlayAs(CUSTOM)}
+              >
+                <span className={styles.customGlyph}>
+                  <Sparkles size={15} />
+                </span>
+                <span className={styles.nationName}>Found your own</span>
+                <span className={styles.nationCode}>nation or order</span>
+              </button>
+            </div>
+          </section>
+
+          {isCustom ? (
+            <section className={`${styles.creator} ${styles.section}`}>
+              <div className={styles.creatorHead}>
+                <FlagPreview flag={flag} color={color} />
+                <div className={styles.creatorTitle}>
+                  <span className="pfKicker">Custom nation</span>
+                  <span className={`${styles.creatorName} pfTitle`}>{customName.trim() || "Unnamed"}</span>
+                </div>
+                {saved.length > 0 ? (
+                  <div className={styles.savedRow}>
+                    <select
+                      value={savedId}
+                      onChange={(event) => loadTemplate(event.target.value)}
+                      title="Start from a saved nation"
+                    >
+                      <option value="">Start from… (new)</option>
+                      {saved.map((entry) => (
+                        <option key={entry.id} value={entry.id}>
+                          {entry.flag && !entry.flag.startsWith("data:") ? `${entry.flag} ` : ""}
+                          {entry.name}
+                        </option>
+                      ))}
+                    </select>
+                    {savedId ? (
+                      <Button
+                        variant="ghost"
+                        icon
+                        size="sm"
+                        title="Delete this saved nation"
+                        onClick={() => {
+                          void api.deleteSavedPolity(savedId).then(() => {
+                            setSaved((entries) => entries.filter((entry) => entry.id !== savedId));
+                            setSavedId("");
+                          });
+                        }}
+                      >
+                        <Trash size={14} />
+                      </Button>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+              <div className={styles.grid2}>
+                <Field
+                  label="Name"
+                  value={customName}
+                  placeholder="e.g. Order of the Silver Dawn"
+                  onChange={(event) => setCustomName(event.target.value)}
+                />
                 <label className={styles.select}>
-                  Start from
-                  <select value={savedId} onChange={(event) => loadTemplate(event.target.value)}>
-                    <option value="">New nation…</option>
-                    {saved.map((entry) => (
-                      <option key={entry.id} value={entry.id}>
-                        {entry.flag && !entry.flag.startsWith("data:") ? `${entry.flag} ` : ""}
-                        {entry.name}
+                  <span className={styles.label}>Territory</span>
+                  <select value={baseCode} onChange={(event) => setBaseCode(event.target.value)}>
+                    <option value="">None — landless organization</option>
+                    {polities.map((entry) => (
+                      <option key={entry.code} value={entry.code}>
+                        Take over {entry.name}
                       </option>
                     ))}
                   </select>
                 </label>
-                {savedId ? (
-                  <Button
-                    variant="ghost"
-                    title="Delete this saved nation"
-                    onClick={() => {
-                      void api.deleteSavedPolity(savedId).then(() => {
-                        setSaved((entries) => entries.filter((entry) => entry.id !== savedId));
-                        setSavedId("");
-                      });
-                    }}
-                  >
-                    ✕
-                  </Button>
+                {!baseCode ? (
+                  <Field
+                    label="Code (2-8 letters, auto if blank)"
+                    value={customCode}
+                    placeholder="SILVDAWN"
+                    onChange={(event) => setCustomCode(event.target.value.toUpperCase())}
+                  />
                 ) : null}
+                <div className={styles.flagRow}>
+                  <label className={styles.colorField}>
+                    <span className={styles.label}>Color</span>
+                    <input type="color" value={color} onChange={(event) => setColor(event.target.value)} />
+                  </label>
+                  <Field
+                    label="Flag (emoji or upload)"
+                    value={flag.startsWith("data:") ? "(image)" : flag}
+                    placeholder="🜲"
+                    onChange={(event) => setFlag(event.target.value)}
+                  />
+                  <Button variant="ghost" onClick={() => fileInput.current?.click()} title="Upload a flag image">
+                    <Upload size={14} />
+                  </Button>
+                  <input
+                    ref={fileInput}
+                    type="file"
+                    accept="image/png,image/svg+xml,image/webp,image/jpeg"
+                    hidden
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) uploadFlag(file);
+                    }}
+                  />
+                </div>
               </div>
-            ) : null}
-            <Field
-              label="Name"
-              value={customName}
-              placeholder="e.g. Order of the Silver Dawn"
-              onChange={(event) => setCustomName(event.target.value)}
-            />
-            <label className={styles.select}>
-              Territory
-              <select value={baseCode} onChange={(event) => setBaseCode(event.target.value)}>
-                <option value="">None — landless organization</option>
-                {polities.map((entry) => (
-                  <option key={entry.code} value={entry.code}>
-                    Take over {entry.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {!baseCode ? (
               <Field
-                label="Code (2-8 uppercase, auto from name if blank)"
-                value={customCode}
-                placeholder="SILVDAWN"
-                onChange={(event) => setCustomCode(event.target.value.toUpperCase())}
+                label="Tags (comma-separated)"
+                value={tags}
+                placeholder="secretive, technocratic, transnational"
+                onChange={(event) => setTags(event.target.value)}
               />
-            ) : null}
-            <div className={styles.flagRow}>
-              <label className={styles.colorField}>
-                <span>Color</span>
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(event) => setColor(event.target.value)}
-                />
+              <TextAreaField
+                label="Backstory & goals (fed to the simulation)"
+                rows={4}
+                value={note}
+                placeholder="Who are they, what do they want, how do they operate? The simulator and every advisor/diplomat sees this."
+                onChange={(event) => setNote(event.target.value)}
+              />
+              <label className={styles.remember}>
+                <input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} />
+                <span>
+                  Save this nation for reuse
+                  {savedId ? " (updates the loaded template)" : ""}
+                </span>
               </label>
-              <Field
-                label="Flag (emoji, or upload)"
-                value={flag.startsWith("data:") ? "(image)" : flag}
-                placeholder="🜲"
-                onChange={(event) => setFlag(event.target.value)}
-              />
-              <Button variant="ghost" onClick={() => fileInput.current?.click()}>
-                Upload…
-              </Button>
-              <input
-                ref={fileInput}
-                type="file"
-                accept="image/png,image/svg+xml,image/webp,image/jpeg"
-                hidden
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) uploadFlag(file);
-                }}
-              />
-              <FlagPreview flag={flag} color={color} />
+            </section>
+          ) : null}
+
+          <section className={styles.section}>
+            <span className="pfKicker">Simulation strictness</span>
+            <div className={styles.ladder} role="radiogroup">
+              {DIFFICULTIES.map((entry, index) => (
+                <button
+                  key={entry.id}
+                  role="radio"
+                  aria-checked={entry.id === difficulty}
+                  className={`${styles.rung} ${entry.id === difficulty ? styles.rungActive : ""}`}
+                  onClick={() => setDifficulty(entry.id)}
+                >
+                  <span className={styles.rungPips}>
+                    {DIFFICULTIES.map((_, pip) => (
+                      <span key={pip} className={`${styles.pip} ${pip <= index ? styles.pipOn : ""}`} />
+                    ))}
+                  </span>
+                  {entry.label}
+                </button>
+              ))}
             </div>
+            <p className={styles.hint}>{level?.description}</p>
+          </section>
+
+          <section className={styles.section}>
             <Field
-              label="Tags (comma-separated)"
-              value={tags}
-              placeholder="secretive, technocratic, transnational"
-              onChange={(event) => setTags(event.target.value)}
+              label="Campaign title"
+              value={title}
+              placeholder={scenario ? `${scenario.name} — ${isCustom ? customName || "Custom" : chosen}` : ""}
+              onChange={(event) => setTitle(event.target.value)}
             />
-            <TextAreaField
-              label="Backstory & goals (fed to the simulation)"
-              rows={4}
-              value={note}
-              placeholder="Who are they, what do they want, how do they operate? The simulator and every advisor/diplomat sees this."
-              onChange={(event) => setNote(event.target.value)}
-            />
-            <label className={styles.remember}>
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(event) => setRemember(event.target.checked)}
-              />
-              <span>
-                Save this nation for reuse
-                {savedId ? " (updates the loaded template)" : ""}
-              </span>
-            </label>
-          </div>
-        ) : null}
-
-        <label className={styles.select}>
-          Simulation strictness
-          <select value={difficulty} onChange={(event) => setDifficulty(event.target.value)}>
-            {DIFFICULTIES.map((level) => (
-              <option key={level.id} value={level.id}>
-                {level.label}
-              </option>
-            ))}
-          </select>
-          <p className={styles.hint}>
-            {DIFFICULTIES.find((level) => level.id === difficulty)?.description}
-          </p>
-        </label>
-
-        <Field
-          label="Title"
-          value={title}
-          placeholder={scenario ? `${scenario.name} — ${isCustom ? customName || "Custom" : chosen}` : ""}
-          onChange={(event) => setTitle(event.target.value)}
-        />
-        {error ? <p className={styles.error}>{error}</p> : null}
+          </section>
+          {error ? <p className={styles.error}>{error}</p> : null}
+        </div>
       </div>
     </Modal>
   );
@@ -309,7 +411,7 @@ export function NewGameModal({
 
 function FlagPreview({ flag, color }: { flag: string; color: string }) {
   return (
-    <span className={styles.flagPreview} style={{ borderColor: color }}>
+    <span className={styles.flagPreview} style={{ borderColor: color, boxShadow: `inset 0 -6px 0 ${color}` }}>
       {flag.startsWith("data:") ? (
         <img src={flag} alt="flag" className={styles.flagImage} />
       ) : (
@@ -318,3 +420,9 @@ function FlagPreview({ flag, color }: { flag: string; color: string }) {
     </span>
   );
 }
+
+const yearOf = (date: string | undefined): string => {
+  const year = date ? parseInt(date, 10) : NaN;
+  if (!Number.isFinite(year)) return "";
+  return year <= 0 ? `${1 - year} BC` : String(year);
+};

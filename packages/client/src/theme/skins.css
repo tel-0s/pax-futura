@@ -1,0 +1,231 @@
+/* Theme skins — structural personality keyed on the data attributes that
+   applyTheme() mirrors onto <html> (corners, ornament, texture, glow).
+   Components opt in with global hook classes (camelCase, unhashed):
+
+     pfPanel      floating material: drawers, modals, cards over the map
+                  (the host must be positioned; ::before/::after are reserved)
+     pfTitle      display heading in the theme's heading voice
+     pfKicker     micro-label above titles and sections
+     pfChamfer    chamfer-cut control (buttons, chips) on machined themes
+     pfRule       ornamental divider carrying the theme's fleuron
+     pfGlowText   accent text that glows on luminous themes
+
+   Everything is still var(--pf-*): a custom theme gets the same skins by
+   choosing the same style options. */
+
+/* ── Panel material ────────────────────────────────────────────────────── */
+
+.pfPanel {
+  background: var(--pf-panel-bg);
+  backdrop-filter: var(--pf-panel-filter);
+  box-shadow:
+    var(--pf-shadow-overlay),
+    inset 0 1px 0 var(--pf-panel-highlight);
+}
+
+/* Chamfered (machined) corners: top-right and bottom-left are cut, and the
+   cut edges get a drawn hairline so the border reads continuous. */
+[data-pf-corners="chamfer"] .pfPanel {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--pf-cut)) 0,
+    100% var(--pf-cut),
+    100% 100%,
+    var(--pf-cut) 100%,
+    0 calc(100% - var(--pf-cut))
+  );
+}
+
+[data-pf-corners="chamfer"] .pfPanel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+        to top right,
+        transparent calc(50% - 1px),
+        var(--pf-border-strong) calc(50% - 1px) calc(50% + 0.5px),
+        transparent calc(50% + 0.5px)
+      )
+      top right / var(--pf-cut) var(--pf-cut) no-repeat,
+    linear-gradient(
+        to top right,
+        transparent calc(50% - 1px),
+        var(--pf-border-strong) calc(50% - 1px) calc(50% + 0.5px),
+        transparent calc(50% + 0.5px)
+      )
+      bottom left / var(--pf-cut) var(--pf-cut) no-repeat;
+  z-index: 3;
+}
+
+[data-pf-corners="chamfer"] .pfChamfer {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--pf-cut-sm)) 0,
+    100% var(--pf-cut-sm),
+    100% 100%,
+    var(--pf-cut-sm) 100%,
+    0 calc(100% - var(--pf-cut-sm))
+  );
+}
+
+/* ── Ornaments ─────────────────────────────────────────────────────────── */
+
+/* HUD corner brackets. */
+[data-pf-ornament="brackets"] .pfPanel::after {
+  --pf-bracket: var(--pf-accent-line);
+
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--pf-bracket), var(--pf-bracket)) top left / 14px 1.5px,
+    linear-gradient(var(--pf-bracket), var(--pf-bracket)) top left / 1.5px 14px,
+    linear-gradient(var(--pf-bracket), var(--pf-bracket)) top right / 14px 1.5px,
+    linear-gradient(var(--pf-bracket), var(--pf-bracket)) top right / 1.5px 14px,
+    linear-gradient(var(--pf-bracket), var(--pf-bracket)) bottom left / 14px 1.5px,
+    linear-gradient(var(--pf-bracket), var(--pf-bracket)) bottom left / 1.5px 14px,
+    linear-gradient(var(--pf-bracket), var(--pf-bracket)) bottom right / 14px 1.5px,
+    linear-gradient(var(--pf-bracket), var(--pf-bracket)) bottom right / 1.5px 14px;
+  background-repeat: no-repeat;
+  z-index: 3;
+}
+
+/* Book-page double rule: a strong outer line and a fine inner one. */
+[data-pf-ornament="double-rule"] .pfPanel::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1.5px solid var(--pf-border-strong);
+  pointer-events: none;
+  z-index: 3;
+}
+
+[data-pf-ornament="double-rule"] .pfPanel::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 0.5px solid var(--pf-border-strong);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Hazard tape on the top edge + an accent rail. */
+[data-pf-ornament="hazard"] .pfPanel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: var(--pf-cut);
+  height: 3px;
+  background:
+    repeating-linear-gradient(-45deg, var(--pf-accent-base) 0 5px, transparent 5px 10px) left
+      top / 72px 3px no-repeat,
+    linear-gradient(var(--pf-accent-line), var(--pf-accent-line)) left 80px top / 100% 1px no-repeat;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Hairline: a fine glassy edge with a bright top lip. */
+[data-pf-ornament="hairline"] .pfPanel {
+  box-shadow:
+    var(--pf-shadow-overlay),
+    inset 0 0 0 1px var(--pf-panel-highlight);
+}
+
+/* ── Typography hooks ──────────────────────────────────────────────────── */
+
+.pfTitle {
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-weight: var(--pf-heading-weight);
+  letter-spacing: var(--pf-heading-tracking);
+  text-transform: var(--pf-heading-transform);
+  font-variant-caps: var(--pf-heading-variant);
+}
+
+[data-pf-glow="low"] .pfTitle,
+[data-pf-glow="high"] .pfTitle,
+[data-pf-glow="low"] .pfGlowText,
+[data-pf-glow="high"] .pfGlowText {
+  text-shadow: var(--pf-text-glow);
+}
+
+.pfKicker {
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pf-text-muted);
+}
+
+/* Serif atlases label in small capitals, not typewriter caps. */
+[data-pf-ornament="double-rule"] .pfKicker {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  text-transform: none;
+}
+
+/* ── Ornamental rule ───────────────────────────────────────────────────── */
+
+.pfRule {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+}
+
+.pfRule::before,
+.pfRule::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pf-border-strong), transparent);
+}
+
+.pfRule::before {
+  background: linear-gradient(90deg, transparent, var(--pf-border-strong));
+}
+
+.pfRule::after {
+  background: linear-gradient(90deg, var(--pf-border-strong), transparent);
+}
+
+.pfFleuron::before {
+  content: var(--pf-fleuron);
+  color: var(--pf-accent-base);
+  letter-spacing: 0.1em;
+}
+
+/* No fleuron: a small lit diamond keeps the rule's centre from reading as a
+   double gap. */
+[data-pf-fleuron="none"] .pfFleuron::before {
+  content: "";
+  display: block;
+  width: 5px;
+  height: 5px;
+  background: var(--pf-accent-line);
+  transform: rotate(45deg);
+}
+
+/* ── Chrome texture overlay (one fixed element in <App>) ───────────────── */
+
+.pfTextureOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  background-image: var(--pf-texture-image);
+  opacity: var(--pf-texture-opacity);
+  mix-blend-mode: var(--pf-texture-blend);
+}
+
+[data-pf-texture="none"] .pfTextureOverlay {
+  display: none;
+}

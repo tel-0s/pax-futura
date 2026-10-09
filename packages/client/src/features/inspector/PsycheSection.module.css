@@ -1,0 +1,302 @@
+/* A foreign leader's disposition: temperament as a pull-quote, opinion of
+   the player on a diverging scale, ambitions and grudges as ledger lists. */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+  margin-top: var(--pf-space-3);
+  animation: pf-fade-in var(--pf-dur) var(--pf-ease-out);
+}
+
+.quiet {
+  margin: 0;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.unprofiled {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  margin: 0;
+  padding: var(--pf-space-3);
+  border: 1px dashed var(--pf-border-strong);
+  border-radius: var(--pf-radius-md);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+  font-style: italic;
+}
+
+.unprofiled svg {
+  flex-shrink: 0;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+.skeleton {
+  display: block;
+  height: 12px;
+  border-radius: var(--pf-radius-sm);
+  background:
+    linear-gradient(90deg, transparent 20%, var(--pf-accent-wash) 50%, transparent 80%) 0 0 / 250% 100%,
+    var(--pf-panel-inset);
+  animation: pf-shimmer 1.6s ease-in-out infinite;
+}
+
+.skeletonShort {
+  width: 60%;
+}
+
+/* ── Temperament ───────────────────────────────────────────────────────── */
+
+.temperament {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-family: var(--pf-font-display);
+  font-size-adjust: var(--pf-display-adjust);
+  font-size: var(--pf-font-md);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.temperament::first-letter {
+  text-transform: uppercase;
+}
+
+/* ── Opinion scale ─────────────────────────────────────────────────────── */
+
+.opinion {
+  --pf-opinion: var(--pf-text-secondary);
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-panel-inset);
+}
+
+.warm {
+  --pf-opinion: var(--pf-semantic-success);
+}
+
+.cold {
+  --pf-opinion: var(--pf-semantic-danger);
+}
+
+.neutral {
+  --pf-opinion: var(--pf-text-secondary);
+}
+
+.opinionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--pf-space-3);
+}
+
+.opinionLabel {
+  overflow: hidden;
+  color: var(--pf-text-muted);
+  font-family: var(--pf-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.opinionWord {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--pf-opinion);
+  font-size: var(--pf-font-sm);
+  font-weight: 600;
+}
+
+.opinionValue {
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+.scale {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.cell {
+  height: 8px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--pf-text-muted) 22%, transparent);
+  transition: background var(--pf-dur) ease;
+}
+
+/* Indifference is the fulcrum: a taller tick in the middle. */
+.centre {
+  height: 12px;
+  margin-top: -2px;
+  background: color-mix(in srgb, var(--pf-text-muted) 45%, transparent);
+}
+
+.lit {
+  background: var(--pf-opinion);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--pf-opinion) 40%, transparent);
+}
+
+.scaleEnds {
+  display: flex;
+  justify-content: space-between;
+  color: var(--pf-text-muted);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.reason {
+  margin: 2px 0 0;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  font-style: italic;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* ── Ambitions + grudges ───────────────────────────────────────────────── */
+
+.motives {
+  --pf-motive: var(--pf-accent-base);
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ambitions {
+  --pf-motive: var(--pf-semantic-info);
+}
+
+.grudges {
+  --pf-motive: var(--pf-semantic-danger);
+}
+
+.motivesLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--pf-motive);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.motiveList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.motiveList li {
+  padding: 3px 0 3px var(--pf-space-3);
+  border-left: 2px solid color-mix(in srgb, var(--pf-motive) 60%, transparent);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* ── Theme voices ──────────────────────────────────────────────────────── */
+
+/* Atlas: the temperament reads as a quoted character note. */
+:global([data-pf-ornament="double-rule"]) .temperament {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-lg);
+  font-style: italic;
+  text-align: center;
+}
+
+:global([data-pf-ornament="double-rule"]) .opinion {
+  border-color: var(--pf-border-strong);
+  background: transparent;
+}
+
+:global([data-pf-ornament="double-rule"]) .opinionLabel,
+:global([data-pf-ornament="double-rule"]) .motivesLabel {
+  font-family: var(--pf-font-ui);
+  font-size: var(--pf-font-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.1em;
+  text-transform: none;
+}
+
+:global([data-pf-ornament="double-rule"]) .lit {
+  box-shadow: none;
+}
+
+:global([data-pf-ornament="double-rule"]) .motiveList li {
+  font-size: var(--pf-font-md);
+}
+
+:global([data-pf-ornament="double-rule"]) .unprofiled {
+  justify-content: center;
+}
+
+/* Machined: angled cells, like the gauges. */
+:global([data-pf-corners="chamfer"]) .cell {
+  clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+}
+
+:global([data-pf-corners="chamfer"]) .opinion {
+  clip-path: polygon(0 0, calc(100% - var(--pf-cut-sm)) 0, 100% var(--pf-cut-sm), 100% 100%, 0 100%);
+}
+
+/* CRT: block cells, the temperament in the display face. */
+:global([data-pf-glow="high"]) .cell {
+  height: 10px;
+}
+
+:global([data-pf-glow="high"]) .centre {
+  height: 14px;
+}
+
+:global([data-pf-glow="high"]) .temperament {
+  font-size: var(--pf-font-lg);
+  line-height: 1.15;
+  text-shadow: var(--pf-text-glow);
+}
+
+:global([data-pf-glow="high"]) .opinion {
+  border-style: dashed;
+}
+
+:global([data-pf-glow="high"]) .motiveList li {
+  border-left-style: dashed;
+}
+
+/* Editorial: a pill scale and a soft card. */
+:global([data-pf-ornament="hairline"]) .cell {
+  border-radius: 4px;
+}
+
+:global([data-pf-ornament="hairline"]) .lit {
+  box-shadow: none;
+}
+
+:global([data-pf-ornament="hairline"]) .temperament {
+  font-size: var(--pf-font-lg);
+  font-style: italic;
+}

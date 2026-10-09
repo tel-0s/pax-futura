@@ -14,6 +14,9 @@ export function App() {
         <Route path="/game/:gameId/n/:nodeId" element={<StageScreen />} />
         <Route path="/dev/themes" element={<ThemeLab />} />
       </Routes>
+      {/* The theme's chrome material (paper, grain, scanlines) — one fixed,
+          click-through layer over everything; hidden when the theme has none. */}
+      <div className="pfTextureOverlay" aria-hidden />
     </BrowserRouter>
   );
 }
