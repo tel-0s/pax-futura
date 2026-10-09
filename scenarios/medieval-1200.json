@@ -1,0 +1,46 @@
+{
+  "id": "medieval-1200",
+  "name": "High Middle Ages 1200",
+  "description": "Christendom, the Islamic world, and the steppe on the eve of the Mongol storm. (Map borders approximate medieval realms onto modern outlines.)",
+  "startDate": "1200-06-01",
+  "playablePolities": [
+    { "code": "FRA", "name": "Kingdom of France" },
+    { "code": "GBR", "name": "Kingdom of England" },
+    { "code": "DEU", "name": "Holy Roman Empire" },
+    { "code": "ESP", "name": "Crown of Castile" },
+    { "code": "TUR", "name": "Byzantine Empire" },
+    { "code": "EGY", "name": "Ayyubid Sultanate" },
+    { "code": "MNG", "name": "Mongol Khanates" },
+    { "code": "ITA", "name": "Papal States" }
+  ],
+  "world": {
+    "regionOwnership": {
+      "AUT": "DEU",
+      "CHE": "DEU",
+      "CZE": "DEU",
+      "NLD": "DEU",
+      "BEL": "DEU",
+      "SVN": "DEU",
+      "GRC": "TUR",
+      "BGR": "TUR",
+      "MKD": "TUR",
+      "ALB": "TUR",
+      "SYR": "EGY",
+      "JOR": "EGY",
+      "LBN": "EGY",
+      "ISR": "EGY",
+      "PSE": "EGY"
+    },
+    "polities": {
+      "FRA": { "code": "FRA", "name": "Kingdom of France", "color": "#2e5aac", "aliases": ["France", "Capetian France"], "note": "Philip II Augustus is breaking Angevin power and centralizing the realm.", "reputation": 60, "tags": ["feudal", "catholic", "centralizing"] },
+      "GBR": { "code": "GBR", "name": "Kingdom of England", "color": "#943126", "aliases": ["England", "Angevin Empire"], "note": "King John holds England and shrinking continental lands; the barons grow restless.", "reputation": 48, "tags": ["feudal", "catholic", "angevin"] },
+      "DEU": { "code": "DEU", "name": "Holy Roman Empire", "color": "#7d7463", "aliases": ["The Empire"], "note": "A contested crown over hundreds of princes, torn between Welf and Hohenstaufen.", "reputation": 55, "tags": ["elective", "catholic", "fragmented"] },
+      "ESP": { "code": "ESP", "name": "Crown of Castile", "color": "#af601a", "aliases": ["Castile"], "note": "Leading the Reconquista against the Almohads.", "reputation": 58, "tags": ["feudal", "catholic", "crusading"] },
+      "TUR": { "code": "TUR", "name": "Byzantine Empire", "color": "#6c3483", "aliases": ["Byzantium", "Eastern Roman Empire"], "note": "Weakened and wealthy; Latin crusaders and Turks circle the old empire.", "reputation": 50, "tags": ["imperial", "orthodox", "declining"] },
+      "EGY": { "code": "EGY", "name": "Ayyubid Sultanate", "color": "#1e8449", "aliases": ["Ayyubids"], "note": "Saladin's heirs hold Egypt and Syria against crusader remnants and each other.", "reputation": 62, "tags": ["sultanate", "sunni", "divided house"] },
+      "MNG": { "code": "MNG", "name": "Mongol Khanates", "color": "#873600", "aliases": ["Mongols"], "note": "Temüjin is uniting the steppe tribes. The world does not yet know his name.", "reputation": 35, "tags": ["nomadic", "tribal", "ascendant"] },
+      "ITA": { "code": "ITA", "name": "Papal States", "color": "#b7950b", "aliases": ["The Papacy", "Rome"], "note": "Innocent III wields excommunication and crusade as instruments of policy.", "reputation": 72, "tags": ["theocratic", "catholic", "diplomatic power"] }
+    },
+    "simulationRules": "Medieval logic: dynastic marriages, papal authority, feudal levies, sieges, plagues, and slow communications. No nation-states — legitimacy flows from crowns, faith, and lineage. Travel and campaigning are seasonal and slow. Borders are approximations of realms, not modern states."
+  }
+}

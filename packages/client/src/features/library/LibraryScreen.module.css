@@ -1,0 +1,130 @@
+.screen {
+  min-height: 100%;
+  padding: var(--pf-space-8);
+  background: var(--pf-surface-0);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--pf-space-6);
+}
+
+.title {
+  font-family: var(--pf-font-display);
+  font-size: var(--pf-font-xl);
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+}
+
+/* The picker is driven by the Import button; never shown, but still focusable
+   by the label-less flow, so it is clipped rather than display:none. */
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-3) var(--pf-space-4);
+  margin-bottom: var(--pf-space-4);
+  border: 1px solid var(--pf-semantic-danger);
+  border-radius: var(--pf-radius-md);
+  color: var(--pf-semantic-danger);
+  font-size: var(--pf-font-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--pf-space-4);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-5);
+  background: var(--pf-surface-1);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-lg);
+  cursor: pointer;
+  transition: border-color 120ms ease;
+}
+
+.card:hover {
+  border-color: var(--pf-border-focus);
+}
+
+.cardTitle {
+  font-size: var(--pf-font-lg);
+  font-family: var(--pf-font-display);
+}
+
+.cardMeta {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--pf-space-2);
+  margin-top: var(--pf-space-2);
+}
+
+/* Matches the shared Button's resting look so the row reads as one control
+   group; an <a download> is used because a link downloads without a popup. */
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-2) var(--pf-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-2);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.linkButton:hover {
+  background: var(--pf-surface-3);
+}
+
+.imported {
+  border-color: var(--pf-accent-base);
+  background: var(--pf-accent-subtle);
+}
+
+.newCard {
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
+  border-style: dashed;
+  color: var(--pf-text-secondary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-4);
+}

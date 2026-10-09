@@ -1,0 +1,56 @@
+.unit {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-1);
+  padding: 0 var(--pf-space-1);
+  border: 2px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-1);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.6;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.unit:hover {
+  background: var(--pf-surface-2);
+}
+
+/* Status ring rides outside the owner-colored border so both stay readable. */
+.danger {
+  outline: 1px solid var(--pf-semantic-danger);
+  outline-offset: 1px;
+}
+
+.warning {
+  outline: 1px solid var(--pf-semantic-warning);
+  outline-offset: 1px;
+}
+
+.defeated {
+  opacity: 0.55;
+}
+
+.glyph {
+  line-height: 1;
+}
+
+.strength {
+  font-family: var(--pf-font-mono);
+  color: var(--pf-text-secondary);
+}
+
+.structure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  padding: 0 2px;
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-1);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.4;
+}

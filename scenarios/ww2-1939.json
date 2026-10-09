@@ -1,0 +1,50 @@
+{
+  "id": "ww2-1939",
+  "name": "Storm Over Europe 1939",
+  "description": "August 1939. Danzig is the demand, Poland is the line, and in Moscow two sworn enemies are quietly talking. The last month of peace — spend it well.",
+  "startDate": "1939-08-01",
+  "playablePolities": [
+    { "code": "DEU", "name": "German Reich" },
+    { "code": "GBR", "name": "United Kingdom" },
+    { "code": "FRA", "name": "French Republic" },
+    { "code": "POL", "name": "Republic of Poland" },
+    { "code": "RUS", "name": "Soviet Union" },
+    { "code": "ITA", "name": "Kingdom of Italy" },
+    { "code": "USA", "name": "United States" },
+    { "code": "JPN", "name": "Empire of Japan" },
+    { "code": "CHN", "name": "Republic of China" }
+  ],
+  "world": {
+    "regionOwnership": {
+      "AUT": "DEU",
+      "CZE": "DEU",
+      "ALB": "ITA",
+      "LBY": "ITA",
+      "BLR": "RUS",
+      "UKR": "RUS",
+      "KAZ": "RUS",
+      "GEO": "RUS",
+      "ARM": "RUS",
+      "AZE": "RUS",
+      "UZB": "RUS",
+      "TKM": "RUS",
+      "TJK": "RUS",
+      "KGZ": "RUS",
+      "KOR": "JPN",
+      "TWN": "JPN",
+      "DZA": "FRA"
+    },
+    "polities": {
+      "DEU": { "code": "DEU", "name": "German Reich", "color": "#4d5656", "aliases": ["Germany", "Nazi Germany"], "note": "Hitler has swallowed Austria and Czechoslovakia without a shot and now demands Danzig; the Wehrmacht's timetable points at September.", "reputation": 25, "tags": ["totalitarian", "expansionist", "rearmed"] },
+      "GBR": { "code": "GBR", "name": "United Kingdom", "color": "#7d6608", "aliases": ["Britain"], "note": "Chamberlain has guaranteed Poland — appeasement is dead, but rearmament is unfinished and the Empire is stretched thin.", "reputation": 60, "tags": ["parliamentary", "naval power", "guarantor"] },
+      "FRA": { "code": "FRA", "name": "French Republic", "color": "#2e5aac", "aliases": ["France"], "note": "The Maginot Line is magnificent and the doctrine behind it is a decade old; the will of 1914 is nowhere to be found.", "reputation": 55, "tags": ["republican", "defensive", "war-weary"] },
+      "POL": { "code": "POL", "name": "Republic of Poland", "color": "#884ea0", "aliases": ["Poland"], "note": "Caught between two totalitarian giants with Western guarantees of uncertain worth, Warsaw will not yield Danzig.", "reputation": 56, "tags": ["defiant", "exposed", "guaranteed"] },
+      "RUS": { "code": "RUS", "name": "Soviet Union", "color": "#c0392b", "aliases": ["USSR", "Soviet Russia"], "note": "Stalin, purge-scarred and patient, entertains suitors from London and Berlin alike. The highest bidder buys his signature.", "reputation": 32, "tags": ["totalitarian", "industrializing", "opportunist"] },
+      "ITA": { "code": "ITA", "name": "Kingdom of Italy", "color": "#1e8449", "aliases": ["Italy", "Fascist Italy"], "note": "Mussolini talks of eight million bayonets but knows the army isn't ready; the Pact of Steel binds him to a war he'd rather delay.", "reputation": 38, "tags": ["fascist", "unready", "posturing"] },
+      "USA": { "code": "USA", "name": "United States", "color": "#3c6e9f", "aliases": ["America"], "note": "Roosevelt sees the storm coming but the Neutrality Acts and an isolationist Congress tie his hands.", "reputation": 64, "tags": ["democratic", "isolationist", "arsenal"] },
+      "JPN": { "code": "JPN", "name": "Empire of Japan", "color": "#d35400", "aliases": ["Japan"], "note": "Two years deep in a brutal war in China, bloodied by the Soviets at Khalkhin Gol, and eyeing the resource-rich south.", "reputation": 30, "tags": ["militarist", "imperial", "resource-hungry"] },
+      "CHN": { "code": "CHN", "name": "Republic of China", "color": "#148f77", "aliases": ["China", "Nationalist China"], "note": "Chiang Kai-shek trades space for time from Chongqing, fighting Japan while watching the Communists in Yan'an.", "reputation": 52, "tags": ["besieged", "divided", "enduring"] }
+    },
+    "simulationRules": "Total war logic: industry, oil, and logistics decide campaigns; doctrine and surprise decide battles. Pact diplomacy is live — a German-Soviet arrangement is under secret negotiation and nothing about the war's shape is fixed yet. Occupations are brutal, resistance movements grow, and blockade and strategic bombing grind home fronts. American isolationism erodes step by step as the democracies bleed."
+  }
+}

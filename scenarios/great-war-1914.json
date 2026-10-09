@@ -1,0 +1,52 @@
+{
+  "id": "great-war-1914",
+  "name": "The Great War 1914",
+  "description": "June 1914. The alliances are wound tight, the mobilization timetables are printed, and an archduke is planning a visit to Sarajevo. One spark, or none — the choice may still be yours.",
+  "startDate": "1914-06-01",
+  "playablePolities": [
+    { "code": "DEU", "name": "German Empire" },
+    { "code": "AUT", "name": "Austria-Hungary" },
+    { "code": "FRA", "name": "French Republic" },
+    { "code": "GBR", "name": "British Empire" },
+    { "code": "RUS", "name": "Russian Empire" },
+    { "code": "TUR", "name": "Ottoman Empire" },
+    { "code": "ITA", "name": "Kingdom of Italy" },
+    { "code": "SRB", "name": "Kingdom of Serbia" },
+    { "code": "USA", "name": "United States" }
+  ],
+  "world": {
+    "regionOwnership": {
+      "HUN": "AUT",
+      "CZE": "AUT",
+      "SVK": "AUT",
+      "HRV": "AUT",
+      "SVN": "AUT",
+      "BIH": "AUT",
+      "SYR": "TUR",
+      "LBN": "TUR",
+      "JOR": "TUR",
+      "ISR": "TUR",
+      "PSE": "TUR",
+      "IRQ": "TUR",
+      "FIN": "RUS",
+      "EST": "RUS",
+      "LVA": "RUS",
+      "LTU": "RUS",
+      "BLR": "RUS",
+      "UKR": "RUS",
+      "POL": "RUS"
+    },
+    "polities": {
+      "DEU": { "code": "DEU", "name": "German Empire", "color": "#5d6d7e", "aliases": ["Germany", "the Reich"], "note": "Wilhelm II's Germany is Europe's industrial titan, encircled in its own imagination, with a war plan that runs through Belgium.", "reputation": 52, "tags": ["imperial", "industrial", "encircled"] },
+      "AUT": { "code": "AUT", "name": "Austria-Hungary", "color": "#d4ac0d", "aliases": ["the Dual Monarchy", "Habsburg Empire"], "note": "Eleven nations under one aging crown; Vienna sees Serbian nationalism as an existential poison.", "reputation": 48, "tags": ["multiethnic", "brittle", "anxious"] },
+      "FRA": { "code": "FRA", "name": "French Republic", "color": "#2e5aac", "aliases": ["France"], "note": "The Third Republic drills for revanche; Alsace-Lorraine is a wound that has not closed since 1871.", "reputation": 58, "tags": ["republican", "revanchist", "allied to Russia"] },
+      "GBR": { "code": "GBR", "name": "British Empire", "color": "#943126", "aliases": ["Britain"], "note": "The Royal Navy has won the dreadnought race, but the cabinet is split on continental commitments — and Ireland smolders.", "reputation": 63, "tags": ["parliamentary", "naval power", "global empire"] },
+      "RUS": { "code": "RUS", "name": "Russian Empire", "color": "#117a65", "aliases": ["Russia"], "note": "Nicholas II commands endless manpower on creaking railways; mobilization, once begun, is nearly impossible to stop.", "reputation": 50, "tags": ["autocratic", "vast", "slow to mobilize"] },
+      "TUR": { "code": "TUR", "name": "Ottoman Empire", "color": "#6c3483", "aliases": ["Ottomans", "the Porte"], "note": "The Young Turks rebuild a battered empire and quietly weigh German offers against old enemies.", "reputation": 42, "tags": ["reforming", "declining", "courted"] },
+      "ITA": { "code": "ITA", "name": "Kingdom of Italy", "color": "#b7950b", "aliases": ["Italy"], "note": "A Triple Alliance member on paper, Rome keeps its options — and its irredentist claims on Austria — very much open.", "reputation": 51, "tags": ["opportunist", "irredentist", "uncommitted"] },
+      "SRB": { "code": "SRB", "name": "Kingdom of Serbia", "color": "#a04000", "aliases": ["Serbia"], "note": "Doubled in size by the Balkan Wars, flush with pan-Slav ambition, and home to secret societies Vienna blames for everything.", "reputation": 44, "tags": ["nationalist", "pan-slav", "defiant"] },
+      "USA": { "code": "USA", "name": "United States", "color": "#5dade2", "aliases": ["America"], "note": "Wilson's America is rich, distant, and determined to stay out of Europe's quarrels — for now.", "reputation": 66, "tags": ["democratic", "neutral", "industrial giant"] }
+    },
+    "simulationRules": "July Crisis logic: alliances are tripwires and mobilization timetables have momentum of their own — but nothing is inevitable; diplomacy can still swerve. If general war comes, it becomes industrial attrition: trenches in the west, vast maneuvers in the east, blockade and U-boats at sea, and home fronts that crack under strain. Neutrals (Italy, the Ottomans, the United States) drift toward whichever side courts or provokes them."
+  }
+}

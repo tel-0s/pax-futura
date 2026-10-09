@@ -1,0 +1,100 @@
+.body {
+  padding-top: var(--pf-space-4);
+  min-width: 460px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+  align-items: flex-start;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-3);
+}
+
+.status {
+  font-size: var(--pf-font-sm);
+  color: var(--pf-text-secondary);
+}
+
+.heading {
+  margin: var(--pf-space-2) 0 0;
+  font-size: var(--pf-font-sm);
+  color: var(--pf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.connection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+}
+
+.connRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--pf-space-2);
+}
+
+.kind {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.roleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  width: 100%;
+}
+
+.roleName {
+  width: 76px;
+  font-size: var(--pf-font-sm);
+  color: var(--pf-text-secondary);
+}
+
+.model {
+  flex: 1;
+  padding: var(--pf-space-1) var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-0);
+  color: var(--pf-text-primary);
+}
+
+.num {
+  width: 90px;
+  padding: var(--pf-space-1) var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-0);
+  color: var(--pf-text-primary);
+}
+
+.muted {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.footerRow {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--pf-space-2);
+}

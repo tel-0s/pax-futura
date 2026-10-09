@@ -1,0 +1,34 @@
+{
+  "meta": { "id": "daylight", "name": "Daylight", "scheme": "light" },
+  "color": {
+    "surface": ["#f7f9fb", "#eef2f6", "#e3e9f0", "#d6dee8"],
+    "text": { "primary": "#17202b", "secondary": "#45536a", "muted": "#7c8aa0", "inverse": "#f7f9fb" },
+    "accent": { "base": "#2f6fd0", "hover": "#4a86e0", "subtle": "#dbe7f8" },
+    "semantic": { "success": "#2e9e68", "warning": "#c98a1f", "danger": "#d0503f", "info": "#2f9cc0" },
+    "border": { "subtle": "#d5dde7", "strong": "#b4c0d0", "focus": "#2f6fd0" },
+    "loom": { "canonicalEdge": "#2f6fd0", "siblingEdge": "#b4c0d0", "nodeCurrent": "#4a86e0", "nodePending": "#c98a1f" }
+  },
+  "font": {
+    "ui": "'Inter', system-ui, sans-serif",
+    "display": "'Inter', system-ui, sans-serif",
+    "mono": "'JetBrains Mono', 'SF Mono', monospace",
+    "scale": { "xs": "11px", "sm": "12.5px", "md": "14px", "lg": "17px", "xl": "22px" }
+  },
+  "space": { "unit": 4 },
+  "radius": { "sm": "4px", "md": "8px", "lg": "14px" },
+  "shadow": {
+    "raise": "0 1px 5px rgba(23,32,43,0.12)",
+    "overlay": "0 8px 36px rgba(23,32,43,0.22)"
+  },
+  "map": {
+    "water": "#cfe2ef",
+    "land": "#eef0e9",
+    "terrainTintOpacity": 0.35,
+    "boundary": { "line": "#9daebe", "disputed": "#c98a1f" },
+    "label": { "color": "#17202b", "halo": "#f7f9fb", "glyphStack": "sans" },
+    "graticule": "#e3e9f0",
+    "selectionOutline": "#2f6fd0",
+    "hoverFill": "#dbe7f8",
+    "polityPalette": { "hueOffset": 0, "sat": [42, 65], "lum": [52, 68], "contested": "blend" }
+  }
+}

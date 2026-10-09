@@ -1,0 +1,184 @@
+.empty,
+.error {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+}
+
+.error {
+  color: var(--pf-semantic-danger);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  margin-bottom: var(--pf-space-5);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--pf-font-display);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pf-text-secondary);
+}
+
+.turns {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+.turn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border-left: 2px solid var(--pf-border-subtle);
+  background: var(--pf-surface-0);
+  border-radius: var(--pf-radius-sm);
+}
+
+.turnHead {
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-accent-base);
+}
+
+.turnSummary {
+  margin: 0;
+  font-size: var(--pf-font-sm);
+  line-height: 1.45;
+  color: var(--pf-text-primary);
+}
+
+/* Extracted facts fold away so the narrative line stays skimmable; the
+   disclosure triangle is the native <details> marker restyled via ::marker. */
+.digestDetails {
+  font-size: var(--pf-font-xs);
+}
+
+.digestToggle {
+  cursor: pointer;
+  color: var(--pf-text-muted);
+  user-select: none;
+}
+
+.digestToggle::marker {
+  color: var(--pf-accent-base);
+}
+
+.digestToggle:hover {
+  color: var(--pf-text-secondary);
+}
+
+.digest {
+  margin: var(--pf-space-1) 0 0;
+  padding-left: var(--pf-space-4);
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--pf-font-xs);
+  line-height: 1.4;
+  color: var(--pf-text-muted);
+}
+
+/* Intel marks: how well the court actually knows the line it is reading.
+   Confirmed facts carry no badge at all — certainty is the quiet default. */
+.reported,
+.rumor {
+  font-family: var(--pf-font-mono);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  padding: 0 3px;
+  white-space: nowrap;
+}
+
+.reported {
+  color: var(--pf-text-muted);
+}
+
+.rumor {
+  color: var(--pf-semantic-warning);
+  border-color: var(--pf-semantic-warning);
+}
+
+/* An author display on the list overrides the UA's closed-<details> hiding —
+   restore the collapse explicitly. */
+.digestDetails:not([open]) .digest {
+  display: none;
+}
+
+.eras {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+}
+
+.era {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-1);
+}
+
+.eraTitle {
+  margin: 0;
+  font-family: var(--pf-font-display);
+  font-size: var(--pf-font-md);
+  color: var(--pf-accent-base);
+}
+
+.eraRange {
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+}
+
+.eraSummary {
+  margin: 0;
+  font-size: var(--pf-font-sm);
+  line-height: 1.55;
+  color: var(--pf-text-primary);
+  white-space: pre-wrap;
+}
+
+.threadsTitle {
+  margin: var(--pf-space-1) 0 0;
+  font-family: var(--pf-font-display);
+  font-size: var(--pf-font-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pf-accent-hover);
+}
+
+/* The open-threads ledger is the panel's action list — dashes plus an accent
+   rule keep it scannable against the narrative paragraph above it. */
+.threads {
+  margin: 0;
+  padding: 0 0 0 var(--pf-space-3);
+  list-style: none;
+  border-left: 2px solid var(--pf-accent-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  font-size: var(--pf-font-sm);
+  line-height: 1.4;
+  color: var(--pf-text-secondary);
+}
+
+.threads li::before {
+  content: "— ";
+  color: var(--pf-accent-base);
+}

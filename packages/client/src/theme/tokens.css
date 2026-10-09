@@ -1,0 +1,82 @@
+/* Base element styles — the ONLY stylesheet allowed to touch bare elements.
+   All values come from --pf-* variables set by applyTheme(); the fallbacks
+   here match the command-deck preset so a pre-theme flash stays coherent. */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--pf-font-ui, system-ui, sans-serif);
+  font-size: var(--pf-font-md, 14px);
+  color: var(--pf-text-primary, #e6ebf2);
+  background: var(--pf-surface-0, #0b0e13);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Selects get themed chrome instead of the native (OS-colored) control.
+   The chevron is drawn with two currentColor gradients so it follows the
+   theme's text color with no baked-in image color. */
+select {
+  appearance: none;
+  padding: var(--pf-space-1) calc(var(--pf-space-6) + 6px) var(--pf-space-1) var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background-color: var(--pf-surface-0);
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentcolor 50%),
+    linear-gradient(135deg, currentcolor 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) calc(50% - 1px),
+    calc(100% - 9px) calc(50% - 1px);
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+  color: var(--pf-text-primary);
+  cursor: pointer;
+}
+
+select:hover {
+  border-color: var(--pf-border-strong);
+}
+
+select:focus {
+  border-color: var(--pf-border-focus);
+  outline: none;
+}
+
+/* The popped-open list is native; color-scheme (set by applyTheme) makes it
+   dark in dark themes, and these nudge engines that honor option styling. */
+select option {
+  background: var(--pf-surface-1);
+  color: var(--pf-text-primary);
+}
+
+a {
+  color: var(--pf-accent-base);
+}
+
+::selection {
+  background: var(--pf-accent-subtle);
+}
+
+:focus-visible {
+  outline: 2px solid var(--pf-border-focus);
+  outline-offset: 1px;
+}

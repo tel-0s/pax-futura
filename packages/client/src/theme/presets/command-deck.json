@@ -1,0 +1,34 @@
+{
+  "meta": { "id": "command-deck", "name": "Command Deck", "scheme": "dark" },
+  "color": {
+    "surface": ["#0b0e13", "#12161e", "#1a202b", "#242c3a"],
+    "text": { "primary": "#e6ebf2", "secondary": "#a8b2c1", "muted": "#6b7a8c", "inverse": "#0b0e13" },
+    "accent": { "base": "#4da3ff", "hover": "#74b8ff", "subtle": "#1d3a5c" },
+    "semantic": { "success": "#4ecb8f", "warning": "#e8b64c", "danger": "#e86a5e", "info": "#5cc8e8" },
+    "border": { "subtle": "#2a3342", "strong": "#3d4a5e", "focus": "#4da3ff" },
+    "loom": { "canonicalEdge": "#4da3ff", "siblingEdge": "#3d4a5e", "nodeCurrent": "#74b8ff", "nodePending": "#e8b64c" }
+  },
+  "font": {
+    "ui": "'Inter', system-ui, sans-serif",
+    "display": "'Inter', system-ui, sans-serif",
+    "mono": "'JetBrains Mono', 'SF Mono', monospace",
+    "scale": { "xs": "11px", "sm": "12.5px", "md": "14px", "lg": "17px", "xl": "22px" }
+  },
+  "space": { "unit": 4 },
+  "radius": { "sm": "4px", "md": "8px", "lg": "14px" },
+  "shadow": {
+    "raise": "0 2px 8px rgba(0,0,0,0.45)",
+    "overlay": "0 8px 40px rgba(0,0,0,0.65)"
+  },
+  "map": {
+    "water": "#0d1420",
+    "land": "#1c2431",
+    "terrainTintOpacity": 0.25,
+    "boundary": { "line": "#3d4a5e", "disputed": "#e8b64c" },
+    "label": { "color": "#e6ebf2", "halo": "#0b0e13", "glyphStack": "sans" },
+    "graticule": "#1a202b",
+    "selectionOutline": "#74b8ff",
+    "hoverFill": "#1d3a5c",
+    "polityPalette": { "hueOffset": 0, "sat": [38, 62], "lum": [38, 55], "contested": "stripe" }
+  }
+}

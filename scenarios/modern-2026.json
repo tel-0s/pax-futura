@@ -1,0 +1,33 @@
+{
+  "id": "modern-2026",
+  "name": "Modern Day 2026",
+  "description": "The contemporary world: great-power competition, fragile institutions, and fast technology. Play any major power or carve your own path.",
+  "startDate": "2026-01-01",
+  "playablePolities": [
+    { "code": "USA", "name": "United States" },
+    { "code": "CHN", "name": "China" },
+    { "code": "RUS", "name": "Russia" },
+    { "code": "IND", "name": "India" },
+    { "code": "DEU", "name": "Germany" },
+    { "code": "FRA", "name": "France" },
+    { "code": "GBR", "name": "United Kingdom" },
+    { "code": "JPN", "name": "Japan" },
+    { "code": "BRA", "name": "Brazil" },
+    { "code": "TUR", "name": "Türkiye" }
+  ],
+  "world": {
+    "polities": {
+      "USA": { "code": "USA", "name": "United States", "color": "#3c6e9f", "aliases": ["America"], "note": "Superpower balancing global commitments against domestic polarization.", "reputation": 58, "tags": ["democratic", "superpower", "naval power"] },
+      "CHN": { "code": "CHN", "name": "China", "color": "#b03a2e", "aliases": ["PRC"], "note": "Rising industrial and technological giant with regional ambitions.", "reputation": 48, "tags": ["authoritarian", "industrial", "rising power"] },
+      "RUS": { "code": "RUS", "name": "Russia", "color": "#7d6608", "aliases": [], "note": "Resource power leaning on energy leverage and military pressure.", "reputation": 30, "tags": ["authoritarian", "resource power", "revisionist"] },
+      "IND": { "code": "IND", "name": "India", "color": "#af601a", "aliases": ["Bharat"], "note": "Fast-growing demographic giant courted by every bloc.", "reputation": 62, "tags": ["democratic", "nonaligned", "rising power"] },
+      "DEU": { "code": "DEU", "name": "Germany", "color": "#5d6d7e", "aliases": [], "note": "Europe's industrial anchor, cautious abroad.", "reputation": 68, "tags": ["democratic", "industrial", "european"] },
+      "FRA": { "code": "FRA", "name": "France", "color": "#2e5aac", "aliases": [], "note": "Nuclear power pushing European strategic autonomy.", "reputation": 63, "tags": ["democratic", "nuclear", "european"] },
+      "GBR": { "code": "GBR", "name": "United Kingdom", "color": "#943126", "aliases": ["Britain"], "note": "Atlanticist naval power seeking a post-Brexit role.", "reputation": 61, "tags": ["democratic", "naval power", "atlanticist"] },
+      "JPN": { "code": "JPN", "name": "Japan", "color": "#884ea0", "aliases": [], "note": "Technological power rearming under regional pressure.", "reputation": 70, "tags": ["democratic", "technological", "pacific"] },
+      "BRA": { "code": "BRA", "name": "Brazil", "color": "#1e8449", "aliases": [], "note": "Continental power and agricultural giant of the Global South.", "reputation": 57, "tags": ["democratic", "regional power", "global south"] },
+      "TUR": { "code": "TUR", "name": "Türkiye", "color": "#a04000", "aliases": ["Turkey"], "note": "Crossroads power playing every side.", "reputation": 45, "tags": ["presidential", "regional power", "balancer"] }
+    },
+    "simulationRules": "Contemporary realism: escalation is constrained by nuclear deterrence, alliances (NATO, etc.), markets, and domestic politics. Wars are rare, hybrid pressure and economic statecraft are common. Technology, elections, and public opinion matter."
+  }
+}

@@ -1,0 +1,25 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+}
+
+.label {
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.input {
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-0);
+  color: var(--pf-text-primary);
+}
+
+.input:focus {
+  border-color: var(--pf-border-focus);
+  outline: none;
+}

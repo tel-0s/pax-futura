@@ -1,0 +1,23 @@
+.hint {
+  margin: 0 0 var(--pf-space-3);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+}
+
+.editor {
+  width: 100%;
+  resize: vertical;
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-0);
+  color: var(--pf-text-primary);
+}
+
+.error {
+  margin: var(--pf-space-2) 0 0;
+  color: var(--pf-semantic-danger);
+  font-size: var(--pf-font-sm);
+}

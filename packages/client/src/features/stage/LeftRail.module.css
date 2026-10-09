@@ -1,0 +1,37 @@
+.rail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  padding: var(--pf-space-2);
+  background: var(--pf-surface-1);
+  border-right: 1px solid var(--pf-border-subtle);
+  z-index: 20;
+}
+
+.item {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--pf-radius-md);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-lg);
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--pf-surface-2);
+  color: var(--pf-text-primary);
+}
+
+.active {
+  background: var(--pf-accent-subtle);
+  color: var(--pf-accent-base);
+}

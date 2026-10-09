@@ -1,0 +1,100 @@
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+.meter {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  font-size: var(--pf-font-sm);
+}
+
+.meterLabel {
+  width: 72px;
+  color: var(--pf-text-muted);
+  flex-shrink: 0;
+}
+
+.meterTrack {
+  flex: 1;
+  height: 8px;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-2);
+  overflow: hidden;
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-accent-base);
+  transition: width 300ms ease;
+}
+
+.meterValue {
+  width: 28px;
+  text-align: right;
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+}
+
+.assessment {
+  margin: var(--pf-space-1) 0 0;
+  font-size: var(--pf-font-sm);
+  color: var(--pf-text-secondary);
+}
+
+.highlights {
+  margin: 0;
+  padding-left: var(--pf-space-4);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-secondary);
+}
+
+.economics {
+  display: flex;
+  gap: var(--pf-space-4);
+  flex-wrap: wrap;
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-0);
+  font-size: var(--pf-font-sm);
+}
+
+.econItem {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.econLabel {
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.econUnit {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pf-space-2);
+}
+
+.hard {
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+}
+
+.note {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+}

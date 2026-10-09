@@ -1,0 +1,25 @@
+{
+  "name": "pax-futura",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.17.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @pax/server --filter @pax/client dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r --sequential test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint packages",
+    "lint:css": "stylelint \"packages/client/src/**/*.css\"",
+    "depcruise": "depcruise packages/*/src",
+    "smoke": "node --experimental-strip-types scripts/smoke.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "dependency-cruiser": "^18.1.0",
+    "eslint": "^10.7.0",
+    "stylelint": "^17.14.1",
+    "stylelint-config-standard": "^40.0.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.65.0"
+  }
+}

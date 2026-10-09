@@ -1,0 +1,52 @@
+{
+  "id": "napoleonic-1805",
+  "name": "Napoleonic Wars 1805",
+  "description": "The Grande Armée waits at Boulogne, the Third Coalition is forming, and Nelson hunts the combined fleet. One man's ambition against all the old crowns of Europe.",
+  "startDate": "1805-08-01",
+  "playablePolities": [
+    { "code": "FRA", "name": "French Empire" },
+    { "code": "GBR", "name": "United Kingdom" },
+    { "code": "AUT", "name": "Austrian Empire" },
+    { "code": "RUS", "name": "Russian Empire" },
+    { "code": "DEU", "name": "Kingdom of Prussia" },
+    { "code": "ESP", "name": "Kingdom of Spain" },
+    { "code": "TUR", "name": "Ottoman Empire" }
+  ],
+  "world": {
+    "regionOwnership": {
+      "BEL": "FRA",
+      "NLD": "FRA",
+      "CHE": "FRA",
+      "ITA": "FRA",
+      "HUN": "AUT",
+      "CZE": "AUT",
+      "SVK": "AUT",
+      "HRV": "AUT",
+      "SVN": "AUT",
+      "BLR": "RUS",
+      "LTU": "RUS",
+      "LVA": "RUS",
+      "EST": "RUS",
+      "UKR": "RUS",
+      "POL": "RUS",
+      "GRC": "TUR",
+      "BGR": "TUR",
+      "SRB": "TUR",
+      "MKD": "TUR",
+      "ALB": "TUR",
+      "BIH": "TUR",
+      "ROU": "TUR",
+      "EGY": "TUR"
+    },
+    "polities": {
+      "FRA": { "code": "FRA", "name": "French Empire", "color": "#2e5aac", "aliases": ["France", "Napoleonic France"], "note": "Napoleon, crowned Emperor last December, masses 200,000 veterans on the Channel coast — but his eye is already turning east.", "reputation": 45, "tags": ["imperial", "revolutionary", "military genius"] },
+      "GBR": { "code": "GBR", "name": "United Kingdom", "color": "#943126", "aliases": ["Britain"], "note": "Pitt bankrolls every coalition against France; the Royal Navy is the wall behind which London plots.", "reputation": 62, "tags": ["parliamentary", "naval power", "paymaster"] },
+      "AUT": { "code": "AUT", "name": "Austrian Empire", "color": "#d4ac0d", "aliases": ["Austria", "the Habsburgs"], "note": "Francis II has signed with Russia and Britain; Mack's army prepares to march into Bavaria. Vienna wants revenge for Italy.", "reputation": 56, "tags": ["imperial", "conservative", "coalition"] },
+      "RUS": { "code": "RUS", "name": "Russian Empire", "color": "#117a65", "aliases": ["Russia"], "note": "Alexander I marches west as Europe's self-appointed savior, his armies vast, slow, and brave.", "reputation": 58, "tags": ["autocratic", "vast", "coalition"] },
+      "DEU": { "code": "DEU", "name": "Kingdom of Prussia", "color": "#5d6d7e", "aliases": ["Prussia"], "note": "Frederick William III clings to neutrality while both camps bid for his famous army.", "reputation": 54, "tags": ["militarist", "neutral", "wavering"] },
+      "ESP": { "code": "ESP", "name": "Kingdom of Spain", "color": "#af601a", "aliases": ["Spain"], "note": "A reluctant French ally; Villeneuve shelters the combined Franco-Spanish fleet at Cádiz.", "reputation": 48, "tags": ["bourbon", "naval", "reluctant ally"] },
+      "TUR": { "code": "TUR", "name": "Ottoman Empire", "color": "#6c3483", "aliases": ["Ottomans", "the Sublime Porte"], "note": "Selim III drills New Order regiments against the Janissaries' fury, courted by Paris and threatened by St. Petersburg.", "reputation": 46, "tags": ["sultanate", "reforming", "pressured"] }
+    },
+    "simulationRules": "Napoleonic warfare: armies of hundreds of thousands live off the land and move by forced march; decisive battles can break empires in an afternoon. Britain is untouchable at sea but weak on land; France is the reverse. Coalitions form, shatter, and reform — subsidies, dynastic marriages, and congress diplomacy matter as much as bayonets. Supply, weather, and distance punish overreach (especially eastward)."
+  }
+}

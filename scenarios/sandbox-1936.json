@@ -1,0 +1,29 @@
+{
+  "id": "sandbox-1936",
+  "name": "Sandbox 1936",
+  "description": "A tiny three-power test scenario used while the real map data lands.",
+  "startDate": "1936-01-01",
+  "playablePolities": [
+    { "code": "FRA", "name": "France" },
+    { "code": "DEU", "name": "Germany" },
+    { "code": "GBR", "name": "United Kingdom" }
+  ],
+  "world": {
+    "regionOwnership": {
+      "FRA.8_1": "FRA",
+      "FRA.6_1": "FRA",
+      "DEU.11_1": "DEU",
+      "DEU.2_1": "DEU",
+      "GBR.1_1": "GBR"
+    },
+    "polities": {
+      "FRA": { "code": "FRA", "name": "France", "color": "#3d6fb4", "aliases": ["French Republic"], "note": "", "reputation": 62, "tags": ["democratic", "colonial"] },
+      "DEU": { "code": "DEU", "name": "Germany", "color": "#54524f", "aliases": ["German Reich"], "note": "", "reputation": 38, "tags": ["fascist", "revanchist"] },
+      "GBR": { "code": "GBR", "name": "United Kingdom", "color": "#b44f4f", "aliases": ["Britain"], "note": "", "reputation": 70, "tags": ["democratic", "naval power"] }
+    },
+    "units": [
+      { "id": "u-fra-1", "name": "2e Division", "type": "infantry", "ownerCode": "FRA", "strength": 300, "lng": 7.7, "lat": 48.6, "regionId": "FRA.6_1", "status": "idle", "note": "", "source": "scenario" }
+    ],
+    "simulationRules": "Keep events grounded in interwar-period plausibility."
+  }
+}

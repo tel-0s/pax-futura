@@ -1,0 +1,26 @@
+.tabs {
+  display: flex;
+  gap: var(--pf-space-1);
+  border-bottom: 1px solid var(--pf-border-subtle);
+  overflow-x: auto;
+}
+
+.tab {
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--pf-text-primary);
+}
+
+.active {
+  color: var(--pf-accent-base);
+  border-bottom-color: var(--pf-accent-base);
+}

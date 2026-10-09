@@ -1,0 +1,35 @@
+.canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+}
+
+.canvas:active {
+  cursor: grabbing;
+}
+
+.world {
+  position: absolute;
+  transform-origin: 0 0;
+}
+
+.edges {
+  position: absolute;
+  overflow: visible;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.edge {
+  fill: none;
+  stroke: var(--pf-loom-sibling-edge);
+  stroke-width: 1.5;
+}
+
+.node {
+  position: absolute;
+}

@@ -1,0 +1,27 @@
+.orders {
+  margin: 0 0 var(--pf-space-4);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--pf-space-2);
+}
+
+.custom {
+  display: flex;
+  gap: var(--pf-space-2);
+  align-items: center;
+  margin-top: var(--pf-space-4);
+}
+
+.amount {
+  width: 80px;
+  padding: var(--pf-space-1) var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-0);
+  color: var(--pf-text-primary);
+}

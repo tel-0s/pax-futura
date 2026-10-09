@@ -1,0 +1,34 @@
+{
+  "meta": { "id": "seraphim", "name": "Seraphim", "scheme": "dark" },
+  "color": {
+    "surface": ["#161618", "#1d1d20", "#252528", "#2e2e32"],
+    "text": { "primary": "#f2efe9", "secondary": "#c9c5bc", "muted": "#8a867d", "inverse": "#161618" },
+    "accent": { "base": "#FF812A", "hover": "#ff9a52", "subtle": "#3d2a1a" },
+    "semantic": { "success": "#8fc65e", "warning": "#FF812A", "danger": "#e05545", "info": "#5aa8c9" },
+    "border": { "subtle": "#38383c", "strong": "#4c4c52", "focus": "#FF812A" },
+    "loom": { "canonicalEdge": "#FF812A", "siblingEdge": "#4c4c52", "nodeCurrent": "#ff9a52", "nodePending": "#c9a24a" }
+  },
+  "font": {
+    "ui": "'Chakra Petch', system-ui, sans-serif",
+    "display": "'Chakra Petch', system-ui, sans-serif",
+    "mono": "'JetBrains Mono', 'SF Mono', monospace",
+    "scale": { "xs": "11.5px", "sm": "13px", "md": "14.5px", "lg": "17.5px", "xl": "23px" }
+  },
+  "space": { "unit": 4 },
+  "radius": { "sm": "2px", "md": "5px", "lg": "9px" },
+  "shadow": {
+    "raise": "0 2px 8px rgba(0,0,0,0.5)",
+    "overlay": "0 8px 40px rgba(0,0,0,0.7)"
+  },
+  "map": {
+    "water": "#131315",
+    "land": "#232326",
+    "terrainTintOpacity": 0.2,
+    "boundary": { "line": "#4c4c52", "disputed": "#FF812A" },
+    "label": { "color": "#f2efe9", "halo": "#161618", "glyphStack": "sans" },
+    "graticule": "#1d1d20",
+    "selectionOutline": "#FF812A",
+    "hoverFill": "#3d2a1a",
+    "polityPalette": { "hueOffset": 12, "sat": [30, 55], "lum": [42, 58], "contested": "stripe" }
+  }
+}

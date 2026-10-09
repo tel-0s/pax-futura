@@ -1,0 +1,291 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: var(--pf-space-2);
+}
+
+.tabsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pf-space-2);
+}
+
+/* Minister titles are long and there can be four channels: let the tab strip
+   scroll itself instead of squeezing the "+ Council" / "+ Nation" buttons. */
+.tabsRow > :first-child {
+  min-width: 0;
+}
+
+.newButtons {
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* Council roster popover: anchored to the "+ Council" button, overlaying the
+   thread rather than pushing it — the drawer is only 340px wide. */
+.menuWrap {
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + var(--pf-space-1));
+  right: 0;
+  z-index: 1;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--pf-space-1);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-1);
+  box-shadow: var(--pf-shadow-overlay);
+}
+
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--pf-space-2);
+  border: none;
+  border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: var(--pf-surface-3);
+}
+
+.menuName {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pf-space-2);
+  font-size: var(--pf-font-sm);
+  font-weight: 600;
+}
+
+.menuOpen {
+  font-size: var(--pf-font-xs);
+  font-weight: 400;
+  color: var(--pf-accent-base);
+}
+
+.menuHint {
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+  line-height: 1.35;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-2) 0;
+}
+
+/* Long threads mount only their tail; this reveals the rest. */
+.showEarlier {
+  display: flex;
+  justify-content: center;
+  padding-bottom: var(--pf-space-1);
+}
+
+.message {
+  max-width: 92%;
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border-radius: var(--pf-radius-md);
+  font-size: var(--pf-font-sm);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+/* Markdown inside assistant bubbles: tighten default element spacing. */
+.content p {
+  margin: 0 0 var(--pf-space-2);
+  white-space: normal;
+}
+
+.content p:last-child {
+  margin-bottom: 0;
+}
+
+.content ul,
+.content ol {
+  margin: 0 0 var(--pf-space-2);
+  padding-left: var(--pf-space-5);
+  white-space: normal;
+}
+
+.content strong {
+  color: var(--pf-text-primary);
+}
+
+.content em {
+  color: var(--pf-text-secondary);
+}
+
+.content code {
+  font-family: var(--pf-font-mono);
+  font-size: 0.92em;
+  background: var(--pf-surface-3);
+  padding: 0 3px;
+  border-radius: var(--pf-radius-sm);
+}
+
+.content h1,
+.content h2,
+.content h3 {
+  margin: var(--pf-space-2) 0 var(--pf-space-1);
+  font-size: var(--pf-font-md);
+}
+
+.user {
+  align-self: flex-end;
+  background: var(--pf-accent-subtle);
+}
+
+.assistant {
+  align-self: flex-start;
+  background: var(--pf-surface-2);
+}
+
+.speaker {
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+  margin-bottom: 2px;
+}
+
+.messageMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  margin-top: var(--pf-space-1);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+}
+
+/* Branch indicator: this is how players find edited/regenerated alternatives,
+   so it must read as a control, not as metadata. */
+.siblingNav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-1);
+  padding: 1px var(--pf-space-1);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-lg);
+  background: var(--pf-surface-1);
+  color: var(--pf-accent-base);
+  font-weight: 600;
+}
+
+.siblingNav button,
+.regen {
+  border: none;
+  background: transparent;
+  color: var(--pf-text-secondary);
+  cursor: pointer;
+  padding: 0 var(--pf-space-1);
+  border-radius: var(--pf-radius-sm);
+}
+
+.siblingNav button {
+  color: var(--pf-accent-base);
+  font-weight: 700;
+}
+
+.siblingNav button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.siblingNav button:hover:not(:disabled),
+.regen:hover {
+  background: var(--pf-surface-3);
+  color: var(--pf-text-primary);
+}
+
+.siblingNav button:hover:not(:disabled) {
+  color: var(--pf-accent-hover);
+}
+
+/* Edit-and-fork: the bubble widens to hold the editor comfortably. */
+.editing {
+  width: 92%;
+}
+
+.editInput {
+  width: 100%;
+  resize: vertical;
+  padding: var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-0);
+  color: var(--pf-text-primary);
+}
+
+.editInput:focus {
+  border-color: var(--pf-border-focus);
+  outline: none;
+}
+
+.editActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pf-space-2);
+  margin-top: var(--pf-space-2);
+}
+
+.cursor {
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.thinking {
+  color: var(--pf-text-muted);
+  font-style: italic;
+}
+
+.dot {
+  animation: blink 1.2s step-start infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.inputRow {
+  display: flex;
+  gap: var(--pf-space-2);
+  align-items: flex-end;
+}
+
+.input {
+  flex: 1;
+  resize: none;
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-0);
+  color: var(--pf-text-primary);
+}
+
+.empty {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+}

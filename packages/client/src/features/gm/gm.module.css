@@ -1,0 +1,147 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-4);
+  overflow-y: auto;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  padding-bottom: var(--pf-space-3);
+  border-bottom: 1px solid var(--pf-border-subtle);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--pf-font-sm);
+  font-family: var(--pf-font-display);
+  color: var(--pf-accent-base);
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+}
+
+.row {
+  display: flex;
+  gap: var(--pf-space-2);
+}
+
+.row > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.selectRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-secondary);
+}
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.suggestion {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-1) var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-2);
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-xs);
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  border-color: var(--pf-accent-base);
+}
+
+.code {
+  font-family: var(--pf-font-mono);
+  color: var(--pf-text-muted);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 160px;
+  overflow-y: auto;
+  font-size: var(--pf-font-xs);
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pf-space-2);
+  padding: 2px var(--pf-space-1);
+  color: var(--pf-text-secondary);
+}
+
+.iconButton {
+  border: none;
+  background: transparent;
+  color: var(--pf-text-muted);
+  cursor: pointer;
+  border-radius: var(--pf-radius-sm);
+  padding: 0 var(--pf-space-1);
+}
+
+.iconButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.iconButton:hover:not(:disabled) {
+  background: var(--pf-surface-3);
+  color: var(--pf-semantic-danger);
+}
+
+.error {
+  margin: 0;
+  font-size: var(--pf-font-xs);
+  color: var(--pf-semantic-danger);
+}
+
+.success {
+  margin: 0;
+  font-size: var(--pf-font-xs);
+  color: var(--pf-semantic-success);
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-secondary);
+}
+
+.link {
+  font-size: var(--pf-font-xs);
+  color: var(--pf-accent-base);
+}
+
+.link:hover {
+  color: var(--pf-accent-hover);
+}

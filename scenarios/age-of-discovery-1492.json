@@ -1,0 +1,38 @@
+{
+  "id": "age-of-discovery-1492",
+  "name": "Age of Discovery 1492",
+  "description": "Granada has fallen, and Christopher Columbus is begging the courts of Europe for ships. Two worlds are about to collide — chart unknown coasts and claim them, or hold your empire against strangers from over the sea. (Map borders approximate realms onto modern outlines.)",
+  "startDate": "1492-04-01",
+  "playablePolities": [
+    { "code": "ESP", "name": "Castile & Aragon" },
+    { "code": "PRT", "name": "Kingdom of Portugal" },
+    { "code": "FRA", "name": "Kingdom of France" },
+    { "code": "GBR", "name": "Kingdom of England" },
+    { "code": "TUR", "name": "Ottoman Empire" },
+    { "code": "MEX", "name": "Aztec Triple Alliance" },
+    { "code": "PER", "name": "Inca Empire" },
+    { "code": "CHN", "name": "Ming China" }
+  ],
+  "world": {
+    "regionOwnership": {
+      "GRC": "TUR",
+      "BGR": "TUR",
+      "MKD": "TUR",
+      "ALB": "TUR",
+      "SRB": "TUR",
+      "BIH": "TUR"
+    },
+    "polities": {
+      "ESP": { "code": "ESP", "name": "Castile & Aragon", "color": "#af601a", "aliases": ["Spain", "the Catholic Monarchs"], "note": "Isabella and Ferdinand have taken Granada and expelled the last emirate. A Genoese sailor waits at court with a mad westward scheme.", "reputation": 62, "tags": ["catholic", "crusading", "ascendant"] },
+      "PRT": { "code": "PRT", "name": "Kingdom of Portugal", "color": "#1e8449", "aliases": ["Portugal"], "note": "John II's captains have rounded the Cape of Good Hope; the sea road to India is almost open, and Lisbon guards its charts like state secrets.", "reputation": 65, "tags": ["catholic", "naval power", "explorer"] },
+      "FRA": { "code": "FRA", "name": "Kingdom of France", "color": "#2e5aac", "aliases": ["France"], "note": "Charles VIII, young and hungry for glory, eyes the crowns of Naples and a crusade beyond.", "reputation": 58, "tags": ["catholic", "feudal", "ambitious"] },
+      "GBR": { "code": "GBR", "name": "Kingdom of England", "color": "#943126", "aliases": ["England"], "note": "Henry VII Tudor counts his coins and marries off his children, rebuilding a realm exhausted by the Wars of the Roses.", "reputation": 55, "tags": ["catholic", "mercantile", "recovering"] },
+      "ITA": { "code": "ITA", "name": "Papal States", "color": "#b7950b", "aliases": ["The Papacy", "Rome"], "note": "Innocent VIII is dying; the conclave that follows may sell the Fisherman's Ring to a Borgia.", "reputation": 60, "tags": ["theocratic", "catholic", "intriguing"] },
+      "TUR": { "code": "TUR", "name": "Ottoman Empire", "color": "#6c3483", "aliases": ["Ottomans", "the Sublime Porte"], "note": "Bayezid II consolidates Mehmed's conquests, welcomes Iberia's expelled Jews, and dominates the eastern Mediterranean.", "reputation": 57, "tags": ["sultanate", "sunni", "great power"] },
+      "MEX": { "code": "MEX", "name": "Aztec Triple Alliance", "color": "#7b241c", "aliases": ["Aztecs", "Mexica"], "note": "Ahuitzotl's armies carry obsidian and tribute demands across Mesoamerica. Of Europe, nothing is known.", "reputation": 50, "tags": ["tributary empire", "warrior cult", "unaware"] },
+      "PER": { "code": "PER", "name": "Inca Empire", "color": "#148f77", "aliases": ["Tawantinsuyu"], "note": "The Sapa Inca rules the largest empire in the Americas through roads, storehouses, and knotted cords. Of Europe, nothing is known.", "reputation": 55, "tags": ["andean empire", "centralized", "unaware"] },
+      "CHN": { "code": "CHN", "name": "Ming China", "color": "#b03a2e", "aliases": ["Ming", "the Middle Kingdom"], "note": "The Hongzhi Emperor governs frugally and well. The treasure fleets are burned; the sea is officially closed.", "reputation": 68, "tags": ["imperial", "confucian", "inward"] }
+    },
+    "simulationRules": "Age of sail: ocean crossings take months and ships vanish in storms. Unmapped coasts may be charted and claimed at country granularity once expeditions actually reach them — no instant knowledge of distant continents. First contact between hemispheres is world-changing: disease devastates populations without immunity, and news travels at the speed of a caravel. Legitimacy flows from crowns, faith, and papal arbitration (a Tordesillas-style division of the unknown world is possible). The Aztec and Inca courts know nothing of Europe until contact, and vice versa."
+  }
+}

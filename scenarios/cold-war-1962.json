@@ -1,0 +1,47 @@
+{
+  "id": "cold-war-1962",
+  "name": "Thirteen Days 1962",
+  "description": "October 1962. Soviet missiles are being assembled in Cuban jungle clearings and a U-2 is about to photograph them. The closest the world ever came — this time, you're at the table.",
+  "startDate": "1962-10-01",
+  "playablePolities": [
+    { "code": "USA", "name": "United States" },
+    { "code": "RUS", "name": "Soviet Union" },
+    { "code": "CUB", "name": "Republic of Cuba" },
+    { "code": "CHN", "name": "People's Republic of China" },
+    { "code": "GBR", "name": "United Kingdom" },
+    { "code": "FRA", "name": "French Republic" },
+    { "code": "DEU", "name": "West Germany" },
+    { "code": "EGY", "name": "United Arab Republic" },
+    { "code": "IND", "name": "Republic of India" }
+  ],
+  "world": {
+    "regionOwnership": {
+      "UKR": "RUS",
+      "BLR": "RUS",
+      "EST": "RUS",
+      "LVA": "RUS",
+      "LTU": "RUS",
+      "GEO": "RUS",
+      "ARM": "RUS",
+      "AZE": "RUS",
+      "KAZ": "RUS",
+      "UZB": "RUS",
+      "TKM": "RUS",
+      "TJK": "RUS",
+      "KGZ": "RUS",
+      "MDA": "RUS"
+    },
+    "polities": {
+      "USA": { "code": "USA", "name": "United States", "color": "#3c6e9f", "aliases": ["America"], "note": "Kennedy's America leads the free world with overwhelming nuclear superiority it hopes never to test — and does not yet know what sits in Cuba.", "reputation": 62, "tags": ["democratic", "superpower", "nuclear"] },
+      "RUS": { "code": "RUS", "name": "Soviet Union", "color": "#c0392b", "aliases": ["USSR"], "note": "Khrushchev gambles: missiles in Cuba would fix the strategic balance and shield the revolution — if the deployment stays secret long enough.", "reputation": 40, "tags": ["communist", "superpower", "gambling"] },
+      "CUB": { "code": "CUB", "name": "Republic of Cuba", "color": "#1e8449", "aliases": ["Cuba"], "note": "Castro, fresh off the Bay of Pigs, has invited Soviet arms and expects an American invasion any season now.", "reputation": 45, "tags": ["revolutionary", "defiant", "exposed"] },
+      "CHN": { "code": "CHN", "name": "People's Republic of China", "color": "#a04000", "aliases": ["China", "PRC"], "note": "Mao scorns Khrushchev's caution as revisionism; on the Himalayan frontier, his armies are ready to teach India a lesson.", "reputation": 35, "tags": ["communist", "revolutionary", "split from Moscow"] },
+      "GBR": { "code": "GBR", "name": "United Kingdom", "color": "#7d6608", "aliases": ["Britain"], "note": "Macmillan manages imperial retreat with nuclear weapons and a special relationship, hoping Washington still calls first.", "reputation": 60, "tags": ["parliamentary", "nuclear", "atlanticist"] },
+      "FRA": { "code": "FRA", "name": "French Republic", "color": "#2e5aac", "aliases": ["France"], "note": "De Gaulle, done with Algeria, builds his own bomb and answers to no bloc entirely.", "reputation": 58, "tags": ["gaullist", "nuclear", "independent"] },
+      "DEU": { "code": "DEU", "name": "West Germany", "color": "#5d6d7e", "aliases": ["Federal Republic", "Bonn"], "note": "Adenauer's republic thrives in the Wirtschaftswunder while the Wall, one year old, cuts through Berlin and the nation. (The map shows Germany whole; the East is under Moscow's shadow.)", "reputation": 63, "tags": ["democratic", "divided nation", "frontline"] },
+      "EGY": { "code": "EGY", "name": "United Arab Republic", "color": "#d4ac0d", "aliases": ["Egypt"], "note": "Nasser, hero of Suez, leads Arab nationalism and the nonaligned between the blocs — while bleeding in Yemen's mountains.", "reputation": 55, "tags": ["nationalist", "nonaligned", "pan-arab"] },
+      "IND": { "code": "IND", "name": "Republic of India", "color": "#884ea0", "aliases": ["India"], "note": "Nehru preaches nonalignment and quietly ignores the Chinese divisions massing above the McMahon Line.", "reputation": 64, "tags": ["democratic", "nonaligned", "unprepared"] }
+    },
+    "simulationRules": "Cold War logic: direct superpower war means mutual annihilation, so conflict flows sideways — proxies, coups, aid, blockades, and brinkmanship measured in DEFCON levels. Crises move in hours, not months: quarantines, back-channels, and public ultimatums. Decolonization churns out new states both blocs court. Intelligence is imperfect — leaders act on photographs, intercepts, and fear. Escalation is easy to start and agonizing to stop."
+  }
+}

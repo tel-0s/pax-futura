@@ -1,0 +1,29 @@
+{
+  "connections": [
+    { "id": "anthropic", "kind": "anthropic", "apiKeyEnv": "ANTHROPIC_API_KEY" },
+    {
+      "id": "openrouter",
+      "kind": "openai-compatible",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKeyEnv": "OPENROUTER_API_KEY"
+    },
+    { "id": "local", "kind": "ollama", "baseUrl": "http://localhost:11434" }
+  ],
+  "roles": {
+    "simulator": {
+      "connectionId": "openrouter",
+      "model": "deepseek/deepseek-chat-v3-0324",
+      "contextWindow": 64000,
+      "maxOutput": 8000
+    },
+    "extractor": {
+      "connectionId": "local",
+      "model": "qwen3:8b",
+      "contextWindow": 32000,
+      "maxOutput": 4096
+    },
+    "advisor": { "inherit": "simulator" },
+    "diplomat": { "inherit": "simulator" },
+    "utility": { "inherit": "extractor" }
+  }
+}

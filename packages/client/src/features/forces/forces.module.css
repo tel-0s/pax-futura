@@ -1,0 +1,167 @@
+.empty {
+  margin: 0;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-4);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+}
+
+.groupHead {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-1) var(--pf-space-2);
+  border-left: 2px solid var(--pf-border-subtle);
+  background: var(--pf-surface-1);
+  border-radius: var(--pf-radius-sm);
+}
+
+/* The owner clicked on the map keeps an accent rule so it reads first. */
+.groupSelected .groupHead {
+  border-left-color: var(--pf-accent-base);
+  background: var(--pf-accent-subtle);
+}
+
+.flag {
+  height: 14px;
+  width: 20px;
+  object-fit: cover;
+  border-radius: var(--pf-radius-sm);
+  border: 1px solid var(--pf-border-subtle);
+}
+
+.groupName {
+  font-family: var(--pf-font-display);
+  font-size: var(--pf-font-sm);
+  color: var(--pf-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.you {
+  font-size: var(--pf-font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pf-accent-base);
+}
+
+.groupStats {
+  margin-left: auto;
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+  white-space: nowrap;
+}
+
+.units {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.unit {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-1) var(--pf-space-2);
+  border: 0;
+  border-bottom: 1px solid var(--pf-border-subtle);
+  background: transparent;
+  color: var(--pf-text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.unit:hover {
+  background: var(--pf-surface-2);
+}
+
+.unit:focus-visible {
+  outline: 2px solid var(--pf-border-focus);
+  outline-offset: -2px;
+}
+
+.glyph {
+  font-size: var(--pf-font-md);
+  line-height: 1;
+}
+
+.unitText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.unitName {
+  font-size: var(--pf-font-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unitMeta {
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.strength {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  width: 76px;
+  flex: none;
+}
+
+.strengthValue {
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-secondary);
+}
+
+/* Strength bar: track is full width, fill is strength / UNIT_STRENGTH_MAX. */
+.bar {
+  width: 100%;
+  height: 3px;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-3);
+  overflow: hidden;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  background: var(--pf-accent-base);
+}
+
+.toneNeutral {
+  background: var(--pf-accent-base);
+}
+
+.toneWarning {
+  background: var(--pf-semantic-warning);
+}
+
+.toneDanger {
+  background: var(--pf-semantic-danger);
+}

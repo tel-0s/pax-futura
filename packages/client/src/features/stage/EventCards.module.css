@@ -1,0 +1,116 @@
+.card {
+  position: absolute;
+  left: 50%;
+  bottom: var(--pf-space-6);
+  transform: translateX(-50%);
+  width: min(560px, calc(100% - 120px));
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  padding: var(--pf-space-4) var(--pf-space-5);
+  background: var(--pf-surface-1);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: var(--pf-radius-lg);
+  box-shadow: var(--pf-shadow-overlay);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+}
+
+.date {
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+}
+
+.counter {
+  margin-left: auto;
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+}
+
+.close {
+  border: none;
+  background: transparent;
+  color: var(--pf-text-secondary);
+  cursor: pointer;
+  padding: 0 var(--pf-space-1);
+  border-radius: var(--pf-radius-sm);
+}
+
+.close:hover {
+  background: var(--pf-surface-2);
+  color: var(--pf-text-primary);
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--pf-font-display);
+  font-size: var(--pf-font-lg);
+  line-height: 1.25;
+}
+
+.description {
+  margin: 0;
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+  color: var(--pf-text-secondary);
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  margin-top: var(--pf-space-1);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.listItem {
+  display: flex;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border-radius: var(--pf-radius-md);
+  font-size: var(--pf-font-sm);
+  cursor: pointer;
+}
+
+.listItem:hover {
+  background: var(--pf-surface-2);
+}
+
+.listActive {
+  background: var(--pf-accent-subtle);
+}
+
+.listDate {
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.listDescription {
+  color: var(--pf-text-secondary);
+}

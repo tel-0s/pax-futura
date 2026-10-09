@@ -1,0 +1,27 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-1);
+  padding: 0 var(--pf-space-2);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-2);
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-xs);
+  line-height: 1.8;
+  white-space: nowrap;
+}
+
+.accent {
+  background: var(--pf-accent-subtle);
+  color: var(--pf-accent-base);
+}
+
+.warning {
+  background: var(--pf-surface-2);
+  color: var(--pf-semantic-warning);
+}
+
+.danger {
+  background: var(--pf-surface-2);
+  color: var(--pf-semantic-danger);
+}

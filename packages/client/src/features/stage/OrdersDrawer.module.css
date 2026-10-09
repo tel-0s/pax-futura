@@ -1,0 +1,81 @@
+.empty {
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-sm);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+.item {
+  display: flex;
+  gap: var(--pf-space-2);
+  align-items: flex-start;
+  padding: var(--pf-space-2) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-0);
+  font-size: var(--pf-font-sm);
+}
+
+.index {
+  font-family: var(--pf-font-mono);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-accent-base);
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.text {
+  flex: 1;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  gap: var(--pf-space-1);
+  flex-shrink: 0;
+}
+
+.iconButton {
+  border: none;
+  background: transparent;
+  color: var(--pf-text-secondary);
+  cursor: pointer;
+  padding: 0 var(--pf-space-1);
+  border-radius: var(--pf-radius-sm);
+}
+
+.iconButton:hover {
+  background: var(--pf-surface-2);
+  color: var(--pf-text-primary);
+}
+
+.editBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+}
+
+.editArea {
+  width: 100%;
+  resize: vertical;
+  padding: var(--pf-space-2);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-1);
+  color: var(--pf-text-primary);
+}
+
+.editActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pf-space-2);
+}

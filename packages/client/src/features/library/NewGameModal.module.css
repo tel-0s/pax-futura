@@ -1,0 +1,96 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-4);
+  min-width: 420px;
+}
+
+.select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  font-size: var(--pf-font-sm);
+}
+
+.savedRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--pf-space-2);
+}
+
+.savedRow > label {
+  flex: 1;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-space-2);
+  font-size: var(--pf-font-sm);
+  color: var(--pf-text-secondary);
+  cursor: pointer;
+}
+
+.creator {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-3);
+  padding: var(--pf-space-4);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-md);
+  background: var(--pf-surface-0);
+}
+
+.flagRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--pf-space-3);
+}
+
+.colorField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-1);
+  font-size: var(--pf-font-xs);
+  color: var(--pf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.flagPreview {
+  width: 44px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Color comes from the inline style (the picked nation color). */
+  border-width: 2px;
+  border-style: solid;
+  border-radius: var(--pf-radius-sm);
+  background: var(--pf-surface-2);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.flagImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flagEmoji {
+  font-size: var(--pf-font-lg);
+}
+
+.hint {
+  margin: 0;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
+
+.error {
+  margin: 0;
+  color: var(--pf-semantic-danger);
+  font-size: var(--pf-font-sm);
+}

@@ -1,0 +1,34 @@
+{
+  "meta": { "id": "parchment", "name": "Parchment", "scheme": "light" },
+  "color": {
+    "surface": ["#efe6d4", "#e7dcc6", "#ddd0b6", "#d2c3a5"],
+    "text": { "primary": "#2e2618", "secondary": "#54492f", "muted": "#7d7156", "inverse": "#f4ecdd" },
+    "accent": { "base": "#8a5a2b", "hover": "#a06b35", "subtle": "#e0cba8" },
+    "semantic": { "success": "#5e7d3f", "warning": "#a8762c", "danger": "#9c3f2f", "info": "#4a6b85" },
+    "border": { "subtle": "#cbbc9c", "strong": "#a89773", "focus": "#8a5a2b" },
+    "loom": { "canonicalEdge": "#8a5a2b", "siblingEdge": "#b3a586", "nodeCurrent": "#a06b35", "nodePending": "#a8762c" }
+  },
+  "font": {
+    "ui": "'Iowan Old Style', 'Palatino', Georgia, serif",
+    "display": "'Iowan Old Style', 'Palatino', Georgia, serif",
+    "mono": "'Courier New', monospace",
+    "scale": { "xs": "11.5px", "sm": "13px", "md": "15px", "lg": "18px", "xl": "24px" }
+  },
+  "space": { "unit": 4 },
+  "radius": { "sm": "2px", "md": "4px", "lg": "8px" },
+  "shadow": {
+    "raise": "0 1px 4px rgba(72,58,32,0.25)",
+    "overlay": "0 6px 30px rgba(72,58,32,0.35)"
+  },
+  "map": {
+    "water": "#cfd9d2",
+    "land": "#e9dfc8",
+    "terrainTintOpacity": 0.4,
+    "boundary": { "line": "#8d7d5a", "disputed": "#a8762c" },
+    "label": { "color": "#2e2618", "halo": "#efe6d4", "glyphStack": "serif" },
+    "graticule": "#d8ccb0",
+    "selectionOutline": "#8a5a2b",
+    "hoverFill": "#e0cba8",
+    "polityPalette": { "hueOffset": 18, "sat": [28, 45], "lum": [55, 72], "contested": "stripe" }
+  }
+}

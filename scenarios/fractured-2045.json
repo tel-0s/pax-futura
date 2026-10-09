@@ -1,0 +1,29 @@
+{
+  "id": "fractured-2045",
+  "name": "Fractured World 2045",
+  "description": "The mid-century: climate shocks, machine minds, orbital assets, and a multipolar order held together with tape. The old hegemony is gone — what replaces it is being decided now.",
+  "startDate": "2045-03-01",
+  "playablePolities": [
+    { "code": "USA", "name": "American Federation" },
+    { "code": "CHN", "name": "China" },
+    { "code": "IND", "name": "India" },
+    { "code": "DEU", "name": "European Federation" },
+    { "code": "RUS", "name": "Russia" },
+    { "code": "BRA", "name": "Brazil" },
+    { "code": "NGA", "name": "Nigeria" },
+    { "code": "IDN", "name": "Indonesia" }
+  ],
+  "world": {
+    "polities": {
+      "USA": { "code": "USA", "name": "American Federation", "color": "#3c6e9f", "aliases": ["America", "the Federation"], "note": "Reconstituted after the turbulent thirties, fusion-powered and inward-looking — a superpower unsure it still wants the job.", "reputation": 55, "tags": ["federal", "fusion pioneer", "retrenching"] },
+      "CHN": { "code": "CHN", "name": "China", "color": "#b03a2e", "aliases": ["PRC"], "note": "The first automation superpower, rich, gray, and shrinking — projecting power abroad to quiet the demographics at home.", "reputation": 50, "tags": ["technocratic", "aging", "orbital power"] },
+      "IND": { "code": "IND", "name": "India", "color": "#af601a", "aliases": ["Bharat"], "note": "The world's largest economy by heads and rising by every other measure, monsoon-whipsawed and ferociously self-confident.", "reputation": 60, "tags": ["democratic", "demographic giant", "ascendant"] },
+      "DEU": { "code": "DEU", "name": "European Federation", "color": "#5d6d7e", "aliases": ["Europe", "the Federation Core"], "note": "The Berlin-Paris core of a federated Europe: rich, regulated, and heavily fortified against the migration century. (Mapped on the German core; the union extends beyond.)", "reputation": 64, "tags": ["federated", "regulatory power", "fortress"] },
+      "RUS": { "code": "RUS", "name": "Russia", "color": "#7d6608", "aliases": [], "note": "Diminished and thawing — literally: the Arctic coast is the last great prize, and Moscow guards it jealously.", "reputation": 35, "tags": ["autocratic", "arctic power", "diminished"] },
+      "BRA": { "code": "BRA", "name": "Brazil", "color": "#145a32", "aliases": [], "note": "Steward of the Amazon Compact and breadbasket to three continents; biotech and carbon credits made it a great power at last.", "reputation": 62, "tags": ["democratic", "biotech power", "carbon broker"] },
+      "NGA": { "code": "NGA", "name": "Nigeria", "color": "#45b39d", "aliases": [], "note": "Africa's demographic colossus — 400 million people, a booming solar belt, and Lagos as the hemisphere's loudest cultural capital.", "reputation": 54, "tags": ["federal", "youthful", "solar power"] },
+      "IDN": { "code": "IDN", "name": "Indonesia", "color": "#884ea0", "aliases": [], "note": "Astride the world's most vital straits with the drones to close them, drowning and building seawalls at the same time.", "reputation": 56, "tags": ["maritime", "chokepoint power", "climate-stressed"] }
+    },
+    "simulationRules": "Mid-century logic: climate disruption is a permanent actor — storms, crop failures, water disputes, and migration waves stress every government. AI and automation reshape labor, warfare, and intelligence; attribution is hard and deniable operations are the norm. Orbital and cyber domains are contested infrastructure. Chip, rare-earth, and food supply chains are leverage. Nuclear deterrence still holds, so great powers collide through proxies, standards, sanctions, and swarms — but a hot war over the Arctic, the straits, or orbit is no longer unthinkable."
+  }
+}
