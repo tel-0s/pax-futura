@@ -121,3 +121,7 @@ A pnpm monorepo with a strict dependency direction, `domain ← providers ← en
 - Administrative boundaries from **[GADM](https://gadm.org)**, via Open-Historia. GADM data is free for non-commercial use; see their license.
 - [MapLibre GL JS](https://maplibre.org), [PMTiles](https://protomaps.com/docs/pmtiles), [react-map-gl](https://visgl.github.io/react-map-gl), [Lucide](https://lucide.dev) icons, [Zod](https://zod.dev), [Hono](https://hono.dev).
 - Typefaces via [Fontsource](https://fontsource.org) (SIL Open Font License): Inter, JetBrains Mono, Barlow Semi Condensed, Chakra Petch, EB Garamond, IM Fell English, Courier Prime, Fraunces, IBM Plex Mono and VT323.
+
+## License
+
+[MIT](LICENSE). This covers the code in this repository. Map data has its own terms: the tile archives and the vendored region vocabulary come from Open-Historia and GADM, under their respective licenses.
