@@ -8,7 +8,7 @@ saves/
 .env.local
 .DS_Store
 coverage/
-assets/
+/assets
 
 # Provider config may hold API keys (llm.example.json is the template)
 config/llm.json
