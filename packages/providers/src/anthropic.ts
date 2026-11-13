@@ -10,6 +10,17 @@ import type {
 } from "./types.ts";
 import { emptyUsage } from "./types.ts";
 import { sanitizeJsonSchemaForAnthropic } from "./jsonSchemaSanitize.ts";
+import { extractJson } from "./extractJson.ts";
+
+/** The endpoint refuses some valid schemas outright (unsupported keywords,
+ * "The compiled grammar is too large" — deeply nested unions compile to
+ * grammars far bigger than their JSON). Those 400s are about the format
+ * request, not the conversation: retry once without structured output and
+ * let the prompt's own contract plus the caller's Zod repair loop hold. */
+const isFormatReject = (error: unknown): boolean => {
+  const e = error as { status?: number; message?: string } | null;
+  return e?.status === 400 && /compiled grammar|output_config|json_schema|Schema type/i.test(String(e?.message ?? ""));
+};
 
 export interface AnthropicAdapterOptions {
   apiKey?: string;
@@ -38,49 +49,62 @@ export class AnthropicAdapter implements LlmClient {
       -1,
     );
 
-    const outputConfig: Record<string, unknown> = {};
-    if (req.tool) {
-      outputConfig.format = {
-        type: "json_schema",
-        schema: sanitizeJsonSchemaForAnthropic(req.tool.schema),
-      };
-    }
-    if (binding.params?.effort) {
-      outputConfig.effort = binding.params.effort;
-    }
+    const openStream = (structured: boolean) => {
+      const outputConfig: Record<string, unknown> = {};
+      if (structured && req.tool) {
+        outputConfig.format = {
+          type: "json_schema",
+          schema: sanitizeJsonSchemaForAnthropic(req.tool.schema),
+        };
+      }
+      if (binding.params?.effort) {
+        outputConfig.effort = binding.params.effort;
+      }
+      return this.client.messages.stream(
+        {
+          model: binding.model,
+          max_tokens: binding.maxOutput,
+          system: req.system.map((block, index) => ({
+            type: "text" as const,
+            text: block.text,
+            ...(index === lastCacheableIndex
+              ? { cache_control: { type: "ephemeral" as const } }
+              : {}),
+          })),
+          messages: req.messages.map((turn) => ({ role: turn.role, content: turn.text })),
+          ...(binding.params?.thinking ? { thinking: { type: "adaptive" as const } } : {}),
+          ...(Object.keys(outputConfig).length > 0 ? { output_config: outputConfig } : {}),
+          ...(binding.params?.extra ?? {}),
+        } as Parameters<typeof this.client.messages.stream>[0],
+        { ...(req.signal ? { signal: req.signal } : {}) },
+      );
+    };
 
-    const stream = this.client.messages.stream(
-      {
-        model: binding.model,
-        max_tokens: binding.maxOutput,
-        system: req.system.map((block, index) => ({
-          type: "text" as const,
-          text: block.text,
-          ...(index === lastCacheableIndex
-            ? { cache_control: { type: "ephemeral" as const } }
-            : {}),
-        })),
-        messages: req.messages.map((turn) => ({ role: turn.role, content: turn.text })),
-        ...(binding.params?.thinking ? { thinking: { type: "adaptive" as const } } : {}),
-        ...(Object.keys(outputConfig).length > 0 ? { output_config: outputConfig } : {}),
-        ...(binding.params?.extra ?? {}),
-      } as Parameters<typeof this.client.messages.stream>[0],
-      { ...(req.signal ? { signal: req.signal } : {}) },
-    );
+    let stream = openStream(true);
+    let fellBack = false;
 
     const events = (async function* (): AsyncGenerator<LlmEvent> {
-      try {
-        for await (const event of stream) {
-          if (event.type === "content_block_delta") {
-            if (event.delta.type === "text_delta") {
-              yield { type: "text_delta", delta: event.delta.text };
-            } else if (event.delta.type === "thinking_delta") {
-              yield { type: "thinking", delta: event.delta.thinking };
+      for (;;) {
+        try {
+          for await (const event of stream) {
+            if (event.type === "content_block_delta") {
+              if (event.delta.type === "text_delta") {
+                yield { type: "text_delta", delta: event.delta.text };
+              } else if (event.delta.type === "thinking_delta") {
+                yield { type: "thinking", delta: event.delta.thinking };
+              }
             }
           }
+          return;
+        } catch (error) {
+          if (isAbort(error)) return;
+          if (!fellBack && req.tool && isFormatReject(error)) {
+            fellBack = true;
+            stream = openStream(false);
+            continue;
+          }
+          throw error;
         }
-      } catch (error) {
-        if (!isAbort(error)) throw error;
       }
     })();
 
@@ -126,7 +150,10 @@ export class AnthropicAdapter implements LlmClient {
         try {
           result.structured = JSON.parse(text) as T;
         } catch (error) {
-          result.structuredError = `Structured output was not valid JSON: ${String(error)}`;
+          // On the no-format fallback the model may wrap the JSON in prose.
+          const extracted = fellBack ? extractJson(text) : undefined;
+          if (extracted !== undefined) result.structured = extracted as T;
+          else result.structuredError = `Structured output was not valid JSON: ${String(error)}`;
         }
       } else if (req.tool && stopReason === "refusal") {
         result.structuredError = "The model declined this request (safety refusal).";

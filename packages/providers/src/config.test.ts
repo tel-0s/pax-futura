@@ -27,6 +27,40 @@ describe("role resolution", () => {
 });
 
 describe("sanitizeJsonSchemaForAnthropic", () => {
+  it("drops an enum past 24 entries (the compiled grammar size cap), keeping small ones", () => {
+    const big = Array.from({ length: 3000 }, (_, i) => `R${i}`);
+    const sanitized = sanitizeJsonSchemaForAnthropic({
+      type: "object",
+      properties: {
+        region: { type: "string", enum: big },
+        kind: { type: "string", enum: ["a", "b", "c"] },
+      },
+    }) as { properties: { region: Record<string, unknown>; kind: Record<string, unknown> } };
+    expect(sanitized.properties.region.enum).toBeUndefined();
+    expect(sanitized.properties.region.type).toBe("string");
+    expect(sanitized.properties.kind.enum).toEqual(["a", "b", "c"]);
+  });
+
+  it("rewrites oneOf to anyOf, merging with an existing anyOf (the endpoint rejects oneOf)", () => {
+    const sanitized = sanitizeJsonSchemaForAnthropic({
+      oneOf: [{ type: "string" }, { type: "number" }],
+    }) as Record<string, unknown>;
+    expect(sanitized.oneOf).toBeUndefined();
+    expect(sanitized.anyOf).toEqual([{ type: "string" }, { type: "number" }]);
+    const merged = sanitizeJsonSchemaForAnthropic({
+      anyOf: [{ type: "boolean" }],
+      oneOf: [{ type: "string" }],
+    }) as Record<string, unknown>;
+    expect(merged.anyOf).toEqual([{ type: "boolean" }, { type: "string" }]);
+    const nested = sanitizeJsonSchemaForAnthropic({
+      type: "object",
+      properties: { impact: { oneOf: [{ type: "string" }] } },
+    }) as { properties: { impact: Record<string, unknown> } };
+    expect(nested.properties.impact.oneOf).toBeUndefined();
+    expect(nested.properties.impact.anyOf).toEqual([{ type: "string" }]);
+  });
+
+
   it("strips unsupported constraints and closes objects", () => {
     const sanitized = sanitizeJsonSchemaForAnthropic({
       type: "object",
