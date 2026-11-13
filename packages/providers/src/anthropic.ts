@@ -60,17 +60,28 @@ export class AnthropicAdapter implements LlmClient {
       if (binding.params?.effort) {
         outputConfig.effort = binding.params.effort;
       }
+      // The no-format fallback carries the schema as text: the prompt's own
+      // contract was written for stronger models, and prose can hold the
+      // bounds the grammar compiler strips (strength caps, coordinate
+      // ranges), so a small simulator keeps its rails.
+      const fallbackContract =
+        !structured && req.tool
+          ? [{
+              type: "text" as const,
+              text: `OUTPUT CONTRACT: respond with ONLY one JSON object (no prose, no code fences) matching this JSON Schema exactly — required fields are required, nothing extra:\n${JSON.stringify(req.tool.schema)}`,
+            }]
+          : [];
       return this.client.messages.stream(
         {
           model: binding.model,
           max_tokens: binding.maxOutput,
-          system: req.system.map((block, index) => ({
+          system: [...req.system.map((block, index) => ({
             type: "text" as const,
             text: block.text,
             ...(index === lastCacheableIndex
               ? { cache_control: { type: "ephemeral" as const } }
               : {}),
-          })),
+          })), ...fallbackContract],
           messages: req.messages.map((turn) => ({ role: turn.role, content: turn.text })),
           ...(binding.params?.thinking ? { thinking: { type: "adaptive" as const } } : {}),
           ...(Object.keys(outputConfig).length > 0 ? { output_config: outputConfig } : {}),
