@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Inbox, MessagesSquare } from "lucide-react";
+import { ArrowLeft, Inbox, MessagesSquare } from "lucide-react";
 import type { ConversationAtNode } from "@pax/domain";
 import { Drawer } from "../../components/Drawer.tsx";
 import { api } from "../../lib/api.ts";
@@ -181,7 +181,7 @@ export function ConversationsDrawer() {
             gameId={gameId}
             entries={entries}
             activeId={activeConversationId}
-            onSelect={setActive}
+            onSelect={(id) => setActive(id === activeConversationId ? null : id)}
             seats={
               <>
                 <CouncilMenu
@@ -198,6 +198,10 @@ export function ConversationsDrawer() {
 
         {active && activeWho ? (
           <>
+            <button type="button" className={styles.deskBack} onClick={() => setActive(null)}>
+              <ArrowLeft size={14} aria-hidden="true" />
+              <span>The desk</span>
+            </button>
             <div className={styles.thread} ref={scroller}>
               {/* Keyed by conversation and node: an open editor and the
                   "show earlier" expansion belong to exactly one of each. */}
@@ -221,12 +225,14 @@ export function ConversationsDrawer() {
               }
             />
           </>
-        ) : entries.length === 0 && loadedFor === nodeId ? (
+        ) : loadedFor === nodeId ? (
           <div className={styles.empty}>
             <Inbox size={24} className={styles.emptyIcon} />
-            <p className={styles.emptyTitle}>The desk is clear</p>
+            <p className={styles.emptyTitle}>{entries.length === 0 ? "The desk is clear" : "The desk"}</p>
             <p className={styles.emptyText}>
-              Summon a minister for counsel, or write to a foreign court.
+              {entries.length === 0
+                ? "Summon a minister for counsel, or write to a foreign court."
+                : "Pick up a correspondence from the strip above, summon a minister, or write to a foreign court."}
             </p>
             <div className={styles.emptyRoster}>
               <span className={`${styles.emptyKicker} pfKicker`}>Your council</span>
