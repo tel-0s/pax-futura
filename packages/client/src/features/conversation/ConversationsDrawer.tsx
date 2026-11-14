@@ -181,7 +181,7 @@ export function ConversationsDrawer() {
             gameId={gameId}
             entries={entries}
             activeId={activeConversationId}
-            onSelect={(id) => setActive(id === activeConversationId ? null : id)}
+            onSelect={setActive}
             seats={
               <>
                 <CouncilMenu
