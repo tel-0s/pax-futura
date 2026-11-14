@@ -1,11 +1,15 @@
-import { describe, expect, it } from "vitest";
-import type { Message } from "@pax/domain";
+import { describe, expect, it, vi } from "vitest";
+import type { ConversationAtNode, Message } from "@pax/domain";
 import {
   selectDeepestDescendant,
   selectMessagePath,
   selectMessageSiblings,
   selectSiblingPositions,
+  useConversationsStore,
 } from "./conversations.ts";
+
+const apiMock = vi.hoisted(() => ({ listConversations: vi.fn() }));
+vi.mock("../lib/api.ts", () => ({ api: apiMock }));
 
 const message = (
   id: string,
@@ -56,5 +60,30 @@ describe("conversation selectors", () => {
     // Newest child wins at each step, so the regenerated reply (03a2) is the leaf.
     expect(selectDeepestDescendant(tree, "01u1")).toBe("03a2");
     expect(selectDeepestDescendant(tree, "02a1")).toBe("04u2");
+  });
+});
+
+describe("the desk survives a list refresh", () => {
+  const conv = (id: string) => ({ id }) as unknown as ConversationAtNode;
+
+  it("a deliberately null active id stays null (refreshList runs on every message.completed)", async () => {
+    useConversationsStore.setState({ activeConversationId: null, list: [] });
+    apiMock.listConversations.mockResolvedValue([conv("c1"), conv("c2")]);
+    await useConversationsStore.getState().refreshList("g1", "n1");
+    expect(useConversationsStore.getState().activeConversationId).toBeNull();
+  });
+
+  it("a stale active id falls back to the first conversation", async () => {
+    useConversationsStore.setState({ activeConversationId: "gone", list: [] });
+    apiMock.listConversations.mockResolvedValue([conv("c1"), conv("c2")]);
+    await useConversationsStore.getState().refreshList("g1", "n1");
+    expect(useConversationsStore.getState().activeConversationId).toBe("c1");
+  });
+
+  it("a live active id is kept", async () => {
+    useConversationsStore.setState({ activeConversationId: "c2", list: [] });
+    apiMock.listConversations.mockResolvedValue([conv("c1"), conv("c2")]);
+    await useConversationsStore.getState().refreshList("g1", "n1");
+    expect(useConversationsStore.getState().activeConversationId).toBe("c2");
   });
 });

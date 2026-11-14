@@ -146,3 +146,25 @@
   justify-content: center;
   margin-top: var(--pf-space-2);
 }
+
+/* The way back from an open letter to the desk (all advisors in view). */
+.deskBack {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-space-1);
+  align-self: flex-start;
+  margin: var(--pf-space-2) var(--pf-space-3) 0;
+  padding: var(--pf-space-1) var(--pf-space-2);
+  border: 1px solid var(--pf-accent-line);
+  border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  font: inherit;
+  font-size: 0.85em;
+  cursor: pointer;
+}
+
+.deskBack:hover {
+  color: var(--pf-text-primary);
+  background: var(--pf-accent-wash);
+}
