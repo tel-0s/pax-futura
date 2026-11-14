@@ -19,7 +19,7 @@ import { extractJson } from "./extractJson.ts";
  * let the prompt's own contract plus the caller's Zod repair loop hold. */
 const isFormatReject = (error: unknown): boolean => {
   const e = error as { status?: number; message?: string } | null;
-  return e?.status === 400 && /compiled grammar|output_config|json_schema|Schema type/i.test(String(e?.message ?? ""));
+  return e?.status === 400 && /compiled grammar|output_config\.format|json_schema|Schema type/i.test(String(e?.message ?? ""));
 };
 
 export interface AnthropicAdapterOptions {
@@ -35,6 +35,11 @@ export interface AnthropicAdapterOptions {
  */
 export class AnthropicAdapter implements LlmClient {
   private readonly client: Anthropic;
+  /** `${model}|${tool.name}` pairs whose format the endpoint has rejected:
+   * the turn schema is refused every time, so without this each attempt
+   * would first spend a full round trip on a request that cannot succeed
+   * (the same memory OpenAICompatAdapter keeps per rung). */
+  private readonly rejectedFormats = new Set<string>();
 
   constructor(options: AnthropicAdapterOptions = {}) {
     this.client = new Anthropic({
@@ -91,8 +96,10 @@ export class AnthropicAdapter implements LlmClient {
       );
     };
 
-    let stream = openStream(true);
-    let fellBack = false;
+    const formatKey = req.tool ? `${binding.model}|${req.tool.name}` : null;
+    let fellBack = formatKey !== null && this.rejectedFormats.has(formatKey);
+    let stream = openStream(!fellBack);
+    const rejectedFormats = this.rejectedFormats;
 
     const events = (async function* (): AsyncGenerator<LlmEvent> {
       for (;;) {
@@ -111,6 +118,7 @@ export class AnthropicAdapter implements LlmClient {
           if (isAbort(error)) return;
           if (!fellBack && req.tool && isFormatReject(error)) {
             fellBack = true;
+            if (formatKey) rejectedFormats.add(formatKey);
             stream = openStream(false);
             continue;
           }

@@ -47,11 +47,18 @@ describe("sanitizeJsonSchemaForAnthropic", () => {
     }) as Record<string, unknown>;
     expect(sanitized.oneOf).toBeUndefined();
     expect(sanitized.anyOf).toEqual([{ type: "string" }, { type: "number" }]);
+    // A node with BOTH keeps its meaning ("this AND exactly one of that"):
+    // each union becomes its own allOf conjunct instead of one weakened anyOf.
     const merged = sanitizeJsonSchemaForAnthropic({
       anyOf: [{ type: "boolean" }],
       oneOf: [{ type: "string" }],
     }) as Record<string, unknown>;
-    expect(merged.anyOf).toEqual([{ type: "boolean" }, { type: "string" }]);
+    expect(merged.anyOf).toBeUndefined();
+    expect(merged.oneOf).toBeUndefined();
+    expect(merged.allOf).toEqual([
+      { anyOf: [{ type: "string" }] },
+      { anyOf: [{ type: "boolean" }] },
+    ]);
     const nested = sanitizeJsonSchemaForAnthropic({
       type: "object",
       properties: { impact: { oneOf: [{ type: "string" }] } },
