@@ -75,7 +75,11 @@ export const CastStrip = memo(function CastStrip({
   gameId: string;
   entries: CastEntry[];
   activeId: string | null;
-  onSelect: (conversationId: string) => void;
+  /** null = back to the desk. Only a CLICK on the active seat toggles closed;
+   * keyboard navigation always selects (clamped arrow targets at the strip's
+   * ends re-land on the active tab, and a toggle there would close the letter
+   * and strand focus with no aria-selected tab to restore to). */
+  onSelect: (conversationId: string | null) => void;
   seats: ReactNode;
 }) {
   const busyIds = useConversationsStore(selectBusyIds);
@@ -219,7 +223,7 @@ export const CastStrip = memo(function CastStrip({
                 data-unread={unread}
                 className={`${styles.castItem} ${active ? styles.castActive : ""} pfChamfer`}
                 title={[who.fullName, who.hint, unread ? "unread reply" : ""].filter(Boolean).join(" — ")}
-                onClick={() => onSelect(conversation.id)}
+                onClick={() => onSelect(active ? null : conversation.id)}
               >
                 <span className={styles.castMark}>
                   <CorrespondentMark who={who} size={30} />
