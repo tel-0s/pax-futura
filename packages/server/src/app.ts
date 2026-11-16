@@ -28,10 +28,14 @@ import {
   getOrBuildStatSheet,
   openConversation,
   regenerateReply,
+  COUNCIL_NAMES,
+  councilEra,
   draftCouncilOrders,
+  generateCouncilNames,
   sendChatMessage,
 } from "@pax/engine";
 import { GameManager, GameNotFoundError, TurnInProgressError } from "./gameManager.ts";
+import { updateCouncilNamePool } from "./db/saveDb.ts";
 import { addPendingAction, listPendingActions, removePendingAction } from "./db/stores/actions.ts";
 import { listEventsForNode } from "./db/stores/events.ts";
 import { setNodeAnchor } from "./db/stores/nodes.ts";
@@ -86,6 +90,38 @@ export const createApp = (manager: GameManager): Hono => {
   app.put("/api/games/:g/regency", zValidator("json", SetRegencyRequestSchema), (c) => {
     const meta = manager.setRegency(c.req.param("g"), c.req.valid("json"));
     return c.json(meta);
+  });
+
+  // The court's names: a one-time billed artifact, generated on first ask and
+  // persisted (the gazette pattern). A failed or refused call answers with the
+  // static era list, uncached, so the next ask simply tries again.
+  app.get("/api/games/:g/council-names", async (c) => {
+    const game = manager.get(c.req.param("g"));
+    const row = game.port.getGame();
+    if (row.councilNamePool) {
+      return c.json({ names: row.councilNamePool, source: "generated" });
+    }
+    const node = game.port.getNode(row.activeNodeId);
+    const world = node?.worldBlobHash ? game.port.getWorld(node.worldBlobHash) : null;
+    const playerName = world?.polities[row.playerPolity]?.name ?? row.playerPolity;
+    let rootId = row.activeNodeId;
+    for (
+      let cursor = node;
+      cursor?.parentId;
+      cursor = game.port.getNode(cursor.parentId)
+    ) {
+      rootId = cursor.parentId;
+    }
+    const startDate = game.port.getNode(rootId)?.gameDate ?? "";
+    const generated = await generateCouncilNames(manager.utilityDeps(game), {
+      playerName,
+      startDate,
+    });
+    if (generated) {
+      updateCouncilNamePool(game.db, generated);
+      return c.json({ names: generated, source: "generated" });
+    }
+    return c.json({ names: [...COUNCIL_NAMES[councilEra(startDate)]], source: "fallback" });
   });
 
   app.delete("/api/games/:g", (c) => {

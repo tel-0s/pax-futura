@@ -53,7 +53,7 @@ export const draftCouncilOrders = async (
     rootId = cursor.parentId;
   }
   const rootDate = store.getNode(rootId)?.gameDate ?? node.gameDate;
-  const members = council(rootId, rootDate);
+  const members = council(rootId, rootDate, game.councilNamePool);
 
   const playerName = world.polities[game.playerPolity]?.name ?? game.playerPolity;
   const context = buildContext({

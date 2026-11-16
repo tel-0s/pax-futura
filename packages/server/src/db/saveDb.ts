@@ -147,6 +147,8 @@ export interface GameRow {
   regency: "off" | "draft" | "auto";
   /** How the council deliberates when regency drafts. */
   councilDepth: "joint" | "chamber";
+  /** The game's generated court-name pool; null = the static era lists. */
+  councilNamePool: string[] | null;
   activeNodeId: string;
   createdAt: number;
 }
@@ -156,7 +158,9 @@ export interface GameRow {
  * used yet): no migration, and any save that predates the feature — or holds
  * junk — reads as today's behavior.
  */
-const parseGameSettings = (raw: string): Pick<GameRow, "regency" | "councilDepth"> => {
+const parseGameSettings = (
+  raw: string,
+): Pick<GameRow, "regency" | "councilDepth" | "councilNamePool"> => {
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
@@ -167,7 +171,29 @@ const parseGameSettings = (raw: string): Pick<GameRow, "regency" | "councilDepth
   const regency =
     settings.regency === "draft" || settings.regency === "auto" ? settings.regency : "off";
   const councilDepth = settings.councilDepth === "chamber" ? "chamber" : "joint";
-  return { regency, councilDepth };
+  const pool = Array.isArray(settings.councilNamePool)
+    ? settings.councilNamePool.filter((name): name is string => typeof name === "string" && name.length > 0)
+    : null;
+  // Three ministers need three distinct names; anything less is the floor.
+  const councilNamePool = pool && pool.length >= 3 ? pool : null;
+  return { regency, councilDepth, councilNamePool };
+};
+
+/** Merge keys into the game row's settings_json, keeping unknown neighbours. */
+const mergeGameSettings = (db: Db, patch: Record<string, unknown>): void => {
+  const row = db.prepare("SELECT settings_json AS raw FROM game WHERE id = 'game'").get() as
+    | { raw: string }
+    | undefined;
+  let existing: Record<string, unknown>;
+  try {
+    existing = (JSON.parse(row?.raw ?? "{}") ?? {}) as Record<string, unknown>;
+  } catch {
+    existing = {};
+  }
+  db.prepare("UPDATE game SET settings_json = ?, updated_at = ? WHERE id = 'game'").run(
+    JSON.stringify({ ...existing, ...patch }),
+    Date.now(),
+  );
 };
 
 export const getGame = (db: Db): GameRow => {
@@ -204,22 +230,10 @@ export const updateRegency = (
   db: Db,
   settings: { regency: GameRow["regency"]; councilDepth: GameRow["councilDepth"] },
 ): void => {
-  const row = db.prepare("SELECT settings_json AS raw FROM game WHERE id = 'game'").get() as
-    | { raw: string }
-    | undefined;
-  let existing: Record<string, unknown>;
-  try {
-    existing = (JSON.parse(row?.raw ?? "{}") ?? {}) as Record<string, unknown>;
-  } catch {
-    existing = {};
-  }
-  const merged = JSON.stringify({
-    ...existing,
-    regency: settings.regency,
-    councilDepth: settings.councilDepth,
-  });
-  db.prepare("UPDATE game SET settings_json = ?, updated_at = ? WHERE id = 'game'").run(
-    merged,
-    Date.now(),
-  );
+  mergeGameSettings(db, { regency: settings.regency, councilDepth: settings.councilDepth });
+};
+
+/** Persist the generated court-name pool (a one-time billed artifact). */
+export const updateCouncilNamePool = (db: Db, names: readonly string[]): void => {
+  mergeGameSettings(db, { councilNamePool: [...names] });
 };

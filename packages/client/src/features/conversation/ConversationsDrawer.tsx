@@ -51,9 +51,15 @@ export function ConversationsDrawer() {
   const startDate = root?.gameDate ?? "";
   const scroller = useRef<HTMLDivElement>(null);
 
+  const namePool = useConversationsStore((state) => state.namePool);
+  const loadNamePool = useConversationsStore((state) => state.loadNamePool);
+  useEffect(() => {
+    if (gameId) void loadNamePool(gameId);
+  }, [gameId, loadNamePool]);
+
   const members = useMemo(
-    () => (root ? council(root.id, startDate) : []),
-    [root, startDate],
+    () => (root ? council(root.id, startDate, namePool) : []),
+    [root, startDate, namePool],
   );
 
   const polities = world?.polities;

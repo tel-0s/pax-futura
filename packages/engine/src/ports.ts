@@ -26,6 +26,8 @@ export interface GameRow {
   regency: "off" | "draft" | "auto";
   /** How the council deliberates when regency drafts. */
   councilDepth: "joint" | "chamber";
+  /** The game's generated court-name pool; null = the static era lists. */
+  councilNamePool: string[] | null;
   activeNodeId: string;
   createdAt: number;
 }

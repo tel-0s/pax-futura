@@ -193,6 +193,19 @@ export const CouncilDraftSchema = z.object({
 });
 export type CouncilDraft = z.infer<typeof CouncilDraftSchema>;
 
+/** The utility call's shape: court given-names fitting the polity and era. */
+export const CouncilNamePoolSchema = z.object({
+  names: z.array(z.string().min(1)).min(3).max(16),
+});
+export type CouncilNamePool = z.infer<typeof CouncilNamePoolSchema>;
+
+export const CouncilNamesResponseSchema = z.object({
+  names: z.array(z.string().min(1)),
+  /** "generated" = the game's own persisted pool; "fallback" = the static era list. */
+  source: z.enum(["generated", "fallback"]),
+});
+export type CouncilNamesResponse = z.infer<typeof CouncilNamesResponseSchema>;
+
 export const GameMetaSchema = z.object({
   gameId: z.string().min(1),
   title: z.string(),
