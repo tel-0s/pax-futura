@@ -6,6 +6,7 @@ import { api } from "../../lib/api.ts";
 import { formatGameDate, formatGameMonth, parseGameDate } from "../../lib/dates.ts";
 import { useLoomStore } from "../../stores/loom.ts";
 import { useOrdersStore } from "../../stores/orders.ts";
+import { useSessionStore } from "../../stores/session.ts";
 import { useUiStore } from "../../stores/ui.ts";
 import styles from "./TurnDialog.module.css";
 
@@ -110,6 +111,32 @@ export function TurnDialog({
   const run = (jumpDays: number) => {
     localStorage.setItem(LAST_JUMP_KEY, String(jumpDays));
     onClose();
+
+    // Regency: an empty orders field is the council's cue, not the world's.
+    // Scouting stays the chronicler's instrument and is never intercepted.
+    const regency = useSessionStore.getState().meta?.regency ?? "off";
+    const { draft } = useOrdersStore.getState();
+    if (regency !== "off" && !scoutFirst && orders.length === 0 && !draft.trim()) {
+      if (regency === "draft") {
+        // The council drafts and the turn pauses: the draft lands in the
+        // command line, the session panel offers approve-or-edit.
+        void useOrdersStore.getState().requestCouncilDraft(gameId, parentId, jumpDays);
+        return;
+      }
+      // Full regency: the council's draft is adopted unseen and time moves.
+      void (async () => {
+        try {
+          const result = await api.councilDraft(gameId, parentId);
+          await useOrdersStore.getState().submit(gameId, parentId, result.draft, "ai");
+          await api.executeTurn(gameId, parentId, { jumpDays, stopPolicy: "toDate" });
+        } catch {
+          // Surfaced the same way a failed turn is: nothing advanced, the
+          // player presses Advance again.
+        }
+      })();
+      return;
+    }
+
     const request = api.executeTurn(gameId, parentId, {
       jumpDays,
       stopPolicy: "toDate",

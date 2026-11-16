@@ -5,6 +5,8 @@ import {
   ConversationTreeSchema,
   DivergenceReportSchema,
   GameEventSchema,
+  CouncilDraftSchema,
+  CouncilNamesResponseSchema,
   GameMetaSchema,
   GazetteSchema,
   LlmConfigSchema,
@@ -28,6 +30,8 @@ import {
   type GmEditRequest,
   type DivergenceReport,
   type GameEvent,
+  type CouncilDraft,
+  type CouncilNamesResponse,
   type GameMeta,
   type Gazette,
   type LlmConfig,
@@ -35,6 +39,7 @@ import {
   type Message,
   type NodeDetail,
   type PsycheSheet,
+  type SetRegencyRequest,
   type ReassessProposal,
   type NodeFingerprint,
   type SavedPolity,
@@ -118,6 +123,22 @@ export const api = {
       method: "PUT",
       body: JSON.stringify(body),
     }),
+
+  setRegency: (gameId: string, body: SetRegencyRequest): Promise<GameMeta> =>
+    request(`/games/${gameId}/regency`, GameMetaSchema, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  /** The council drafts orders for an empty field; nothing is persisted. */
+  councilDraft: (gameId: string, nodeId: string): Promise<CouncilDraft> =>
+    request(`/games/${gameId}/nodes/${nodeId}/council-draft`, CouncilDraftSchema, {
+      method: "POST",
+    }),
+
+  /** The game's court-name pool (generated once, then cached server-side). */
+  councilNames: (gameId: string): Promise<CouncilNamesResponse> =>
+    request(`/games/${gameId}/council-names`, CouncilNamesResponseSchema),
 
   deleteGame: (gameId: string): Promise<void> =>
     request(`/games/${gameId}`, null, { method: "DELETE" }),

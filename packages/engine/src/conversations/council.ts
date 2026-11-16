@@ -80,9 +80,17 @@ const capitalise = (word: string): string => word.charAt(0).toUpperCase() + word
  * The three ministers of a game. Pure: same seed and start date, same cast, forever.
  * Seed with the ROOT NODE id, never the gameId — import re-keys gameIds, and
  * an imported campaign must keep its ministers.
+ *
+ * A generated per-game name pool (3+ names) replaces the static era list;
+ * anything less keeps the deterministic floor, so a missing or degenerate
+ * pool can never cost a game its council.
  */
-export const council = (seed: string, startDate: string): CouncilMember[] => {
-  const names = COUNCIL_NAMES[councilEra(startDate)];
+export const council = (
+  seed: string,
+  startDate: string,
+  pool?: readonly string[] | null,
+): CouncilMember[] => {
+  const names = pool && pool.length >= 3 ? pool : COUNCIL_NAMES[councilEra(startDate)];
   const taken = new Set<string>();
   return COUNCIL_ROLES.map((role) => {
     // Advance on collision so two ministers never share a name; roles are

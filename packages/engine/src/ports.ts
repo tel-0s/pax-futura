@@ -22,6 +22,12 @@ export interface GameRow {
   scenarioId: string;
   playerPolity: string;
   difficulty: string;
+  /** What Advance Time does with an empty orders field. */
+  regency: "off" | "draft" | "auto";
+  /** How the council deliberates when regency drafts. */
+  councilDepth: "joint" | "chamber";
+  /** The game's generated court-name pool; null = the static era lists. */
+  councilNamePool: string[] | null;
   activeNodeId: string;
   createdAt: number;
 }

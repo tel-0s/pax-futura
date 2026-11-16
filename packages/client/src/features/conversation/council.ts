@@ -1,8 +1,11 @@
 /**
  * Client twin of the council's *naming* half — keep in sync with
  * `packages/engine/src/conversations/council.ts`. The client cannot import the
- * engine (dependency direction), and there is no endpoint that hands out
- * minister names, so the ~20 lines of seeded hashing live on both sides.
+ * engine (dependency direction), so the ~20 lines of seeded hashing live on
+ * both sides. GET /games/:g/council-names hands out the per-game generated
+ * pool; both twins take it as an optional parameter and fall back to these
+ * static era lists when it's missing, so the two sides stay name-identical
+ * whenever they see the same pool.
  *
  * The duplication is safe by construction: the client only ever chooses a
  * conversation *title*, and the engine derives the persona by parsing the role
@@ -56,8 +59,12 @@ export const councilEra = (startDate: string): CouncilEra => {
 
 const capitalise = (word: string): string => word.charAt(0).toUpperCase() + word.slice(1);
 
-export const council = (seed: string, startDate: string): CouncilMember[] => {
-  const names = COUNCIL_NAMES[councilEra(startDate)];
+export const council = (
+  seed: string,
+  startDate: string,
+  pool?: readonly string[] | null,
+): CouncilMember[] => {
+  const names = pool && pool.length >= 3 ? pool : COUNCIL_NAMES[councilEra(startDate)];
   const taken = new Set<string>();
   return COUNCIL_ROLES.map((role) => {
     let index = seededIndex(`${seed}:${role}`, names.length);

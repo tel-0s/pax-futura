@@ -26,3 +26,19 @@ describe("client council twin", () => {
     expect(isCouncilTitle("Advisor")).toBe(false);
   });
 });
+
+describe("the generated pool (twin of the engine's)", () => {
+  it("draws from the pool when it holds three or more names", () => {
+    const pool = ["Cusi", "Amaru", "Quispe", "Titu"];
+    const members = council("root-1", "1492-01-01", pool);
+    for (const member of members) expect(pool).toContain(member.name);
+    expect(new Set(members.map((member) => member.name)).size).toBe(3);
+  });
+
+  it("keeps the static floor for a short or missing pool", () => {
+    expect(council("root-1", "1492-01-01", ["One", "Two"])).toEqual(
+      council("root-1", "1492-01-01"),
+    );
+    expect(council("root-1", "1492-01-01", null)).toEqual(council("root-1", "1492-01-01"));
+  });
+});

@@ -26,14 +26,30 @@ let dataDir: string;
 let app: Hono;
 let fake: FakeLlmClient;
 let manager: GameManager;
+let nameCalls = 0;
+let namesRefuse = false;
 
 beforeEach(() => {
   dataDir = mkdtempSync(join(tmpdir(), "pax-test-"));
+  nameCalls = 0;
+  namesRefuse = false;
   let turnCalls = 0;
   fake = new FakeLlmClient((req) => {
     // Background fact extraction also hits the fake; keep it out of the
     // turn-roll numbering the assertions rely on.
     if (req.taskLabel === "extractFacts") return { structured: { facts: [] } };
+    if (req.taskLabel === "councilNames") {
+      nameCalls += 1;
+      if (namesRefuse) return { structuredError: "declined" };
+      return { structured: { names: ["Cusi", "Amaru", "Quispe"] } };
+    }
+    if (req.taskLabel === "councilDraft") {
+      return {
+        deltas: [
+          "Chancellor: Coin says no.\nMarshal: The pass says yes.\nORDERS PROPOSAL:\nTake the pass before the thaw.",
+        ],
+      };
+    }
     const roll = ++turnCalls;
     return {
       structured: {
@@ -308,5 +324,89 @@ describe("game lifecycle over HTTP", () => {
     // Checkout did not move.
     const meta = await json<{ activeNodeId: string }>(await failApp.request(`/api/games/${game.gameId}`));
     expect(meta.activeNodeId).toBe(game.activeNodeId);
+  });
+});
+
+describe("regency over HTTP", () => {
+  it("defaults off/joint, round-trips the setting, and survives a reopen", async () => {
+    const game = await createGame();
+    const before = await json<{ regency: string; councilDepth: string }>(
+      await app.request(`/api/games/${game.gameId}`),
+    );
+    expect(before.regency).toBe("off");
+    expect(before.councilDepth).toBe("joint");
+
+    const res = await app.request(`/api/games/${game.gameId}/regency`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mode: "draft", depth: "chamber" }),
+    });
+    expect(res.status).toBe(200);
+    const meta = await json<{ regency: string; councilDepth: string }>(res);
+    expect(meta.regency).toBe("draft");
+    expect(meta.councilDepth).toBe("chamber");
+
+    const again = await json<{ regency: string; councilDepth: string }>(
+      await app.request(`/api/games/${game.gameId}`),
+    );
+    expect(again.regency).toBe("draft");
+    expect(again.councilDepth).toBe("chamber");
+  });
+
+  it("rejects a junk mode", async () => {
+    const game = await createGame();
+    const res = await app.request(`/api/games/${game.gameId}/regency`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mode: "abdicate", depth: "joint" }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("council-draft returns the proposal and the stances", async () => {
+    const game = await createGame();
+    const res = await app.request(
+      `/api/games/${game.gameId}/nodes/${game.activeNodeId}/council-draft`,
+      { method: "POST" },
+    );
+    expect(res.status).toBe(200);
+    const body = await json<{ draft: string; stances: Array<{ role: string }> }>(res);
+    expect(body.draft).toBe("Take the pass before the thaw.");
+    expect(body.stances.map((stance) => stance.role)).toEqual(["chancellor", "marshal"]);
+  });
+});
+
+describe("council names over HTTP", () => {
+  it("generates once, persists, and serves the cache thereafter", async () => {
+    const game = await createGame();
+    const first = await app.request(`/api/games/${game.gameId}/council-names`);
+    expect(first.status).toBe(200);
+    const generated = await json<{ names: string[]; source: string }>(first);
+    expect(generated.source).toBe("generated");
+    expect(generated.names).toEqual(["Cusi", "Amaru", "Quispe"]);
+
+    nameCalls = 0;
+    const second = await app.request(`/api/games/${game.gameId}/council-names`);
+    const cached = await json<{ names: string[]; source: string }>(second);
+    expect(cached.source).toBe("generated");
+    expect(cached.names).toEqual(["Cusi", "Amaru", "Quispe"]);
+    expect(nameCalls).toBe(0);
+  });
+
+  it("a refused call answers with the era fallback, uncached", async () => {
+    const game = await createGame();
+    namesRefuse = true;
+    const first = await json<{ names: string[]; source: string }>(
+      await app.request(`/api/games/${game.gameId}/council-names`),
+    );
+    expect(first.source).toBe("fallback");
+    expect(first.names.length).toBeGreaterThan(0);
+
+    // The next ask tries again and succeeds — nothing was cached.
+    namesRefuse = false;
+    const second = await json<{ names: string[]; source: string }>(
+      await app.request(`/api/games/${game.gameId}/council-names`),
+    );
+    expect(second.source).toBe("generated");
   });
 });

@@ -51,9 +51,15 @@ export function ConversationsDrawer() {
   const startDate = root?.gameDate ?? "";
   const scroller = useRef<HTMLDivElement>(null);
 
+  const namePool = useConversationsStore((state) => state.namePool);
+  const loadNamePool = useConversationsStore((state) => state.loadNamePool);
+  useEffect(() => {
+    if (gameId) void loadNamePool(gameId);
+  }, [gameId, loadNamePool]);
+
   const members = useMemo(
-    () => (root ? council(root.id, startDate) : []),
-    [root, startDate],
+    () => (root ? council(root.id, startDate, namePool) : []),
+    [root, startDate, namePool],
   );
 
   const polities = world?.polities;
@@ -244,6 +250,10 @@ export function ConversationsDrawer() {
               />
             </div>
             <div className={styles.emptyActions}>{nationPicker("button")}</div>
+            <p className={styles.deskCharter}>
+              Counsel and negotiation live here; only orders move the world. Adopt a minister's
+              proposal, or write your own at the command line.
+            </p>
           </div>
         ) : null}
       </div>
