@@ -101,6 +101,42 @@ export const regenerateReply = async (
   });
 };
 
+/**
+ * The marker an advisor uses to end a reply with adoptable orders. A line of
+ * its own (case-insensitive, colon optional); everything after the LAST
+ * marker is the proposal. Prompt contract, not structured output: chat
+ * streams prose into the letter UI, and the same contract-plus-parse move
+ * the turn pipeline made before structured outputs existed.
+ */
+const PROPOSAL_MARKER = /^[ \t]*orders proposal:?[ \t]*$/im;
+
+export const splitProposedOrders = (
+  text: string,
+): { prose: string; proposedOrders?: string } => {
+  let lastIndex = -1;
+  let lastLength = 0;
+  const scanner = new RegExp(PROPOSAL_MARKER.source, "gim");
+  for (let match = scanner.exec(text); match; match = scanner.exec(text)) {
+    lastIndex = match.index;
+    lastLength = match[0].length;
+  }
+  if (lastIndex === -1) return { prose: text };
+  const proposal = text.slice(lastIndex + lastLength).trim();
+  const prose = text.slice(0, lastIndex).replace(/\s+$/, "");
+  // A dangling marker with nothing under it is contract scaffolding, not
+  // counsel: drop the marker, keep the prose, propose nothing.
+  if (!proposal) return { prose };
+  return { prose, proposedOrders: proposal };
+};
+
+/**
+ * The advisor-side half of the contract. Only advisors get it: a diplomatic
+ * counterpart proposing the player's own orders would be the two-channel
+ * confusion this feature exists to end.
+ */
+const PROPOSAL_CONTRACT =
+  "When — and only when — your counsel amounts to concrete actions the leader could order, you may end your reply with a line reading exactly ORDERS PROPOSAL: followed by those orders as you would have them given — imperative, one to three sentences, no commentary. At most one such block, always last. Most replies need none.";
+
 const generateReply = async (
   deps: ChatDeps,
   params: {
@@ -151,15 +187,21 @@ const generateReply = async (
     conversation.kind === "advisor"
       ? (parseCouncilTitle(conversation.title)?.title ?? "Advisor")
       : conversation.participants[0] ?? "Counterpart";
+  // Advisors may end with an adoptable orders block; counterparts never
+  // (their letters stay verbatim, marker and all — it isn't their channel).
+  const { prose, proposedOrders } =
+    conversation.kind === "advisor"
+      ? splitProposedOrders(result.text)
+      : { prose: result.text };
   const assistantMessage = store.insertMessage({
     id: assistantId,
     conversationId: conversation.id,
     parentMessageId: parentUserMessageId,
     role: "assistant",
     speaker,
-    content: result.text || "…",
+    content: prose || "…",
     authoredNodeId: nodeId,
-    meta: { model: result.model },
+    meta: { model: result.model, ...(proposedOrders ? { proposedOrders } : {}) },
   });
   store.setConversationHead(nodeId, conversation.id, assistantMessage.id);
   emit({ type: "message.completed", conversationId: conversation.id, messageId: assistantMessage.id });
@@ -196,9 +238,11 @@ const buildChatRequest = (params: {
     conversation.kind === "advisor"
       ? {
           cacheable: true,
-          text: minister
-            ? councilPersona(minister, playerName)
-            : `You are the chief strategic advisor to the leader of ${playerName}. Speak plainly and concretely about the situation, risks, and options. You advise; you never decide for the leader. Ground every judgement in the situation provided. Stay in character; never mention being an AI or a game.`,
+          text: `${
+            minister
+              ? councilPersona(minister, playerName)
+              : `You are the chief strategic advisor to the leader of ${playerName}. Speak plainly and concretely about the situation, risks, and options. You advise; you never decide for the leader. Ground every judgement in the situation provided. Stay in character; never mention being an AI or a game.`
+          } ${PROPOSAL_CONTRACT}`,
         }
       : {
           // Disposition moves turn to turn, so a cache breakpoint here would

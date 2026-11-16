@@ -168,3 +168,13 @@
   color: var(--pf-text-primary);
   background: var(--pf-accent-wash);
 }
+
+/* The desk's one honest sentence about what the channels are. */
+.deskCharter {
+  margin: var(--pf-space-4) 0 0;
+  max-width: 34ch;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  line-height: 1.5;
+  text-align: center;
+}
