@@ -149,6 +149,10 @@ export interface GameRow {
   councilDepth: "joint" | "chamber";
   /** The game's generated court-name pool; null = the static era lists. */
   councilNamePool: string[] | null;
+  /** The court's starting knowledge; null = knowledge never modeled. */
+  knownPolitiesSeed: string[] | null;
+  /** Whether the dispatch feed shows only the court's known world. */
+  courtKnowledge: boolean;
   activeNodeId: string;
   createdAt: number;
 }
@@ -160,7 +164,7 @@ export interface GameRow {
  */
 const parseGameSettings = (
   raw: string,
-): Pick<GameRow, "regency" | "councilDepth" | "councilNamePool"> => {
+): Pick<GameRow, "regency" | "councilDepth" | "councilNamePool" | "knownPolitiesSeed" | "courtKnowledge"> => {
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
@@ -176,7 +180,14 @@ const parseGameSettings = (
     : null;
   // Three ministers need three distinct names; anything less is the floor.
   const councilNamePool = pool && pool.length >= 3 ? pool : null;
-  return { regency, councilDepth, councilNamePool };
+  const seed = Array.isArray(settings.knownPolitiesSeed)
+    ? settings.knownPolitiesSeed.filter(
+        (code): code is string => typeof code === "string" && code.length > 0,
+      )
+    : null;
+  const knownPolitiesSeed = seed && seed.length > 0 ? seed : null;
+  const courtKnowledge = settings.courtKnowledge === true;
+  return { regency, councilDepth, councilNamePool, knownPolitiesSeed, courtKnowledge };
 };
 
 /** Merge keys into the game row's settings_json, keeping unknown neighbours. */
@@ -236,4 +247,14 @@ export const updateRegency = (
 /** Persist the generated court-name pool (a one-time billed artifact). */
 export const updateCouncilNamePool = (db: Db, names: readonly string[]): void => {
   mergeGameSettings(db, { councilNamePool: [...names] });
+};
+
+/** The court's starting knowledge, resolved from the scenario at creation. */
+export const updateKnownPolitiesSeed = (db: Db, codes: readonly string[]): void => {
+  mergeGameSettings(db, { knownPolitiesSeed: [...codes] });
+};
+
+/** Live game setting — whether the feed shows only the known world. */
+export const updateCourtKnowledge = (db: Db, enabled: boolean): void => {
+  mergeGameSettings(db, { courtKnowledge: enabled });
 };

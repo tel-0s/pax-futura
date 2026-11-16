@@ -28,6 +28,10 @@ export interface GameRow {
   councilDepth: "joint" | "chamber";
   /** The game's generated court-name pool; null = the static era lists. */
   councilNamePool: string[] | null;
+  /** The court's starting knowledge; null = knowledge never modeled. */
+  knownPolitiesSeed: string[] | null;
+  /** Whether the dispatch feed shows only the court's known world. */
+  courtKnowledge: boolean;
   activeNodeId: string;
   createdAt: number;
 }

@@ -7,6 +7,7 @@ import {
   GameEventSchema,
   CouncilDraftSchema,
   CouncilNamesResponseSchema,
+  KnownPolitiesResponseSchema,
   GameMetaSchema,
   GazetteSchema,
   LlmConfigSchema,
@@ -32,6 +33,8 @@ import {
   type GameEvent,
   type CouncilDraft,
   type CouncilNamesResponse,
+  type KnownPolitiesResponse,
+  type SetCourtKnowledgeRequest,
   type GameMeta,
   type Gazette,
   type LlmConfig,
@@ -139,6 +142,16 @@ export const api = {
   /** The game's court-name pool (generated once, then cached server-side). */
   councilNames: (gameId: string): Promise<CouncilNamesResponse> =>
     request(`/games/${gameId}/council-names`, CouncilNamesResponseSchema),
+
+  setCourtKnowledge: (gameId: string, body: SetCourtKnowledgeRequest): Promise<GameMeta> =>
+    request(`/games/${gameId}/court-knowledge`, GameMetaSchema, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  /** The court's known world as of a node; null = omniscient. */
+  knownPolities: (gameId: string, nodeId: string): Promise<KnownPolitiesResponse> =>
+    request(`/games/${gameId}/nodes/${nodeId}/known-polities`, KnownPolitiesResponseSchema),
 
   deleteGame: (gameId: string): Promise<void> =>
     request(`/games/${gameId}`, null, { method: "DELETE" }),

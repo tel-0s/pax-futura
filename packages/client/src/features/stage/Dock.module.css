@@ -516,3 +516,20 @@
   color: var(--pf-text-muted);
   font-size: var(--pf-font-xs);
 }
+
+/* An event from beyond the known world: the court hears only a rumor. */
+.cardRumor {
+  opacity: 0.65;
+  font-style: italic;
+}
+
+.cardRumorTag {
+  padding: 0 var(--pf-space-1);
+  border: 1px dashed var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}

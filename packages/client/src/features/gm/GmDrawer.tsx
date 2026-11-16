@@ -4,6 +4,7 @@ import {
   Check,
   CircleAlert,
   GitBranch,
+  EyeOff,
   Landmark,
   LoaderCircle,
   MapPin,
@@ -166,6 +167,7 @@ export function GmDrawer() {
         <div className={styles.panel} hidden={tab !== "rules"}>
           <DifficultySection gameId={gameId} />
           <RegencySection gameId={gameId} />
+          <CourtKnowledgeSection gameId={gameId} />
         </div>
         <div className={styles.panel} hidden={tab !== "raw"}>
           <GmRawSection submit={submit} busy={busy} />
@@ -276,6 +278,67 @@ function DifficultySection({ gameId }: { gameId: string }) {
           {busy ? "Saving…" : "Apply strictness"}
         </Button>
       </div>
+    </GmSection>
+  );
+}
+
+/**
+ * The court's-knowledge feed mode: a sibling toggle to simulation
+ * strictness. The chronicle always keeps everything; this governs only
+ * what the dispatch feed shows. Scenarios that curate no starting
+ * knowledge stay omniscient whatever this says, and the toggle says so.
+ */
+function CourtKnowledgeSection({ gameId }: { gameId: string }) {
+  const meta = useSessionStore((state) => state.meta);
+  const enabled = meta?.courtKnowledge ?? false;
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const flip = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      const updated = await api.setCourtKnowledge(gameId, { enabled: !enabled });
+      useSessionStore.getState().setMeta(updated);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <GmSection
+      icon={EyeOff}
+      title="Court's knowledge"
+      hint="The dispatch feed shows the court's world, not the chronicler's. Unknown powers reach you as rumors at most; the chronicle still keeps everything."
+    >
+      <div className={styles.choices} role="radiogroup" aria-label="Court's knowledge">
+        <button
+          role="radio"
+          aria-checked={!enabled}
+          className={`${styles.choice} ${!enabled ? styles.choiceOn : ""}`}
+          onClick={() => (enabled ? void flip() : undefined)}
+        >
+          Chronicler's feed
+        </button>
+        <button
+          role="radio"
+          aria-checked={enabled}
+          className={`${styles.choice} ${enabled ? styles.choiceOn : ""}`}
+          onClick={() => (enabled ? undefined : void flip())}
+        >
+          Court's feed
+        </button>
+      </div>
+      <p className={styles.hint}>
+        Takes effect immediately, feed-only. A scenario that curates no starting knowledge stays
+        all-seeing either way (this game's seed comes from the scenario; the 1492 scenario curates
+        all eight courts).
+      </p>
+      {error ? <p className={styles.error}>{error}</p> : null}
+      {busy ? <p className={styles.hint}>Saving…</p> : null}
     </GmSection>
   );
 }

@@ -20,6 +20,8 @@ import { formatDayMonth, formatGameDate } from "../../lib/dates.ts";
 import { useEventCardsStore } from "../../stores/eventCards.ts";
 import { useLoomStore, type TurnProgress } from "../../stores/loom.ts";
 import { useOrdersStore } from "../../stores/orders.ts";
+import { useSessionStore } from "../../stores/session.ts";
+import { useKnowledgeStore, feedVisibility } from "../../stores/knowledge.ts";
 import { useUiStore } from "../../stores/ui.ts";
 import { useWorldStore } from "../../stores/world.ts";
 import { LoomStrip } from "../loom/LoomStrip.tsx";
@@ -145,6 +147,14 @@ function Dispatches({ gameId, nodeId }: { gameId: string; nodeId: string }) {
   const activeIndex = useEventCardsStore((state) => (state.open ? state.index : -1));
   const activeNode = useEventCardsStore((state) => state.nodeId);
   const scroller = useRef<HTMLDivElement>(null);
+  // The court's-knowledge feed filter: the chronicle keeps everything; the
+  // ticker shows the court's world. Fail-open — a null set is omniscient.
+  const courtKnowledge = useSessionStore((state) => state.meta?.courtKnowledge ?? false);
+  const known = useKnowledgeStore((state) => state.known);
+  const factsVersion = useLoomStore((state) => state.factsVersion);
+  useEffect(() => {
+    if (courtKnowledge) void useKnowledgeStore.getState().load(gameId, nodeId);
+  }, [courtKnowledge, gameId, nodeId, factsVersion]);
 
   useEffect(() => {
     let cancelled = false;
@@ -175,36 +185,42 @@ function Dispatches({ gameId, nodeId }: { gameId: string; nodeId: string }) {
     }
   }, []);
 
-  if (events.length === 0) return null;
-  const pivotal = events.filter((event) => event.importance !== "minor").length;
+  const feed = events
+    .map((event) => ({ event, visibility: feedVisibility(event, known, courtKnowledge) }))
+    .filter((entry) => entry.visibility !== "hidden");
+  if (feed.length === 0) return null;
+  const feedEvents = feed.map((entry) => entry.event);
+  const pivotal = feed.filter((entry) => entry.event.importance !== "minor").length;
 
   return (
     <section className={styles.dispatches}>
       <button className={styles.dispatchHeader} onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className="pfKicker">Dispatches</span>
-        <span className={styles.dispatchCount}>{events.length}</span>
+        <span className={styles.dispatchCount}>{feed.length}</span>
         {pivotal > 0 ? <span className={styles.dispatchMajor}>{pivotal} major</span> : null}
         <span className={styles.dispatchToggle}>{open ? <ChevronDown size={14} /> : <ChevronUp size={14} />}</span>
       </button>
       {open ? (
         <div ref={scroller} className={styles.ticker} onWheel={onWheel}>
-          {events.map((event, index) => (
+          {feed.map(({ event, visibility }, index) => (
             <button
               key={event.id}
               className={[
                 styles.card,
                 styles[event.importance],
                 event.playerRelated ? styles.mine : "",
+                visibility === "rumor" ? styles.cardRumor : "",
                 activeNode === nodeId && activeIndex === index ? styles.cardActive : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
-              onClick={() => useEventCardsStore.getState().show(events, index)}
+              onClick={() => useEventCardsStore.getState().show(feedEvents, index)}
               title={event.description || event.title}
             >
               <span className={styles.cardMeta}>
                 <span className={styles.cardDot} />
                 {formatDayMonth(event.date)}
+                {visibility === "rumor" ? <span className={styles.cardRumorTag}>rumor</span> : null}
                 {event.playerRelated ? <span className={styles.cardYou}>you</span> : null}
                 {event.lng !== undefined ? <span className={styles.cardPin}>⌖</span> : null}
               </span>

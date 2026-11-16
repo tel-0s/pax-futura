@@ -177,6 +177,17 @@ export const SetRegencyRequestSchema = z.object({
 });
 export type SetRegencyRequest = z.infer<typeof SetRegencyRequestSchema>;
 
+export const SetCourtKnowledgeRequestSchema = z.object({
+  enabled: z.boolean(),
+});
+export type SetCourtKnowledgeRequest = z.infer<typeof SetCourtKnowledgeRequestSchema>;
+
+/** The court's known world as of a node; null = knowledge never modeled. */
+export const KnownPolitiesResponseSchema = z.object({
+  known: z.array(z.string()).nullable(),
+});
+export type KnownPolitiesResponse = z.infer<typeof KnownPolitiesResponseSchema>;
+
 /** One minister's position in a council session, for the pause UI. */
 export const CouncilStanceSchema = z.object({
   role: z.string(),
@@ -214,6 +225,8 @@ export const GameMetaSchema = z.object({
   difficulty: z.string(),
   regency: RegencyModeSchema.default("off"),
   councilDepth: CouncilDepthSchema.default("joint"),
+  /** Whether the dispatch feed shows only the court's known world. */
+  courtKnowledge: z.boolean().default(false),
   activeNodeId: z.string(),
   createdAt: z.number().int(),
 });

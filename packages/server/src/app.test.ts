@@ -13,6 +13,8 @@ const scenario = ScenarioSchema.parse({
   id: "test",
   name: "Test",
   startDate: "1936-01-01",
+  // FRA's court starts knowing only itself; GER is uncurated (omniscient).
+  knownPolities: { FRA: ["FRA"] },
   world: {
     regionOwnership: { r1: "FRA", r2: "GER" },
     polities: {
@@ -38,6 +40,10 @@ beforeEach(() => {
     // Background fact extraction also hits the fake; keep it out of the
     // turn-roll numbering the assertions rely on.
     if (req.taskLabel === "extractFacts") return { structured: { facts: [] } };
+    // The player-related test event wakes passes that must not disturb the
+    // turn-roll numbering: psyches fail to parent-passthrough by design, and
+    // an idle-diplomacy overture is plain chat text.
+    if (req.taskLabel === "updatePsyches") return { structuredError: "skip" };
     if (req.taskLabel === "councilNames") {
       nameCalls += 1;
       if (namesRefuse) return { structuredError: "declined" };
@@ -50,6 +56,7 @@ beforeEach(() => {
         ],
       };
     }
+    if (!req.tool) return { deltas: ["(an overture)"] };
     const roll = ++turnCalls;
     return {
       structured: {
@@ -62,7 +69,8 @@ beforeEach(() => {
             // Kept short: under the reconcile pass's 60-char narration
             // threshold, so the cartographer never joins the roll numbering.
             description: "It happened.",
-            impacts: { regionTransfers: [{ regionId: "r2", toCode: "FRA" }] },
+            playerRelated: true,
+            impacts: { regionTransfers: [{ regionId: "r2", fromCode: "GER", toCode: "FRA" }] },
           },
         ],
       },
@@ -408,5 +416,55 @@ describe("council names over HTTP", () => {
       await app.request(`/api/games/${game.gameId}/council-names`),
     );
     expect(second.source).toBe("generated");
+  });
+});
+
+describe("court's knowledge over HTTP", () => {
+  it("seeds from the scenario, serves the seed pre-extraction, and grows by contact", async () => {
+    const game = await createGame();
+    // Pre-extraction: the root has no rollup, so the seed answers.
+    const seeded = await json<{ known: string[] | null }>(
+      await app.request(`/api/games/${game.gameId}/nodes/${game.activeNodeId}/known-polities`),
+    );
+    expect(seeded.known).toEqual(["FRA"]);
+
+    // A turn whose player-related event names GER is first contact. The
+    // fake's turn roll transfers r2 to FRA (player-related by derivation).
+    const child = await executeTurn(game.gameId, game.activeNodeId);
+    await manager.get(game.gameId).extractionQueue;
+    const grown = await json<{ known: string[] | null }>(
+      await app.request(`/api/games/${game.gameId}/nodes/${child.id}/known-polities`),
+    );
+    expect(grown.known).toContain("FRA");
+    expect(grown.known).toContain("GER");
+  });
+
+  it("an uncurated polity reads null — omniscient — at every depth", async () => {
+    const res = await app.request("/api/games", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ scenarioId: "test", title: "It", playerPolity: "GER" }),
+    });
+    const game = await json<{ gameId: string; activeNodeId: string }>(res);
+    const body = await json<{ known: string[] | null }>(
+      await app.request(`/api/games/${game.gameId}/nodes/${game.activeNodeId}/known-polities`),
+    );
+    expect(body.known).toBeNull();
+  });
+
+  it("the court-knowledge toggle round-trips on the meta", async () => {
+    const game = await createGame();
+    const put = await app.request(`/api/games/${game.gameId}/court-knowledge`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ enabled: true }),
+    });
+    expect(put.status).toBe(200);
+    const meta = await json<{ courtKnowledge: boolean }>(put);
+    expect(meta.courtKnowledge).toBe(true);
+    const again = await json<{ courtKnowledge: boolean }>(
+      await app.request(`/api/games/${game.gameId}`),
+    );
+    expect(again.courtKnowledge).toBe(true);
   });
 });

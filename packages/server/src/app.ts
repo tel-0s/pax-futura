@@ -11,6 +11,7 @@ import {
   SetActiveNodeRequestSchema,
   SetAnchorRequestSchema,
   SetDifficultyRequestSchema,
+  SetCourtKnowledgeRequestSchema,
   SetRegencyRequestSchema,
   SetHeadRequestSchema,
 } from "@pax/domain";
@@ -90,6 +91,35 @@ export const createApp = (manager: GameManager): Hono => {
   app.put("/api/games/:g/regency", zValidator("json", SetRegencyRequestSchema), (c) => {
     const meta = manager.setRegency(c.req.param("g"), c.req.valid("json"));
     return c.json(meta);
+  });
+
+  app.put(
+    "/api/games/:g/court-knowledge",
+    zValidator("json", SetCourtKnowledgeRequestSchema),
+    (c) => {
+      const meta = manager.setCourtKnowledge(c.req.param("g"), c.req.valid("json").enabled);
+      return c.json(meta);
+    },
+  );
+
+  /**
+   * The court's known world as of a node: the NEAREST ancestor rollup's set
+   * (the psyche endpoint's walk), the game's seed before any extraction has
+   * run, or null when knowledge was never modeled — which clients must read
+   * as omniscient, today's behavior.
+   */
+  app.get("/api/games/:g/nodes/:n/known-polities", (c) => {
+    const game = manager.get(c.req.param("g"));
+    let nodeId: string | null = c.req.param("n");
+    if (!game.port.getNodeMeta(nodeId)) return c.json({ error: "Unknown node" }, 404);
+    while (nodeId) {
+      const rollup = game.port.getRollup(nodeId);
+      if (rollup) return c.json({ known: rollup.knownPolities });
+      nodeId = game.port.getNodeMeta(nodeId)?.parentId ?? null;
+    }
+    const row = game.port.getGame();
+    const seed = row.knownPolitiesSeed;
+    return c.json({ known: seed ? [...new Set([row.playerPolity, ...seed])].sort() : null });
   });
 
   // The court's names: a one-time billed artifact, generated on first ask and

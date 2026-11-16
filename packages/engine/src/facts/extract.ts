@@ -2,6 +2,8 @@ import {
   DERIVED_FACT_TYPES,
   FactBatchSchema,
   emptyRollup,
+  eventPolities,
+  growKnownPolities,
   newId,
   toLlmToolSchema,
   type Fact,
@@ -124,13 +126,32 @@ Grade every fact you emit.`,
       events,
     });
 
+    // The court's knowledge grows deterministically: player-related events'
+    // impact codes, open diplomacy channels, and any court with a psyche
+    // (it acted toward us). Null seed and null parent = never modeled.
+    const game = store.getGame();
+    const contacts = [
+      ...events.filter((event) => event.playerRelated).flatMap((event) => eventPolities(event.impacts)),
+      ...store
+        .conversationsAtNode(nodeId)
+        .filter((conversation) => conversation.kind === "diplomacy")
+        .flatMap((conversation) => conversation.participants),
+      ...Object.keys(psyches),
+    ];
+    const knownPolities = growKnownPolities({
+      parent: parentRollup.knownPolities,
+      seed: game.knownPolitiesSeed,
+      playerCode: game.playerPolity,
+      contacts,
+    });
+
     store.transaction(() => {
       // Derived facts are stored ungraded on purpose: an absent grade reads as
       // "confirmed", and what the engine computed from applied impacts is the
       // one thing the player's court cannot be wrong about.
       store.insertFacts(nodeId, derived, "derived");
       if (extracted.length > 0) store.insertFacts(nodeId, extracted, "extracted", derived.length);
-      store.setRollup(nodeId, { ...foldRollup(parentRollup, facts, node.depth), psyches });
+      store.setRollup(nodeId, { ...foldRollup(parentRollup, facts, node.depth), psyches, knownPolities });
       store.setExtractionStatus(nodeId, "done");
     });
     emit({ type: "facts.updated", nodeId });
