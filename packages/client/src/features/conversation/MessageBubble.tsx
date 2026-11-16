@@ -1,8 +1,9 @@
-import { memo } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
-import { PencilLine, RefreshCw } from "lucide-react";
+import { Check, ListPlus, PencilLine, RefreshCw } from "lucide-react";
 import type { Message } from "@pax/domain";
 import { Button } from "../../components/Button.tsx";
+import { useOrdersStore } from "../../stores/orders.ts";
 import type { Correspondent } from "./correspondents.ts";
 import { LetterHead, letterTint, SiblingNav, ToolButton } from "./LetterParts.tsx";
 import styles from "./Letters.module.css";
@@ -62,6 +63,10 @@ function MessageBubbleImpl({
 
   if (message.role !== "user") {
     const tint = letterTint(who);
+    const proposedOrders =
+      typeof message.meta.proposedOrders === "string" && message.meta.proposedOrders.trim()
+        ? message.meta.proposedOrders
+        : null;
     return (
       <article className={`${styles.letter} ${tint.className} pfChamfer`} style={tint.style}>
         <LetterHead who={who}>
@@ -75,6 +80,7 @@ function MessageBubbleImpl({
         <div className={styles.body}>
           <Markdown>{message.content}</Markdown>
         </div>
+        {proposedOrders ? <ProposalSlip text={proposedOrders} /> : null}
       </article>
     );
   }
@@ -123,6 +129,48 @@ function MessageBubbleImpl({
       ) : null}
       <div className={`${styles.note} pfChamfer`}>{message.content}</div>
       {siblings ? <div className={styles.noteMeta}>{siblings}</div> : null}
+    </div>
+  );
+}
+
+/**
+ * An advisor's adoptable orders, pinned under the letter. Adoption only
+ * APPENDS to the command line's draft — the player still edits and submits;
+ * the council's arbitration design stays intact, made mechanical.
+ */
+function ProposalSlip({ text }: { text: string }) {
+  const [adopted, setAdopted] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+  const adopt = () => {
+    useOrdersStore.getState().appendToDraft(text);
+    setAdopted(true);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setAdopted(false), 2500);
+  };
+  return (
+    <div className={styles.proposal}>
+      <span className={`${styles.proposalLabel} pfKicker`}>Proposed orders</span>
+      <p className={styles.proposalText}>{text}</p>
+      <div className={styles.proposalActions}>
+        <span className={styles.proposalHint}>Lands in your draft — edit before you queue it.</span>
+        <Button variant="ghost" size="sm" onClick={adopt} title="Append to the orders draft">
+          {adopted ? (
+            <>
+              <Check size={13} /> In your draft
+            </>
+          ) : (
+            <>
+              <ListPlus size={13} /> Adopt into orders
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

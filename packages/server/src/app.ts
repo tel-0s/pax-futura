@@ -11,6 +11,7 @@ import {
   SetActiveNodeRequestSchema,
   SetAnchorRequestSchema,
   SetDifficultyRequestSchema,
+  SetRegencyRequestSchema,
   SetHeadRequestSchema,
 } from "@pax/domain";
 import {
@@ -27,6 +28,7 @@ import {
   getOrBuildStatSheet,
   openConversation,
   regenerateReply,
+  draftCouncilOrders,
   sendChatMessage,
 } from "@pax/engine";
 import { GameManager, GameNotFoundError, TurnInProgressError } from "./gameManager.ts";
@@ -78,6 +80,11 @@ export const createApp = (manager: GameManager): Hono => {
 
   app.put("/api/games/:g/difficulty", zValidator("json", SetDifficultyRequestSchema), (c) => {
     const meta = manager.setDifficulty(c.req.param("g"), c.req.valid("json").difficulty);
+    return c.json(meta);
+  });
+
+  app.put("/api/games/:g/regency", zValidator("json", SetRegencyRequestSchema), (c) => {
+    const meta = manager.setRegency(c.req.param("g"), c.req.valid("json"));
     return c.json(meta);
   });
 
@@ -360,6 +367,19 @@ export const createApp = (manager: GameManager): Hono => {
       return c.json(result, 201);
     },
   );
+
+  // The regency draft: the council proposes orders for an empty field. The
+  // caller (client or a future auto path) decides what becomes of the draft;
+  // nothing is persisted here — a draft is not an act.
+  app.post("/api/games/:g/nodes/:n/council-draft", async (c) => {
+    const game = manager.get(c.req.param("g"));
+    const depth = game.port.getGame().councilDepth;
+    const result = await draftCouncilOrders(manager.chatDeps(game), {
+      nodeId: c.req.param("n"),
+      depth,
+    });
+    return c.json(result);
+  });
 
   app.post("/api/games/:g/nodes/:n/conversations/:c/messages/:m/regenerate", async (c) => {
     const game = manager.get(c.req.param("g"));

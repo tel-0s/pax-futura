@@ -244,6 +244,10 @@ export function ConversationsDrawer() {
               />
             </div>
             <div className={styles.emptyActions}>{nationPicker("button")}</div>
+            <p className={styles.deskCharter}>
+              Counsel and negotiation live here; only orders move the world. Adopt a minister's
+              proposal, or write your own at the command line.
+            </p>
           </div>
         ) : null}
       </div>

@@ -149,12 +149,58 @@ export const SetDifficultyRequestSchema = z.object({
 });
 export type SetDifficultyRequest = z.infer<typeof SetDifficultyRequestSchema>;
 
+/**
+ * Regency: what Advance Time does with an empty orders field.
+ * - off:   the world's own momentum (today's behavior).
+ * - draft: the council drafts orders and the turn pauses for the player to
+ *          approve or edit — the 4X heartbeat: it tells you what wants deciding.
+ * - auto:  the council's draft is adopted unseen; the player reads the gazette.
+ */
+export const RegencyModeSchema = z.enum(["off", "draft", "auto"]);
+export type RegencyMode = z.infer<typeof RegencyModeSchema>;
+
+/**
+ * How the council deliberates when regency drafts.
+ * - joint:   one sitting — a single call returns each minister's stance and
+ *            the agreed draft. Cheap, one model call.
+ * - chamber: each minister argues in their own persona, in sequence, with the
+ *            session so far in view — they can genuinely fight — then the
+ *            session is synthesized into one draft. One call per minister
+ *            plus the synthesis.
+ */
+export const CouncilDepthSchema = z.enum(["joint", "chamber"]);
+export type CouncilDepth = z.infer<typeof CouncilDepthSchema>;
+
+export const SetRegencyRequestSchema = z.object({
+  mode: RegencyModeSchema,
+  depth: CouncilDepthSchema,
+});
+export type SetRegencyRequest = z.infer<typeof SetRegencyRequestSchema>;
+
+/** One minister's position in a council session, for the pause UI. */
+export const CouncilStanceSchema = z.object({
+  role: z.string(),
+  title: z.string(),
+  position: z.string(),
+});
+export type CouncilStance = z.infer<typeof CouncilStanceSchema>;
+
+export const CouncilDraftSchema = z.object({
+  /** The proposed orders, ready for the command line's draft. */
+  draft: z.string().min(1),
+  /** The ministers' positions, in speaking order. */
+  stances: z.array(CouncilStanceSchema).default([]),
+});
+export type CouncilDraft = z.infer<typeof CouncilDraftSchema>;
+
 export const GameMetaSchema = z.object({
   gameId: z.string().min(1),
   title: z.string(),
   scenarioId: z.string(),
   playerPolity: z.string(),
   difficulty: z.string(),
+  regency: RegencyModeSchema.default("off"),
+  councilDepth: CouncilDepthSchema.default("joint"),
   activeNodeId: z.string(),
   createdAt: z.number().int(),
 });

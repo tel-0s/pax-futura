@@ -22,6 +22,10 @@ export interface GameRow {
   scenarioId: string;
   playerPolity: string;
   difficulty: string;
+  /** What Advance Time does with an empty orders field. */
+  regency: "off" | "draft" | "auto";
+  /** How the council deliberates when regency drafts. */
+  councilDepth: "joint" | "chamber";
   activeNodeId: string;
   createdAt: number;
 }
