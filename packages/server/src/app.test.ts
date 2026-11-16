@@ -34,6 +34,13 @@ beforeEach(() => {
     // Background fact extraction also hits the fake; keep it out of the
     // turn-roll numbering the assertions rely on.
     if (req.taskLabel === "extractFacts") return { structured: { facts: [] } };
+    if (req.taskLabel === "councilDraft") {
+      return {
+        deltas: [
+          "Chancellor: Coin says no.\nMarshal: The pass says yes.\nORDERS PROPOSAL:\nTake the pass before the thaw.",
+        ],
+      };
+    }
     const roll = ++turnCalls;
     return {
       structured: {
@@ -308,5 +315,54 @@ describe("game lifecycle over HTTP", () => {
     // Checkout did not move.
     const meta = await json<{ activeNodeId: string }>(await failApp.request(`/api/games/${game.gameId}`));
     expect(meta.activeNodeId).toBe(game.activeNodeId);
+  });
+});
+
+describe("regency over HTTP", () => {
+  it("defaults off/joint, round-trips the setting, and survives a reopen", async () => {
+    const game = await createGame();
+    const before = await json<{ regency: string; councilDepth: string }>(
+      await app.request(`/api/games/${game.gameId}`),
+    );
+    expect(before.regency).toBe("off");
+    expect(before.councilDepth).toBe("joint");
+
+    const res = await app.request(`/api/games/${game.gameId}/regency`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mode: "draft", depth: "chamber" }),
+    });
+    expect(res.status).toBe(200);
+    const meta = await json<{ regency: string; councilDepth: string }>(res);
+    expect(meta.regency).toBe("draft");
+    expect(meta.councilDepth).toBe("chamber");
+
+    const again = await json<{ regency: string; councilDepth: string }>(
+      await app.request(`/api/games/${game.gameId}`),
+    );
+    expect(again.regency).toBe("draft");
+    expect(again.councilDepth).toBe("chamber");
+  });
+
+  it("rejects a junk mode", async () => {
+    const game = await createGame();
+    const res = await app.request(`/api/games/${game.gameId}/regency`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mode: "abdicate", depth: "joint" }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("council-draft returns the proposal and the stances", async () => {
+    const game = await createGame();
+    const res = await app.request(
+      `/api/games/${game.gameId}/nodes/${game.activeNodeId}/council-draft`,
+      { method: "POST" },
+    );
+    expect(res.status).toBe(200);
+    const body = await json<{ draft: string; stances: Array<{ role: string }> }>(res);
+    expect(body.draft).toBe("Take the pass before the thaw.");
+    expect(body.stances.map((stance) => stance.role)).toEqual(["chancellor", "marshal"]);
   });
 });

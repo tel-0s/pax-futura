@@ -12,6 +12,7 @@ export * from "./prompts/modules.ts";
 export * from "./prompts/assemble.ts";
 export * from "./turn/validate.ts";
 export * from "./conversations/chat.ts";
+export * from "./conversations/regency.ts";
 export * from "./facts/derive.ts";
 export * from "./facts/rollup.ts";
 export * from "./facts/digest.ts";

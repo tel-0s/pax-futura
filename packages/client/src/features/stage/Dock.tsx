@@ -7,6 +7,7 @@ import {
   Eye,
   FastForward,
   Ghost,
+  Landmark,
   ListTodo,
   Send,
   Square,
@@ -66,6 +67,7 @@ export function Dock({
       {ghost ? (
         <GhostBar gameId={gameId} ghost={ghost} liveNodeId={nodeId} onDecided={onGhostDecided} />
       ) : null}
+      {nodeId ? <CouncilBar gameId={gameId} parentId={nodeId} /> : null}
       <CommandLine
         gameId={gameId}
         parentId={nodeId}
@@ -73,6 +75,64 @@ export function Dock({
         blocked={Boolean(ghost)}
         onAdvance={onAdvance}
       />
+    </div>
+  );
+}
+
+/**
+ * The regency pause: the council has drafted into the command line and the
+ * turn waits. Approve queues the CURRENT draft (edits included) and advances;
+ * dismiss keeps the draft for hand-editing. The stances are the session's
+ * record — in chamber mode, the fight itself.
+ */
+function CouncilBar({ gameId, parentId }: { gameId: string; parentId: string }) {
+  const council = useOrdersStore((state) => state.council);
+  const draft = useOrdersStore((state) => state.draft);
+  if (!council) return null;
+  return (
+    <div className={styles.council}>
+      <span className={`${styles.councilKicker} pfKicker`}>
+        <Landmark size={12} />
+        {council.status === "drafting"
+          ? "The council sits…"
+          : council.status === "failed"
+            ? "The council adjourned"
+            : "The council proposes"}
+      </span>
+      {council.status === "proposed" ? (
+        <>
+          {council.stances.length > 0 ? (
+            <ul className={styles.councilStances}>
+              {council.stances.map((stance) => (
+                <li key={stance.role}>
+                  <strong>{stance.title}:</strong> {stance.position}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <div className={styles.councilActions}>
+            <span className={styles.councilHint}>The draft is in your command line — edit it, or send it as it stands.</span>
+            <Button variant="ghost" size="sm" onClick={() => useOrdersStore.getState().dismissCouncil()}>
+              I'll word it myself
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              disabled={!draft.trim()}
+              onClick={() => void useOrdersStore.getState().approveCouncil(gameId, parentId)}
+            >
+              <FastForward size={13} /> Approve &amp; advance
+            </Button>
+          </div>
+        </>
+      ) : council.status === "failed" ? (
+        <div className={styles.councilActions}>
+          <span className={styles.councilHint}>{council.error}</span>
+          <Button variant="ghost" size="sm" onClick={() => useOrdersStore.getState().dismissCouncil()}>
+            Dismiss
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

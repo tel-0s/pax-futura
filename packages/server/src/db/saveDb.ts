@@ -143,20 +143,45 @@ export interface GameRow {
   scenarioId: string;
   playerPolity: string;
   difficulty: string;
+  /** What Advance Time does with an empty orders field. */
+  regency: "off" | "draft" | "auto";
+  /** How the council deliberates when regency drafts. */
+  councilDepth: "joint" | "chamber";
   activeNodeId: string;
   createdAt: number;
 }
+
+/**
+ * Regency lives in the game row's settings_json (a day-one column nobody had
+ * used yet): no migration, and any save that predates the feature — or holds
+ * junk — reads as today's behavior.
+ */
+const parseGameSettings = (raw: string): Pick<GameRow, "regency" | "councilDepth"> => {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    parsed = {};
+  }
+  const settings = (parsed ?? {}) as Record<string, unknown>;
+  const regency =
+    settings.regency === "draft" || settings.regency === "auto" ? settings.regency : "off";
+  const councilDepth = settings.councilDepth === "chamber" ? "chamber" : "joint";
+  return { regency, councilDepth };
+};
 
 export const getGame = (db: Db): GameRow => {
   const row = db
     .prepare(
       `SELECT game_id AS gameId, title, scenario_id AS scenarioId, player_polity AS playerPolity,
-              difficulty, active_node_id AS activeNodeId, created_at AS createdAt
+              difficulty, active_node_id AS activeNodeId, created_at AS createdAt,
+              settings_json AS settingsJson
        FROM game WHERE id = 'game'`,
     )
-    .get() as GameRow | undefined;
+    .get() as (Omit<GameRow, "regency" | "councilDepth"> & { settingsJson: string }) | undefined;
   if (!row) throw new Error("Corrupt save: missing game row");
-  return row;
+  const { settingsJson, ...game } = row;
+  return { ...game, ...parseGameSettings(settingsJson) };
 };
 
 export const setActiveNode = (db: Db, nodeId: string): void => {
@@ -170,6 +195,31 @@ export const setActiveNode = (db: Db, nodeId: string): void => {
 export const updateDifficulty = (db: Db, difficulty: string): void => {
   db.prepare("UPDATE game SET difficulty = ?, updated_at = ? WHERE id = 'game'").run(
     difficulty,
+    Date.now(),
+  );
+};
+
+/** Live game setting — regency, merged into settings_json beside future keys. */
+export const updateRegency = (
+  db: Db,
+  settings: { regency: GameRow["regency"]; councilDepth: GameRow["councilDepth"] },
+): void => {
+  const row = db.prepare("SELECT settings_json AS raw FROM game WHERE id = 'game'").get() as
+    | { raw: string }
+    | undefined;
+  let existing: Record<string, unknown>;
+  try {
+    existing = (JSON.parse(row?.raw ?? "{}") ?? {}) as Record<string, unknown>;
+  } catch {
+    existing = {};
+  }
+  const merged = JSON.stringify({
+    ...existing,
+    regency: settings.regency,
+    councilDepth: settings.councilDepth,
+  });
+  db.prepare("UPDATE game SET settings_json = ?, updated_at = ? WHERE id = 'game'").run(
+    merged,
     Date.now(),
   );
 };

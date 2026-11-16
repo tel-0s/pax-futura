@@ -5,6 +5,7 @@ import {
   ConversationTreeSchema,
   DivergenceReportSchema,
   GameEventSchema,
+  CouncilDraftSchema,
   GameMetaSchema,
   GazetteSchema,
   LlmConfigSchema,
@@ -28,6 +29,7 @@ import {
   type GmEditRequest,
   type DivergenceReport,
   type GameEvent,
+  type CouncilDraft,
   type GameMeta,
   type Gazette,
   type LlmConfig,
@@ -35,6 +37,7 @@ import {
   type Message,
   type NodeDetail,
   type PsycheSheet,
+  type SetRegencyRequest,
   type ReassessProposal,
   type NodeFingerprint,
   type SavedPolity,
@@ -117,6 +120,18 @@ export const api = {
     request(`/games/${gameId}/difficulty`, GameMetaSchema, {
       method: "PUT",
       body: JSON.stringify(body),
+    }),
+
+  setRegency: (gameId: string, body: SetRegencyRequest): Promise<GameMeta> =>
+    request(`/games/${gameId}/regency`, GameMetaSchema, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  /** The council drafts orders for an empty field; nothing is persisted. */
+  councilDraft: (gameId: string, nodeId: string): Promise<CouncilDraft> =>
+    request(`/games/${gameId}/nodes/${nodeId}/council-draft`, CouncilDraftSchema, {
+      method: "POST",
     }),
 
   deleteGame: (gameId: string): Promise<void> =>

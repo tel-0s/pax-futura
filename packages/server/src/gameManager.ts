@@ -9,6 +9,7 @@ import {
   type GameMeta,
   type GmEditInput,
   type Scenario,
+  type SetRegencyRequest,
   type TurnInput,
   type WorldState,
 } from "@pax/domain";
@@ -25,7 +26,7 @@ import {
   type SavePort,
 } from "@pax/engine";
 import type { Db } from "./db/openDb.ts";
-import { backupSave, createSaveDb, deleteSaveBackups, openSaveDb, updateDifficulty } from "./db/saveDb.ts";
+import { backupSave, createSaveDb, deleteSaveBackups, openSaveDb, updateDifficulty, updateRegency } from "./db/saveDb.ts";
 import { getRegistryEntry, listGames, registerGame, touchGame, unregisterGame } from "./db/appDb.ts";
 import { makeSavePort } from "./savePort.ts";
 import { SseHub } from "./sse/hub.ts";
@@ -176,6 +177,8 @@ export class GameManager {
       scenarioId: row.scenarioId,
       playerPolity: row.playerPolity,
       difficulty: row.difficulty,
+      regency: row.regency,
+      councilDepth: row.councilDepth,
       activeNodeId: row.activeNodeId,
       createdAt: row.createdAt,
     };
@@ -185,6 +188,13 @@ export class GameManager {
   setDifficulty(gameId: string, difficulty: string): GameMeta {
     const game = this.get(gameId);
     updateDifficulty(game.db, difficulty);
+    return this.gameMeta(gameId);
+  }
+
+  /** Live-swap the regency setting; returns the refreshed meta. */
+  setRegency(gameId: string, settings: SetRegencyRequest): GameMeta {
+    const game = this.get(gameId);
+    updateRegency(game.db, { regency: settings.mode, councilDepth: settings.depth });
     return this.gameMeta(gameId);
   }
 
