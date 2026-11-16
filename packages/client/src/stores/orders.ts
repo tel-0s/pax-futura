@@ -5,6 +5,15 @@ import { api } from "../lib/api.ts";
 interface OrdersState {
   /** Pending orders queued on the current node, consumed by the next turn. */
   orders: Action[];
+  /**
+   * The command line's unsent text. Lives here (not in the Dock) so an
+   * advisor's adopted proposal can land in it from the correspondence
+   * drawer — adoption drafts; only the player submits.
+   */
+  draft: string;
+  setDraft: (text: string) => void;
+  /** Append a block to the draft, separated by a blank line when non-empty. */
+  appendToDraft: (text: string) => void;
   load: (gameId: string, nodeId: string) => Promise<void>;
   submit: (gameId: string, nodeId: string, text: string) => Promise<void>;
   remove: (gameId: string, nodeId: string, actionId: string) => Promise<void>;
@@ -14,6 +23,12 @@ interface OrdersState {
 
 export const useOrdersStore = create<OrdersState>((set, get) => ({
   orders: [],
+  draft: "",
+  setDraft: (text) => set({ draft: text }),
+  appendToDraft: (text) => {
+    const current = get().draft.replace(/\s+$/, "");
+    set({ draft: current ? `${current}\n\n${text}` : text });
+  },
 
   load: async (gameId, nodeId) => {
     const res = await fetch(`/api/games/${gameId}/nodes/${nodeId}/actions`);

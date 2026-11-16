@@ -179,7 +179,10 @@ function CommandLine({
   blocked: boolean;
   onAdvance: () => void;
 }) {
-  const [draft, setDraft] = useState("");
+  // The draft lives in the orders store so an advisor's adopted proposal
+  // can land here from the correspondence drawer.
+  const draft = useOrdersStore((state) => state.draft);
+  const setDraft = useOrdersStore((state) => state.setDraft);
   const [submitting, setSubmitting] = useState(false);
   const queued = useOrdersStore((state) => state.orders.length);
   const openLeftDrawer = useUiStore((state) => state.openLeftDrawer);

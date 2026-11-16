@@ -751,3 +751,42 @@
   content: "> ";
   color: var(--pf-accent-base);
 }
+
+/* An advisor's adoptable orders block: set apart from the prose like a
+   dispatch slip pinned under the letter, inked in the minister's tint. */
+.proposal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-space-2);
+  margin-top: var(--pf-space-2);
+  padding: var(--pf-space-3);
+  border: 1px solid color-mix(in oklab, var(--pf-letter-tint) 45%, var(--pf-border-subtle));
+  border-left: 3px solid var(--pf-letter-tint);
+  border-radius: var(--pf-radius-sm);
+  background: color-mix(in oklab, var(--pf-letter-tint) 8%, var(--pf-panel-inset));
+}
+
+.proposalLabel {
+  color: color-mix(in oklab, var(--pf-letter-tint) 70%, var(--pf-text-primary));
+}
+
+.proposalText {
+  margin: 0;
+  color: var(--pf-text-primary);
+  font-size: var(--pf-font-sm);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.proposalActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--pf-space-2);
+}
+
+.proposalHint {
+  margin-right: auto;
+  color: var(--pf-text-muted);
+  font-size: var(--pf-font-xs);
+}
