@@ -20,6 +20,14 @@ interface ConversationsState {
    * knows whether the drawer is open), cleared when the drawer is looked at.
    */
   unread: boolean;
+  /**
+   * The game's court-name pool; null until fetched (or when the server could
+   * only offer the fallback, in which case the static era lists apply and the
+   * next game open retries). Fetched once per game.
+   */
+  namePool: string[] | null;
+  namePoolFor: string | null;
+  loadNamePool: (gameId: string) => Promise<void>;
 
   load: (gameId: string, nodeId: string) => Promise<void>;
   /** List + head pointers only — no tree refetches (per-reply refresh path). */
@@ -66,6 +74,20 @@ export const useConversationsStore = create<ConversationsState>((set, get) => ({
   awaiting: {},
   activeConversationId: null,
   unread: false,
+  namePool: null,
+  namePoolFor: null,
+
+  loadNamePool: async (gameId) => {
+    if (get().namePoolFor === gameId) return;
+    set({ namePool: null, namePoolFor: gameId });
+    try {
+      const result = await api.councilNames(gameId);
+      if (get().namePoolFor !== gameId) return; // the game changed underneath
+      set({ namePool: result.source === "generated" ? result.names : null });
+    } catch {
+      // The static era lists are the floor; nothing to surface.
+    }
+  },
 
   load: async (gameId, nodeId) => {
     const token = ++listToken;

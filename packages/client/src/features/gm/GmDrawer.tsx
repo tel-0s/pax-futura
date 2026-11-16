@@ -4,6 +4,7 @@ import {
   Check,
   CircleAlert,
   GitBranch,
+  EyeOff,
   Landmark,
   LoaderCircle,
   MapPin,
@@ -165,6 +166,8 @@ export function GmDrawer() {
         </div>
         <div className={styles.panel} hidden={tab !== "rules"}>
           <DifficultySection gameId={gameId} />
+          <RegencySection gameId={gameId} />
+          <CourtKnowledgeSection gameId={gameId} />
         </div>
         <div className={styles.panel} hidden={tab !== "raw"}>
           <GmRawSection submit={submit} busy={busy} />
@@ -273,6 +276,156 @@ function DifficultySection({ gameId }: { gameId: string }) {
       <div className={styles.actions}>
         <Button variant="primary" disabled={busy || !known || choice === stored} onClick={() => void apply()}>
           {busy ? "Saving…" : "Apply strictness"}
+        </Button>
+      </div>
+    </GmSection>
+  );
+}
+
+/**
+ * The court's-knowledge feed mode: a sibling toggle to simulation
+ * strictness. The chronicle always keeps everything; this governs only
+ * what the dispatch feed shows. Scenarios that curate no starting
+ * knowledge stay omniscient whatever this says, and the toggle says so.
+ */
+function CourtKnowledgeSection({ gameId }: { gameId: string }) {
+  const meta = useSessionStore((state) => state.meta);
+  const enabled = meta?.courtKnowledge ?? false;
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const flip = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      const updated = await api.setCourtKnowledge(gameId, { enabled: !enabled });
+      useSessionStore.getState().setMeta(updated);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <GmSection
+      icon={EyeOff}
+      title="Court's knowledge"
+      hint="The dispatch feed shows the court's world, not the chronicler's. Unknown powers reach you as rumors at most; the chronicle still keeps everything."
+    >
+      <div className={styles.choices} role="radiogroup" aria-label="Court's knowledge">
+        <button
+          role="radio"
+          aria-checked={!enabled}
+          className={`${styles.choice} ${!enabled ? styles.choiceOn : ""}`}
+          onClick={() => (enabled ? void flip() : undefined)}
+        >
+          Chronicler's feed
+        </button>
+        <button
+          role="radio"
+          aria-checked={enabled}
+          className={`${styles.choice} ${enabled ? styles.choiceOn : ""}`}
+          onClick={() => (enabled ? undefined : void flip())}
+        >
+          Court's feed
+        </button>
+      </div>
+      <p className={styles.hint}>
+        Takes effect immediately, feed-only. A scenario that curates no starting knowledge stays
+        all-seeing either way (this game's seed comes from the scenario; the 1492 scenario curates
+        all eight courts).
+      </p>
+      {error ? <p className={styles.error}>{error}</p> : null}
+      {busy ? <p className={styles.hint}>Saving…</p> : null}
+    </GmSection>
+  );
+}
+
+const REGENCY_MODES = [
+  { id: "off", label: "Off", description: "An empty orders field means the world's own momentum — today's behavior." },
+  { id: "draft", label: "Council drafts", description: "The council drafts orders and the turn pauses for you to approve or edit. The 4X heartbeat: it tells you what wants deciding." },
+  { id: "auto", label: "Full regency", description: "The council's draft is adopted unseen; you read the gazette. The idle-simulator end of the spectrum." },
+] as const;
+
+const COUNCIL_DEPTHS = [
+  { id: "joint", label: "One sitting", description: "A single call returns each minister's stance and the agreed draft. One model call per idle turn." },
+  { id: "chamber", label: "Full chamber", description: "Each minister argues in persona with the session in view — they can genuinely fight — then a synthesis closes the draft. One call per minister plus one, per idle turn." },
+] as const;
+
+/**
+ * Regency is a live game setting like strictness: what Advance Time does
+ * with an empty orders field, and how deep the council's sitting runs.
+ */
+function RegencySection({ gameId }: { gameId: string }) {
+  const meta = useSessionStore((state) => state.meta);
+  const [mode, setMode] = useState<"off" | "draft" | "auto">(meta?.regency ?? "off");
+  const [depth, setDepth] = useState<"joint" | "chamber">(meta?.councilDepth ?? "joint");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const stored = { mode: meta?.regency ?? "off", depth: meta?.councilDepth ?? "joint" };
+  const dirty = mode !== stored.mode || depth !== stored.depth;
+
+  const apply = async () => {
+    if (busy || !dirty) return;
+    setBusy(true);
+    setError("");
+    try {
+      const updated = await api.setRegency(gameId, { mode, depth });
+      useSessionStore.getState().setMeta(updated);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <GmSection
+      icon={Landmark}
+      title="Regency"
+      hint="What Advance Time does when you give no orders. Scouted turns are never intercepted."
+    >
+      <div className={styles.choices} role="radiogroup" aria-label="Regency mode">
+        {REGENCY_MODES.map((entry) => (
+          <button
+            key={entry.id}
+            role="radio"
+            aria-checked={entry.id === mode}
+            title={entry.description}
+            className={`${styles.choice} ${entry.id === mode ? styles.choiceOn : ""}`}
+            onClick={() => setMode(entry.id)}
+          >
+            {entry.label}
+          </button>
+        ))}
+      </div>
+      <p className={styles.ladderText}>{REGENCY_MODES.find((entry) => entry.id === mode)?.description}</p>
+      {mode !== "off" ? (
+        <>
+          <div className={styles.choices} role="radiogroup" aria-label="Council depth">
+            {COUNCIL_DEPTHS.map((entry) => (
+              <button
+                key={entry.id}
+                role="radio"
+                aria-checked={entry.id === depth}
+                title={entry.description}
+                className={`${styles.choice} ${entry.id === depth ? styles.choiceOn : ""}`}
+                onClick={() => setDepth(entry.id)}
+              >
+                {entry.label}
+              </button>
+            ))}
+          </div>
+          <p className={styles.ladderText}>{COUNCIL_DEPTHS.find((entry) => entry.id === depth)?.description}</p>
+        </>
+      ) : null}
+      {error ? <p className={styles.error}>{error}</p> : null}
+      <div className={styles.actions}>
+        <Button variant="primary" disabled={busy || !dirty} onClick={() => void apply()}>
+          {busy ? "Saving…" : "Apply regency"}
         </Button>
       </div>
     </GmSection>

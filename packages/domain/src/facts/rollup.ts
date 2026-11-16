@@ -68,6 +68,11 @@ export const RollupSchema = z.object({
     .default([]),
   /** Leader psyches by polity code; defaulted so pre-feature rollups parse. */
   psyches: z.record(z.string(), PsycheSheetSchema).default({}),
+  /**
+   * Polities the player's court knows of; null (the default, and every
+   * pre-feature rollup) = knowledge never modeled, read as omniscient.
+   */
+  knownPolities: z.array(z.string()).nullable().default(null),
 });
 export type Rollup = z.infer<typeof RollupSchema>;
 

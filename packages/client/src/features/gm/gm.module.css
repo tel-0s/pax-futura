@@ -1326,3 +1326,31 @@
   border-color: var(--pf-border-subtle);
   box-shadow: var(--pf-shadow-raise);
 }
+
+/* Regency: flat choice chips, a lighter instrument than the strictness ladder. */
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pf-space-2);
+}
+
+.choice {
+  padding: var(--pf-space-1) var(--pf-space-3);
+  border: 1px solid var(--pf-border-subtle);
+  border-radius: var(--pf-radius-sm);
+  background: transparent;
+  color: var(--pf-text-secondary);
+  font-size: var(--pf-font-sm);
+  cursor: pointer;
+}
+
+.choice:hover {
+  border-color: var(--pf-accent-line);
+  color: var(--pf-text-primary);
+}
+
+.choiceOn {
+  border-color: var(--pf-accent-line);
+  background: var(--pf-accent-wash);
+  color: var(--pf-text-primary);
+}

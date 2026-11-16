@@ -11,6 +11,8 @@ import {
   SetActiveNodeRequestSchema,
   SetAnchorRequestSchema,
   SetDifficultyRequestSchema,
+  SetCourtKnowledgeRequestSchema,
+  SetRegencyRequestSchema,
   SetHeadRequestSchema,
 } from "@pax/domain";
 import {
@@ -27,9 +29,14 @@ import {
   getOrBuildStatSheet,
   openConversation,
   regenerateReply,
+  COUNCIL_NAMES,
+  councilEra,
+  draftCouncilOrders,
+  generateCouncilNames,
   sendChatMessage,
 } from "@pax/engine";
 import { GameManager, GameNotFoundError, TurnInProgressError } from "./gameManager.ts";
+import { updateCouncilNamePool } from "./db/saveDb.ts";
 import { addPendingAction, listPendingActions, removePendingAction } from "./db/stores/actions.ts";
 import { listEventsForNode } from "./db/stores/events.ts";
 import { setNodeAnchor } from "./db/stores/nodes.ts";
@@ -79,6 +86,72 @@ export const createApp = (manager: GameManager): Hono => {
   app.put("/api/games/:g/difficulty", zValidator("json", SetDifficultyRequestSchema), (c) => {
     const meta = manager.setDifficulty(c.req.param("g"), c.req.valid("json").difficulty);
     return c.json(meta);
+  });
+
+  app.put("/api/games/:g/regency", zValidator("json", SetRegencyRequestSchema), (c) => {
+    const meta = manager.setRegency(c.req.param("g"), c.req.valid("json"));
+    return c.json(meta);
+  });
+
+  app.put(
+    "/api/games/:g/court-knowledge",
+    zValidator("json", SetCourtKnowledgeRequestSchema),
+    (c) => {
+      const meta = manager.setCourtKnowledge(c.req.param("g"), c.req.valid("json").enabled);
+      return c.json(meta);
+    },
+  );
+
+  /**
+   * The court's known world as of a node: the NEAREST ancestor rollup's set
+   * (the psyche endpoint's walk), the game's seed before any extraction has
+   * run, or null when knowledge was never modeled — which clients must read
+   * as omniscient, today's behavior.
+   */
+  app.get("/api/games/:g/nodes/:n/known-polities", (c) => {
+    const game = manager.get(c.req.param("g"));
+    let nodeId: string | null = c.req.param("n");
+    if (!game.port.getNodeMeta(nodeId)) return c.json({ error: "Unknown node" }, 404);
+    while (nodeId) {
+      const rollup = game.port.getRollup(nodeId);
+      if (rollup) return c.json({ known: rollup.knownPolities });
+      nodeId = game.port.getNodeMeta(nodeId)?.parentId ?? null;
+    }
+    const row = game.port.getGame();
+    const seed = row.knownPolitiesSeed;
+    return c.json({ known: seed ? [...new Set([row.playerPolity, ...seed])].sort() : null });
+  });
+
+  // The court's names: a one-time billed artifact, generated on first ask and
+  // persisted (the gazette pattern). A failed or refused call answers with the
+  // static era list, uncached, so the next ask simply tries again.
+  app.get("/api/games/:g/council-names", async (c) => {
+    const game = manager.get(c.req.param("g"));
+    const row = game.port.getGame();
+    if (row.councilNamePool) {
+      return c.json({ names: row.councilNamePool, source: "generated" });
+    }
+    const node = game.port.getNode(row.activeNodeId);
+    const world = node?.worldBlobHash ? game.port.getWorld(node.worldBlobHash) : null;
+    const playerName = world?.polities[row.playerPolity]?.name ?? row.playerPolity;
+    let rootId = row.activeNodeId;
+    for (
+      let cursor = node;
+      cursor?.parentId;
+      cursor = game.port.getNode(cursor.parentId)
+    ) {
+      rootId = cursor.parentId;
+    }
+    const startDate = game.port.getNode(rootId)?.gameDate ?? "";
+    const generated = await generateCouncilNames(manager.utilityDeps(game), {
+      playerName,
+      startDate,
+    });
+    if (generated) {
+      updateCouncilNamePool(game.db, generated);
+      return c.json({ names: generated, source: "generated" });
+    }
+    return c.json({ names: [...COUNCIL_NAMES[councilEra(startDate)]], source: "fallback" });
   });
 
   app.delete("/api/games/:g", (c) => {
@@ -360,6 +433,19 @@ export const createApp = (manager: GameManager): Hono => {
       return c.json(result, 201);
     },
   );
+
+  // The regency draft: the council proposes orders for an empty field. The
+  // caller (client or a future auto path) decides what becomes of the draft;
+  // nothing is persisted here — a draft is not an act.
+  app.post("/api/games/:g/nodes/:n/council-draft", async (c) => {
+    const game = manager.get(c.req.param("g"));
+    const depth = game.port.getGame().councilDepth;
+    const result = await draftCouncilOrders(manager.chatDeps(game), {
+      nodeId: c.req.param("n"),
+      depth,
+    });
+    return c.json(result);
+  });
 
   app.post("/api/games/:g/nodes/:n/conversations/:c/messages/:m/regenerate", async (c) => {
     const game = manager.get(c.req.param("g"));

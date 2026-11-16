@@ -7,6 +7,7 @@ import {
   Eye,
   FastForward,
   Ghost,
+  Landmark,
   ListTodo,
   Send,
   Square,
@@ -19,6 +20,8 @@ import { formatDayMonth, formatGameDate } from "../../lib/dates.ts";
 import { useEventCardsStore } from "../../stores/eventCards.ts";
 import { useLoomStore, type TurnProgress } from "../../stores/loom.ts";
 import { useOrdersStore } from "../../stores/orders.ts";
+import { useSessionStore } from "../../stores/session.ts";
+import { useKnowledgeStore, feedVisibility } from "../../stores/knowledge.ts";
 import { useUiStore } from "../../stores/ui.ts";
 import { useWorldStore } from "../../stores/world.ts";
 import { LoomStrip } from "../loom/LoomStrip.tsx";
@@ -66,6 +69,7 @@ export function Dock({
       {ghost ? (
         <GhostBar gameId={gameId} ghost={ghost} liveNodeId={nodeId} onDecided={onGhostDecided} />
       ) : null}
+      {nodeId ? <CouncilBar gameId={gameId} parentId={nodeId} /> : null}
       <CommandLine
         gameId={gameId}
         parentId={nodeId}
@@ -73,6 +77,64 @@ export function Dock({
         blocked={Boolean(ghost)}
         onAdvance={onAdvance}
       />
+    </div>
+  );
+}
+
+/**
+ * The regency pause: the council has drafted into the command line and the
+ * turn waits. Approve queues the CURRENT draft (edits included) and advances;
+ * dismiss keeps the draft for hand-editing. The stances are the session's
+ * record — in chamber mode, the fight itself.
+ */
+function CouncilBar({ gameId, parentId }: { gameId: string; parentId: string }) {
+  const council = useOrdersStore((state) => state.council);
+  const draft = useOrdersStore((state) => state.draft);
+  if (!council) return null;
+  return (
+    <div className={styles.council}>
+      <span className={`${styles.councilKicker} pfKicker`}>
+        <Landmark size={12} />
+        {council.status === "drafting"
+          ? "The council sits…"
+          : council.status === "failed"
+            ? "The council adjourned"
+            : "The council proposes"}
+      </span>
+      {council.status === "proposed" ? (
+        <>
+          {council.stances.length > 0 ? (
+            <ul className={styles.councilStances}>
+              {council.stances.map((stance) => (
+                <li key={stance.role}>
+                  <strong>{stance.title}:</strong> {stance.position}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <div className={styles.councilActions}>
+            <span className={styles.councilHint}>The draft is in your command line — edit it, or send it as it stands.</span>
+            <Button variant="ghost" size="sm" onClick={() => useOrdersStore.getState().dismissCouncil()}>
+              I'll word it myself
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              disabled={!draft.trim()}
+              onClick={() => void useOrdersStore.getState().approveCouncil(gameId, parentId)}
+            >
+              <FastForward size={13} /> Approve &amp; advance
+            </Button>
+          </div>
+        </>
+      ) : council.status === "failed" ? (
+        <div className={styles.councilActions}>
+          <span className={styles.councilHint}>{council.error}</span>
+          <Button variant="ghost" size="sm" onClick={() => useOrdersStore.getState().dismissCouncil()}>
+            Dismiss
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -85,6 +147,14 @@ function Dispatches({ gameId, nodeId }: { gameId: string; nodeId: string }) {
   const activeIndex = useEventCardsStore((state) => (state.open ? state.index : -1));
   const activeNode = useEventCardsStore((state) => state.nodeId);
   const scroller = useRef<HTMLDivElement>(null);
+  // The court's-knowledge feed filter: the chronicle keeps everything; the
+  // ticker shows the court's world. Fail-open — a null set is omniscient.
+  const courtKnowledge = useSessionStore((state) => state.meta?.courtKnowledge ?? false);
+  const known = useKnowledgeStore((state) => state.known);
+  const factsVersion = useLoomStore((state) => state.factsVersion);
+  useEffect(() => {
+    if (courtKnowledge) void useKnowledgeStore.getState().load(gameId, nodeId);
+  }, [courtKnowledge, gameId, nodeId, factsVersion]);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,36 +185,42 @@ function Dispatches({ gameId, nodeId }: { gameId: string; nodeId: string }) {
     }
   }, []);
 
-  if (events.length === 0) return null;
-  const pivotal = events.filter((event) => event.importance !== "minor").length;
+  const feed = events
+    .map((event) => ({ event, visibility: feedVisibility(event, known, courtKnowledge) }))
+    .filter((entry) => entry.visibility !== "hidden");
+  if (feed.length === 0) return null;
+  const feedEvents = feed.map((entry) => entry.event);
+  const pivotal = feed.filter((entry) => entry.event.importance !== "minor").length;
 
   return (
     <section className={styles.dispatches}>
       <button className={styles.dispatchHeader} onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className="pfKicker">Dispatches</span>
-        <span className={styles.dispatchCount}>{events.length}</span>
+        <span className={styles.dispatchCount}>{feed.length}</span>
         {pivotal > 0 ? <span className={styles.dispatchMajor}>{pivotal} major</span> : null}
         <span className={styles.dispatchToggle}>{open ? <ChevronDown size={14} /> : <ChevronUp size={14} />}</span>
       </button>
       {open ? (
         <div ref={scroller} className={styles.ticker} onWheel={onWheel}>
-          {events.map((event, index) => (
+          {feed.map(({ event, visibility }, index) => (
             <button
               key={event.id}
               className={[
                 styles.card,
                 styles[event.importance],
                 event.playerRelated ? styles.mine : "",
+                visibility === "rumor" ? styles.cardRumor : "",
                 activeNode === nodeId && activeIndex === index ? styles.cardActive : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
-              onClick={() => useEventCardsStore.getState().show(events, index)}
+              onClick={() => useEventCardsStore.getState().show(feedEvents, index)}
               title={event.description || event.title}
             >
               <span className={styles.cardMeta}>
                 <span className={styles.cardDot} />
                 {formatDayMonth(event.date)}
+                {visibility === "rumor" ? <span className={styles.cardRumorTag}>rumor</span> : null}
                 {event.playerRelated ? <span className={styles.cardYou}>you</span> : null}
                 {event.lng !== undefined ? <span className={styles.cardPin}>⌖</span> : null}
               </span>
@@ -179,7 +255,10 @@ function CommandLine({
   blocked: boolean;
   onAdvance: () => void;
 }) {
-  const [draft, setDraft] = useState("");
+  // The draft lives in the orders store so an advisor's adopted proposal
+  // can land here from the correspondence drawer.
+  const draft = useOrdersStore((state) => state.draft);
+  const setDraft = useOrdersStore((state) => state.setDraft);
   const [submitting, setSubmitting] = useState(false);
   const queued = useOrdersStore((state) => state.orders.length);
   const openLeftDrawer = useUiStore((state) => state.openLeftDrawer);

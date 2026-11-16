@@ -9,6 +9,7 @@ import {
   type GameMeta,
   type GmEditInput,
   type Scenario,
+  type SetRegencyRequest,
   type TurnInput,
   type WorldState,
 } from "@pax/domain";
@@ -25,7 +26,7 @@ import {
   type SavePort,
 } from "@pax/engine";
 import type { Db } from "./db/openDb.ts";
-import { backupSave, createSaveDb, deleteSaveBackups, openSaveDb, updateDifficulty } from "./db/saveDb.ts";
+import { backupSave, createSaveDb, deleteSaveBackups, openSaveDb, updateCourtKnowledge, updateDifficulty, updateKnownPolitiesSeed, updateRegency } from "./db/saveDb.ts";
 import { getRegistryEntry, listGames, registerGame, touchGame, unregisterGame } from "./db/appDb.ts";
 import { makeSavePort } from "./savePort.ts";
 import { SseHub } from "./sse/hub.ts";
@@ -134,6 +135,12 @@ export class GameManager {
       startDate: scenario.startDate,
       world,
     });
+    // The court's starting knowledge, when the scenario curates it for this
+    // polity. A custom polity based on a curated playable keeps that seed
+    // (same seat, new identity); a landless custom actor has no curated row
+    // and stays omniscient, like every uncurated scenario.
+    const seed = scenario.knownPolities?.[playerPolity] ?? scenario.knownPolities?.[params.playerPolity];
+    if (seed) updateKnownPolitiesSeed(db, [...new Set([playerPolity, ...seed])]);
     registerGame(this.appDb, {
       gameId,
       filePath,
@@ -176,6 +183,9 @@ export class GameManager {
       scenarioId: row.scenarioId,
       playerPolity: row.playerPolity,
       difficulty: row.difficulty,
+      regency: row.regency,
+      councilDepth: row.councilDepth,
+      courtKnowledge: row.courtKnowledge,
       activeNodeId: row.activeNodeId,
       createdAt: row.createdAt,
     };
@@ -185,6 +195,20 @@ export class GameManager {
   setDifficulty(gameId: string, difficulty: string): GameMeta {
     const game = this.get(gameId);
     updateDifficulty(game.db, difficulty);
+    return this.gameMeta(gameId);
+  }
+
+  /** Live-swap the regency setting; returns the refreshed meta. */
+  setRegency(gameId: string, settings: SetRegencyRequest): GameMeta {
+    const game = this.get(gameId);
+    updateRegency(game.db, { regency: settings.mode, councilDepth: settings.depth });
+    return this.gameMeta(gameId);
+  }
+
+  /** Live-swap the court's-knowledge feed mode; returns the refreshed meta. */
+  setCourtKnowledge(gameId: string, enabled: boolean): GameMeta {
+    const game = this.get(gameId);
+    updateCourtKnowledge(game.db, enabled);
     return this.gameMeta(gameId);
   }
 

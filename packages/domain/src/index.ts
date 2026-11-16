@@ -12,6 +12,7 @@ export * from "./turn/applyImpacts.ts";
 export * from "./conversation/conversation.ts";
 export * from "./facts/fact.ts";
 export * from "./facts/rollup.ts";
+export * from "./facts/knowledge.ts";
 export * from "./facts/statSheet.ts";
 export * from "./facts/eraSummary.ts";
 export * from "./llm/outputs.ts";

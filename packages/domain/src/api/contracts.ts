@@ -149,12 +149,84 @@ export const SetDifficultyRequestSchema = z.object({
 });
 export type SetDifficultyRequest = z.infer<typeof SetDifficultyRequestSchema>;
 
+/**
+ * Regency: what Advance Time does with an empty orders field.
+ * - off:   the world's own momentum (today's behavior).
+ * - draft: the council drafts orders and the turn pauses for the player to
+ *          approve or edit — the 4X heartbeat: it tells you what wants deciding.
+ * - auto:  the council's draft is adopted unseen; the player reads the gazette.
+ */
+export const RegencyModeSchema = z.enum(["off", "draft", "auto"]);
+export type RegencyMode = z.infer<typeof RegencyModeSchema>;
+
+/**
+ * How the council deliberates when regency drafts.
+ * - joint:   one sitting — a single call returns each minister's stance and
+ *            the agreed draft. Cheap, one model call.
+ * - chamber: each minister argues in their own persona, in sequence, with the
+ *            session so far in view — they can genuinely fight — then the
+ *            session is synthesized into one draft. One call per minister
+ *            plus the synthesis.
+ */
+export const CouncilDepthSchema = z.enum(["joint", "chamber"]);
+export type CouncilDepth = z.infer<typeof CouncilDepthSchema>;
+
+export const SetRegencyRequestSchema = z.object({
+  mode: RegencyModeSchema,
+  depth: CouncilDepthSchema,
+});
+export type SetRegencyRequest = z.infer<typeof SetRegencyRequestSchema>;
+
+export const SetCourtKnowledgeRequestSchema = z.object({
+  enabled: z.boolean(),
+});
+export type SetCourtKnowledgeRequest = z.infer<typeof SetCourtKnowledgeRequestSchema>;
+
+/** The court's known world as of a node; null = knowledge never modeled. */
+export const KnownPolitiesResponseSchema = z.object({
+  known: z.array(z.string()).nullable(),
+});
+export type KnownPolitiesResponse = z.infer<typeof KnownPolitiesResponseSchema>;
+
+/** One minister's position in a council session, for the pause UI. */
+export const CouncilStanceSchema = z.object({
+  role: z.string(),
+  title: z.string(),
+  position: z.string(),
+});
+export type CouncilStance = z.infer<typeof CouncilStanceSchema>;
+
+export const CouncilDraftSchema = z.object({
+  /** The proposed orders, ready for the command line's draft. */
+  draft: z.string().min(1),
+  /** The ministers' positions, in speaking order. */
+  stances: z.array(CouncilStanceSchema).default([]),
+});
+export type CouncilDraft = z.infer<typeof CouncilDraftSchema>;
+
+/** The utility call's shape: court given-names fitting the polity and era. */
+export const CouncilNamePoolSchema = z.object({
+  names: z.array(z.string().min(1)).min(3).max(16),
+});
+export type CouncilNamePool = z.infer<typeof CouncilNamePoolSchema>;
+
+export const CouncilNamesResponseSchema = z.object({
+  names: z.array(z.string().min(1)),
+  /** "generated" = the game's own persisted pool; "fallback" = the static era list. */
+  source: z.enum(["generated", "fallback"]),
+});
+export type CouncilNamesResponse = z.infer<typeof CouncilNamesResponseSchema>;
+
 export const GameMetaSchema = z.object({
   gameId: z.string().min(1),
   title: z.string(),
   scenarioId: z.string(),
   playerPolity: z.string(),
   difficulty: z.string(),
+  regency: RegencyModeSchema.default("off"),
+  councilDepth: CouncilDepthSchema.default("joint"),
+  /** Whether the dispatch feed shows only the court's known world. */
+  courtKnowledge: z.boolean().default(false),
   activeNodeId: z.string(),
   createdAt: z.number().int(),
 });
